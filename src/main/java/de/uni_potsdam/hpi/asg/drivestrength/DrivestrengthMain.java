@@ -28,6 +28,8 @@ public class DrivestrengthMain {
             if(options.parseCmdLine(args)) {
                 logger = LoggerHelper.initLogger(options.getOutputlevel(), options.getLogfile(), options.isDebug());
                 logger.debug("Args: " + Arrays.asList(args).toString());
+                WorkingdirGenerator.getInstance().create(options.getWorkingdir(), "", "drivestrengthwork", null);
+                
                 status = execute();
             }
             long end = System.currentTimeMillis();

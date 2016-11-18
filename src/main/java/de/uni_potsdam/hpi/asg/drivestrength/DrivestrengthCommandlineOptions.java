@@ -18,6 +18,10 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     @Option(name = "-log", metaVar = "<logfile>", usage = "Define output Logfile, default is drivestrength.log")
     private File logfile = new File("drivestrength.log");
     
+    @Option(name = "-w", metaVar = "<workingdir>", usage = "Working directory. If not given, the value in configfile is used. If there is no entry, 'resynwork*' in the os default tmp dir is used.")
+    private File workingdir = null;
+    
+    
     @Option(name = "-debug")
     private boolean debug = false;
     
@@ -41,6 +45,10 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
 
     public File getNetlistfile() {
         return netlistfile;
+    }
+    
+    public File getWorkingdir() {
+        return workingdir;
     }
 
 
