@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model;
+package de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model;
 
 /*
  * Copyright (C) 2016 Norman Kluge
@@ -19,7 +19,7 @@ package de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model;
  * along with ASGdelaymatch.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogSignal.Direction;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogSignal.Direction;
 
 public class VerilogSignalGroup {
 

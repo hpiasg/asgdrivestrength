@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.verilogparser;
+package de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld;
 
 /*
  * Copyright (C) 2016 Norman Kluge
@@ -34,12 +34,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.common.iohelper.FileHelper;
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogModule;
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogModuleConnection;
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogModuleInstance;
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogModuleInstanceConnectionTemp;
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogModuleInstanceTemp;
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogSignal;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogModule;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogModuleConnection;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogModuleInstance;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogModuleInstanceConnectionTemp;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogModuleInstanceTemp;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogSignal;
 
 public class VerilogParser {
     private static final Logger        logger           = LogManager.getLogger();

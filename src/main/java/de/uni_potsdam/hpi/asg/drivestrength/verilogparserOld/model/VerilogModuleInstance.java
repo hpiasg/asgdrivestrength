@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model;
+package de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model;
 
 import java.util.HashMap;
 

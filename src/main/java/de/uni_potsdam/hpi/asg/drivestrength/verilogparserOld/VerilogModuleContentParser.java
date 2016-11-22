@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.verilogparser;
+package de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld;
 
 /*
  * Copyright (C) 2016 Norman Kluge
@@ -29,12 +29,12 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogModuleInstanceConnectionTemp;
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogModuleInstanceTemp;
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogSignal;
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogSignalGroup;
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogSignalGroupSignal;
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.model.VerilogSignal.Direction;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogModuleInstanceConnectionTemp;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogModuleInstanceTemp;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogSignal;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogSignal.Direction;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogSignalGroup;
+import de.uni_potsdam.hpi.asg.drivestrength.verilogparserOld.model.VerilogSignalGroupSignal;
 
 public class VerilogModuleContentParser {
     private static final Logger             logger                = LogManager.getLogger();
@@ -149,6 +149,7 @@ public class VerilogModuleContentParser {
             m = hssignalpattern.matcher(str);
             VerilogSignal sig = null;
             if(m.matches()) {
+                System.out.println("SIGNAL GROUP: " + str);
                 String name = m.group(1);
                 int id = Integer.parseInt(m.group(2));
 
