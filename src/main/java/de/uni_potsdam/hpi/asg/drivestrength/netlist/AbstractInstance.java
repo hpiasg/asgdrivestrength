@@ -5,22 +5,22 @@ import java.util.List;
 
 public abstract class AbstractInstance {
     private String name;
-    private List<PinConnection> pinConnections;
+    private List<PinAssignment> pinAssignments;
     
-    public AbstractInstance(String name, List<PinConnection> pinConnections) {
+    public AbstractInstance(String name, List<PinAssignment> pinAssignments) {
         this.name = name;
-        this.pinConnections = pinConnections;
+        this.pinAssignments = pinAssignments;
     }
     
     abstract String definitionName();
     
     String toVerilog() {
         String verilog = definitionName() + " " + this.getName() + " (";
-        List<String> pinConnectionLiterals = new ArrayList<>();
-        for (PinConnection pc : this.getPinConnections()) {
-            pinConnectionLiterals.add(pc.toVerilog());
+        List<String> pinAssignmentLiterals = new ArrayList<>();
+        for (PinAssignment pc : this.getPinConnections()) {
+            pinAssignmentLiterals.add(pc.toVerilog());
         }
-        verilog += String.join(", ", pinConnectionLiterals);
+        verilog += String.join(", ", pinAssignmentLiterals);
         verilog += ");";
         return verilog;
     }
@@ -29,7 +29,7 @@ public abstract class AbstractInstance {
         return name;
     }
 
-    public List<PinConnection> getPinConnections() {
-        return pinConnections;
+    public List<PinAssignment> getPinConnections() {
+        return pinAssignments;
     }
 }

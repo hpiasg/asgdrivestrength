@@ -15,7 +15,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.GateInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.ModuleInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.PinConnection;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.PinAssignment;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal.Direction;
 
@@ -24,8 +24,8 @@ public class VerilogModuleParser {
     
     private static final Pattern startmodulePattern = Pattern.compile("module (.*) \\((.*)\\);\\s*$");
 
-    private static final Pattern signalBundlePattern = Pattern.compile("(input|output|wire)\\s*\\[\\s*(\\d+):(\\d+)\\]\\s*(.*);");
-    private static final Pattern signalSinglePattern = Pattern.compile("(input|output|wire)\\s*(.*);");
+    private static final Pattern signalBundlePattern = Pattern.compile("(input|output|wire|supply0|supply1)\\s*\\[\\s*(\\d+):(\\d+)\\]\\s*(.*);");
+    private static final Pattern signalSinglePattern = Pattern.compile("(input|output|wire|supply0|supply1)\\s*(.*);");
 
     private static final Pattern assignPattern = Pattern.compile("assign\\s*(.*)\\s*=\\s*(.*)\\s*;");
     private static final Pattern signalBitIndexPattern = Pattern.compile("(.*)\\[(\\d+)\\]");
@@ -102,6 +102,10 @@ public class VerilogModuleParser {
                 return Direction.output;
             case "wire":
                 return Direction.wire;
+            case "supply0":
+                return Direction.supply0;
+            case "supply1":
+                return Direction.supply1;
         }
         throw new Error("parseSignalDirection failed: " + directionString);
     }
@@ -146,29 +150,29 @@ public class VerilogModuleParser {
         String definitionName = m.group(1).trim();
         String instanceName = m.group(2).trim();
         
-        List<PinConnection> pinConnections = parsePinConnections(m.group(3));
+        List<PinAssignment> pinAssignments = parsePinAssignments(m.group(3));
         
         try {
             Module definition = this.netlist.getModuleByName(definitionName);
-            AbstractInstance instance = new ModuleInstance(instanceName, definition, pinConnections);
+            AbstractInstance instance = new ModuleInstance(instanceName, definition, pinAssignments);
             this.module.addInstance(instance);
         } catch (Error e) {
             String definition = definitionName;
-            AbstractInstance instance = new GateInstance(instanceName, definition, pinConnections);
+            AbstractInstance instance = new GateInstance(instanceName, definition, pinAssignments);
             this.module.addInstance(instance);
         }
         
         return true;
     }
     
-    private List<PinConnection> parsePinConnections(String pinConnectionsLiteral) {
-        List<PinConnection> pinConnections = new ArrayList<>();
+    private List<PinAssignment> parsePinAssignments(String pinAssignmentsLiteral) {
+        List<PinAssignment> pinAssignments = new ArrayList<>();
         
-        List<String> pinConnectionLiterals = Arrays.asList(pinConnectionsLiteral.trim().split("\\s*\\,\\s*"));
+        List<String> pinAssignmentLiterals = Arrays.asList(pinAssignmentsLiteral.trim().split("\\s*\\,\\s*"));
         
         int pinPosition = 0;
-        for (String pinConnectionLiteral : pinConnectionLiterals) {
-            Matcher mappedMatcher = mappedPositionPattern.matcher(pinConnectionLiteral);
+        for (String pinAssignmentLiteral : pinAssignmentLiterals) {
+            Matcher mappedMatcher = mappedPositionPattern.matcher(pinAssignmentLiteral);
             if (mappedMatcher.matches()) {
                 //mapped
                 String pinName = mappedMatcher.group(1);
@@ -177,17 +181,17 @@ public class VerilogModuleParser {
                 String signalName = extractSignalName(signalLiteral);
                 int bitIndex = extractBitIndex(signalLiteral);
                 Signal connectedSignal = this.module.getSignalByName(signalName);
-                pinConnections.add(new PinConnection(connectedSignal, bitIndex, pinName));
+                pinAssignments.add(new PinAssignment(connectedSignal, bitIndex, pinName));
             } else {
                 //positional                
-                String signalName = extractSignalName(pinConnectionLiteral);
-                int bitIndex = extractBitIndex(pinConnectionLiteral);
+                String signalName = extractSignalName(pinAssignmentLiteral);
+                int bitIndex = extractBitIndex(pinAssignmentLiteral);
                 Signal connectedSignal = this.module.getSignalByName(signalName);
 
-                pinConnections.add(new PinConnection(connectedSignal, bitIndex, pinPosition));
+                pinAssignments.add(new PinAssignment(connectedSignal, bitIndex, pinPosition));
                 pinPosition++;
             }
         }
-        return pinConnections;
+        return pinAssignments;
     }
 }

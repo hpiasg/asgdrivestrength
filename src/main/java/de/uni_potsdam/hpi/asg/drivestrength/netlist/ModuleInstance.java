@@ -5,8 +5,8 @@ import java.util.List;
 public class ModuleInstance extends AbstractInstance {
     private Module definition;
     
-    public ModuleInstance(String name, Module definition, List<PinConnection> pinConnections) {
-        super(name, pinConnections);
+    public ModuleInstance(String name, Module definition, List<PinAssignment> pinAssignments) {
+        super(name, pinAssignments);
         this.definition = definition;
     }
 

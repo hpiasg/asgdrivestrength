@@ -20,7 +20,7 @@ public class Module {
     }
     
     public String toVerilog() {
-        String verilog = "module " + this.name + "(";
+        String verilog = "module " + this.name + " (";
         verilog += String.join(", ", this.interfaceSignals);
         verilog += ");\n";
         
@@ -69,12 +69,6 @@ public class Module {
     }
     
     public Signal getSignalByName(String signalName) {
-        if (signalName.equals("gnd")) {
-            return Signal.getGroundInstance();
-        }
-        if (signalName.equals("vdd")) {
-            return Signal.getSupplyInstance();
-        }
         if (signalName.equals("0")) {
             return Signal.getZeroInstance();
         }

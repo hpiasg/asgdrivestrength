@@ -1,18 +1,18 @@
 package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 
-public class PinConnection {
+public class PinAssignment {
     private Signal signal;
     private int signalBitIndex;
     private int pinPosition;
     private String pinName;
 
-    public PinConnection(Signal signal, int signalBitIndex, String pinName) {
+    public PinAssignment(Signal signal, int signalBitIndex, String pinName) {
         this.signal = signal;
         this.signalBitIndex = signalBitIndex;
         this.pinName = pinName;        
     }
 
-    public PinConnection(Signal signal, int signalBitIndex, int pinPosition) {
+    public PinAssignment(Signal signal, int signalBitIndex, int pinPosition) {
         this.signal = signal;
         this.signalBitIndex = signalBitIndex;
         this.pinPosition = pinPosition;        
