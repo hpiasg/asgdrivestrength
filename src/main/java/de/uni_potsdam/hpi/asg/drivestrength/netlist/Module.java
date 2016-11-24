@@ -29,9 +29,9 @@ public class Module {
         verilog += String.join(", ", this.interfaceSignals);
         verilog += ");\n";
         
-//        for (Signal signal : this.signals) {
-//            verilog += "  " + signal.toVerilog() + "\n";
-//        }
+        for (Signal signal : this.signals) {
+            verilog += "  " + signal.toVerilog() + "\n";
+        }
         
         verilog += "\n";
         
@@ -40,7 +40,7 @@ public class Module {
         }
         
         verilog += "\n";
-        verilog += "  //TODO: other module contents\n";
+        verilog += "  //TODO: instance statements\n";
         verilog += "endmodule";
         return verilog; 
     }
