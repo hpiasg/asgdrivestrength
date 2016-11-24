@@ -10,6 +10,7 @@ public class Module {
     private String name;
     private List<String> interfaceSignals;
     private List<Signal> signals;
+    private List<AssignConnection> assignConnections;
 
     public static Module newFromVerilog(List<String> verilogStatements) {
         VerilogModuleParser moduleParser = new VerilogModuleParser(verilogStatements);
@@ -20,6 +21,7 @@ public class Module {
         this.name = null;
         this.signals = new ArrayList<Signal>();
         this.interfaceSignals = new ArrayList<String>();
+        this.assignConnections = new ArrayList<AssignConnection>();
     }
     
     public String toVerilog() {
@@ -27,8 +29,14 @@ public class Module {
         verilog += String.join(", ", this.interfaceSignals);
         verilog += ");\n";
         
-        for (Signal signal : this.signals) {
-            verilog += "  " + signal.toVerilog() + "\n";
+//        for (Signal signal : this.signals) {
+//            verilog += "  " + signal.toVerilog() + "\n";
+//        }
+        
+        verilog += "\n";
+        
+        for (AssignConnection assignConnection: this.assignConnections) {
+            verilog += "  " + assignConnection.toVerilog() + "\n";
         }
         
         verilog += "\n";
@@ -51,5 +59,27 @@ public class Module {
     
     public void addSignal(Signal signal) {
         this.signals.add(signal);
+    }
+    
+    public Signal getSignalByName(String signalName) {
+        if (signalName.equals("gnd")) {
+            return Signal.getGroundInstance();
+        }
+        if (signalName.equals("vdd")) {
+            return Signal.getSupplyInstance();
+        }
+        if (signalName.equals("0")) {
+            return Signal.getZeroInstance();
+        }
+        for (Signal s : this.signals) {
+            if (s.getName().equals(signalName)) {
+                return s;
+            }
+        }
+        throw new Error("Module does not have a Signal named " + signalName);
+    }
+    
+    public void addAssignConnection(AssignConnection assignConnection) {
+        this.assignConnections.add(assignConnection);
     }
 }

@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.AssignConnection;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal.Direction;
@@ -15,10 +16,13 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal.Direction;
 public class VerilogModuleParser {
     private static final Logger logger = LogManager.getLogger();
     
-    private static final Pattern startmodulePattern = Pattern.compile("^\\s*module (.*) \\((.*)\\);\\s*$");
+    private static final Pattern startmodulePattern = Pattern.compile("module (.*) \\((.*)\\);\\s*$");
 
-    private static final Pattern signalBundlePattern = Pattern.compile("\\s*(input|output|wire)\\s*\\[\\s*(\\d+):(\\d+)\\]\\s*(.*);");
-    private static final Pattern signalSinglePattern = Pattern.compile("\\s*(input|output|wire)\\s*(.*);");
+    private static final Pattern signalBundlePattern = Pattern.compile("(input|output|wire)\\s*\\[\\s*(\\d+):(\\d+)\\]\\s*(.*);");
+    private static final Pattern signalSinglePattern = Pattern.compile("(input|output|wire)\\s*(.*);");
+
+    private static final Pattern assignPattern = Pattern.compile("assign\\s*(.*)\\s*=\\s*(.*)\\s*;");
+    private static final Pattern signalBitIndexPattern = Pattern.compile("(.*)\\[(\\d+)\\]");
     
     private List<String>statements;
     
@@ -31,11 +35,11 @@ public class VerilogModuleParser {
     public Module createModule() {
         this.module = new Module();
         
-        logger.info("\n");
-        
         for (String statement : this.statements) {
             parseStartmoduleStatement(statement);
             parseSignalStatement(statement);
+            parseAssignStatement(statement);
+            parseInstanceStatement(statement);
         }
         
         return this.module;
@@ -87,4 +91,41 @@ public class VerilogModuleParser {
         throw new Error("parseSignalDirection failed: " + directionString);
     }
     
+    private void parseAssignStatement(String statement) {
+        Matcher assignMatcher = assignPattern.matcher(statement);
+        if(!assignMatcher.matches()) return;
+        
+        String sourceLiteral = assignMatcher.group(2).trim();
+        String destinationLiteral = assignMatcher.group(1).trim();
+        Signal sourceSignal = this.module.getSignalByName(extractSignalName(sourceLiteral));
+        Signal destinationSignal = this.module.getSignalByName(extractSignalName(destinationLiteral));
+        int sourceBitIndex = extractBitIndex(sourceLiteral);
+        int destinationBitIndex = extractBitIndex(destinationLiteral);
+        AssignConnection assignConnection = new AssignConnection(
+                sourceSignal, destinationSignal, sourceBitIndex, destinationBitIndex);
+        this.module.addAssignConnection(assignConnection);
+    }
+
+    private String extractSignalName(String signalLiteral) {
+        Matcher m = signalBitIndexPattern.matcher(signalLiteral);
+        if (m.matches()) {
+            logger.info(signalLiteral + " matches bitIndexPattern. group1: " + m.group(1));
+            return m.group(1);            
+        }
+        logger.info(signalLiteral + " does not match bitIndexPattern.");
+        return signalLiteral;
+    }
+    
+    private int extractBitIndex(String signalLiteral) {
+        Matcher m = signalBitIndexPattern.matcher(signalLiteral);
+        if (m.matches()) {
+            return Integer.parseInt(m.group(2));            
+        }
+        return 0;
+    }
+    
+    
+    private void parseInstanceStatement(String statement) {
+        
+    }
 }

@@ -28,12 +28,40 @@ public class Signal {
     private static final Logger logger = LogManager.getLogger();
 
     public enum Direction {
-        input, output, wire
+        input, output, wire, constant
     }
 
     protected String    name;
     protected Direction direction;
     protected int       width;
+
+
+    private static Signal zeroInstance;
+    private static Signal groundInstance;
+    private static Signal supplyInstance;
+
+    public static Signal getGroundInstance() {
+        if (groundInstance == null) {
+            groundInstance = new Signal("gnd", Direction.constant, 1);
+        }
+        return groundInstance;
+    }
+    
+    public static Signal getSupplyInstance() {
+        if (supplyInstance == null) {
+            supplyInstance = new Signal("vdd", Direction.constant, 1);
+        }
+        return supplyInstance;
+    }
+    
+    public static Signal getZeroInstance() {
+        if (zeroInstance == null) {
+            zeroInstance = new Signal("0", Direction.constant, 1);
+        }
+        return zeroInstance;
+    }
+    
+    
     
     public Signal(String name, Direction direction, int width) {
         this.direction = direction;
