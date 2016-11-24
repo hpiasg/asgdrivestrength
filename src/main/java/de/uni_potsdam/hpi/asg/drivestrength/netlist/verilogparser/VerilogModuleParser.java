@@ -1,5 +1,6 @@
 package de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -8,8 +9,13 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.AbstractInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.AssignConnection;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.GateInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.ModuleInstance;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.PinConnection;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal.Direction;
 
@@ -30,9 +36,11 @@ public class VerilogModuleParser {
     private List<String>statements;
     
     private Module module;
+    private Netlist netlist;
 
-    public VerilogModuleParser(List<String> statements) {
+    public VerilogModuleParser(List<String> statements, Netlist netlist) {
         this.statements = statements;
+        this.netlist = netlist;
     }
     
     public Module createModule() {
@@ -127,7 +135,7 @@ public class VerilogModuleParser {
         if (m.matches()) {
             return Integer.parseInt(m.group(2));            
         }
-        return 0;
+        return -1;
     }
     
     
@@ -137,10 +145,49 @@ public class VerilogModuleParser {
         
         String definitionName = m.group(1).trim();
         String instanceName = m.group(2).trim();
-        List<String> pinConnections = Arrays.asList(m.group(3).trim().split("\\s*\\,\\s*"));
         
-        logger.info("connections: " + String.join(", ", pinConnections));
+        List<PinConnection> pinConnections = parsePinConnections(m.group(3));
+        
+        try {
+            Module definition = this.netlist.getModuleByName(definitionName);
+            AbstractInstance instance = new ModuleInstance(instanceName, definition, pinConnections);
+            this.module.addInstance(instance);
+        } catch (Error e) {
+            String definition = definitionName;
+            AbstractInstance instance = new GateInstance(instanceName, definition, pinConnections);
+            this.module.addInstance(instance);
+        }
         
         return true;
+    }
+    
+    private List<PinConnection> parsePinConnections(String pinConnectionsLiteral) {
+        List<PinConnection> pinConnections = new ArrayList<>();
+        
+        List<String> pinConnectionLiterals = Arrays.asList(pinConnectionsLiteral.trim().split("\\s*\\,\\s*"));
+        
+        int pinPosition = 0;
+        for (String pinConnectionLiteral : pinConnectionLiterals) {
+            Matcher mappedMatcher = mappedPositionPattern.matcher(pinConnectionLiteral);
+            if (mappedMatcher.matches()) {
+                //mapped
+                String pinName = mappedMatcher.group(1);
+                String signalLiteral = mappedMatcher.group(2).trim();
+                signalLiteral = signalLiteral.replaceAll("\\[.*\\]", "");
+                String signalName = extractSignalName(signalLiteral);
+                int bitIndex = extractBitIndex(signalLiteral);
+                Signal connectedSignal = this.module.getSignalByName(signalName);
+                pinConnections.add(new PinConnection(connectedSignal, bitIndex, pinName));
+            } else {
+                //positional                
+                String signalName = extractSignalName(pinConnectionLiteral);
+                int bitIndex = extractBitIndex(pinConnectionLiteral);
+                Signal connectedSignal = this.module.getSignalByName(signalName);
+
+                pinConnections.add(new PinConnection(connectedSignal, bitIndex, pinPosition));
+                pinPosition++;
+            }
+        }
+        return pinConnections;
     }
 }

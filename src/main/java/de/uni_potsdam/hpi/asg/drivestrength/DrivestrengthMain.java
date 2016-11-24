@@ -51,7 +51,7 @@ public class DrivestrengthMain {
         logger.info("Verilog netlist parsed. Root module name: "
                 + netlist.getRootModule().getName());
         
-        //logger.info(netlist.toVerilog());
+        logger.info(netlist.toVerilog());
         
         
 //        

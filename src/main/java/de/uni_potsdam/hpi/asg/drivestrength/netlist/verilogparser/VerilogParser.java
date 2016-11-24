@@ -75,7 +75,7 @@ public class VerilogParser {
         for (String statement: statements) {
             currentModuleStatements.add(statement);
             if (matches(statement, endmodulePattern)) {
-                Module module = Module.newFromVerilog(currentModuleStatements);
+                Module module = new VerilogModuleParser(currentModuleStatements, netlist).createModule();
                 netlist.addModule(module);
                 currentModuleStatements = new ArrayList<String>();
             }            

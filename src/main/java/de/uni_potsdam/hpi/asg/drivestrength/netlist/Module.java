@@ -3,25 +3,20 @@ package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogModuleParser;
-
 public class Module {
 
     private String name;
     private List<String> interfaceSignals;
     private List<Signal> signals;
     private List<AssignConnection> assignConnections;
-
-    public static Module newFromVerilog(List<String> verilogStatements) {
-        VerilogModuleParser moduleParser = new VerilogModuleParser(verilogStatements);
-        return moduleParser.createModule();
-    }
+    private List<AbstractInstance> instances; /*these are instances of gates and *other* modules */
     
     public Module() {
         this.name = null;
-        this.signals = new ArrayList<Signal>();
-        this.interfaceSignals = new ArrayList<String>();
-        this.assignConnections = new ArrayList<AssignConnection>();
+        this.signals = new ArrayList<>();
+        this.interfaceSignals = new ArrayList<>();
+        this.assignConnections = new ArrayList<>();
+        this.instances = new ArrayList<>();
     }
     
     public String toVerilog() {
@@ -33,14 +28,22 @@ public class Module {
             verilog += "  " + signal.toVerilog() + "\n";
         }
         
-        verilog += "\n";
+        if(this.assignConnections.size() > 0) {
+            verilog += "\n";            
+        }
         
         for (AssignConnection assignConnection: this.assignConnections) {
             verilog += "  " + assignConnection.toVerilog() + "\n";
         }
+
+        if(this.instances.size() > 0) {
+            verilog += "\n";            
+        }
         
-        verilog += "\n";
-        verilog += "  //TODO: instance statements\n";
+        for (AbstractInstance instance: this.instances) {
+            verilog += "  " + instance.toVerilog() + "\n";
+        }
+        
         verilog += "endmodule";
         return verilog; 
     }
@@ -59,6 +62,10 @@ public class Module {
     
     public void addSignal(Signal signal) {
         this.signals.add(signal);
+    }
+    
+    public void addInstance(AbstractInstance instance) {
+        this.instances.add(instance);
     }
     
     public Signal getSignalByName(String signalName) {

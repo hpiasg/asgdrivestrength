@@ -41,6 +41,16 @@ public class Netlist {
         this.rootModule = newModule;
     }
     
+    public Module getModuleByName(String moduleName) {
+
+        for (Module m : this.modules) {
+            if (m.getName().equals(moduleName)) {
+                return m;
+            }
+        }
+        throw new Error("Netlist does not have a Module named " + moduleName);
+    }
+    
     public String toVerilog() {
         String verilog = "";
         for (Module module: modules) {

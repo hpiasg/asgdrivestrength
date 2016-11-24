@@ -33,4 +33,27 @@ public class PinConnection {
     public boolean isPositional() {
         return pinName == null;
     }
+    
+    public boolean hasSelectedBit() {
+        return signalBitIndex != -1;
+    }
+    
+    public String toVerilog() {
+        String verilog = "";
+        if (this.pinName == null) {
+            //positional
+            verilog += signal.getName();
+            if (this.hasSelectedBit()) {
+                verilog += "[" + signalBitIndex + "]";
+            }
+        } else {
+            //mapped
+            verilog += "." + this.pinName + "(" + signal.getName();
+            if (this.hasSelectedBit()) {
+                verilog += "[" + signalBitIndex + "]";
+            }
+            verilog += ")";
+        }
+        return verilog;
+    }
 }
