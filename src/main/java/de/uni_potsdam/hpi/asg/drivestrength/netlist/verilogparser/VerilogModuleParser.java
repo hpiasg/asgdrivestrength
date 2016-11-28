@@ -19,7 +19,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal.Direction;
 
 public class VerilogModuleParser {
-    private static final Logger logger = LogManager.getLogger();
+    protected static final Logger logger = LogManager.getLogger();
     
     private static final Pattern startmodulePattern = Pattern.compile("module (.*) \\((.*)\\);\\s*$");
 

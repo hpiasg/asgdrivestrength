@@ -6,11 +6,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.uni_potsdam.hpi.asg.common.iohelper.FileHelper;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 
 public class VerilogParser {
+    protected static final Logger logger = LogManager.getLogger();
+    
     private static final Pattern endmodulePattern = Pattern.compile("^\\s*endmodule\\s*$");
     private static final Pattern statementPattern = Pattern.compile("^.*;$");
     
@@ -26,6 +31,7 @@ public class VerilogParser {
     
     private List<String> readVerilogStatementsFromFile(File verilogFile) {
         List<String> lines = FileHelper.getInstance().readFile(verilogFile);
+        assert(lines != null);
         List<String> statements = mergeMultilineStatements(lines);
         return statements;
     }

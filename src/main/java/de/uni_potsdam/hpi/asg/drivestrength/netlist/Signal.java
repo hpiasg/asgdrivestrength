@@ -3,29 +3,8 @@ package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
-/*
- * Copyright (C) 2016 Norman Kluge
- * 
- * This file is part of ASGdelaymatch.
- * 
- * ASGdelaymatch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * ASGdelaymatch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with ASGdelaymatch.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 public class Signal {
-
-    private static final Logger logger = LogManager.getLogger();
+    protected static final Logger logger = LogManager.getLogger();
 
     public enum Direction {
         input, output, wire, supply0, supply1, constant
@@ -92,6 +71,8 @@ public class Signal {
             case supply1:
                 directionString = "supply1";
                 break;
+            default:
+                throw new Error("Trying to serialize Signal with unknown direction type: " + directionString);
         }
         String bundleString = "";
         if (width > 1) {

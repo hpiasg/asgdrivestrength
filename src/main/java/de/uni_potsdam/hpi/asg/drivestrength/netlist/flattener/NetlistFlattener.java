@@ -11,7 +11,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.ModuleInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 
 public class NetlistFlattener {
-    private static final Logger logger = LogManager.getLogger();
+    protected static final Logger logger = LogManager.getLogger();
     
     private Netlist netlist;
     private List<Module> flattenedModules;
@@ -35,20 +35,18 @@ public class NetlistFlattener {
     }
     
     private void flattenFromModule(Module module) {
-        logger.info("flatten from module "+ module.getName());
-        
         for (ModuleInstance instance : module.getModuleInstances()) {
             Module definition = instance.getDefinition();
-            if (definition.isAssignOnly()) {
+            if (definition.hasAssignStatementsOnly()) {
                 addModuleUnique(definition);
                 continue;
             }
-            logger.info("instance of module " + definition.getName());
             Module flattenedModule = this.createFlattenedCopy(definition, 
                                                  instance.getName(), module.getName());
             instance.setDefinition(flattenedModule);
             flattenFromModule(flattenedModule);
-            flattenedModules.add(flattenedModule);
+            // add *after* recursive call to preserve hierarchical ordering
+            flattenedModules.add(flattenedModule); 
         }
     }
     

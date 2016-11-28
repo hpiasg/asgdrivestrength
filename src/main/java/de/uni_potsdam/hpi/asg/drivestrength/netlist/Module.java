@@ -161,7 +161,7 @@ public class Module {
         this.assignConnections.add(assignConnection);
     }
     
-    public boolean isAssignOnly() {
+    public boolean hasAssignStatementsOnly() {
         return this.getAllInstances().isEmpty();
     }
 }
