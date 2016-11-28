@@ -51,6 +51,12 @@ public class Signal {
         this.width = width;
     }
     
+    public Signal(Signal signalToCopy) {
+        this.direction = signalToCopy.getDirection();
+        this.name = signalToCopy.getName();
+        this.width = signalToCopy.getWidth();
+    }
+    
     public String getName() {
         return name;
     }

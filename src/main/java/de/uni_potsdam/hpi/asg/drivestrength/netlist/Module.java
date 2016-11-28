@@ -9,14 +9,51 @@ public class Module {
     private List<String> interfaceSignals;
     private List<Signal> signals;
     private List<AssignConnection> assignConnections;
-    private List<AbstractInstance> instances; /*these are instances of gates and *other* modules */
+    private List<GateInstance> gateInstances;
+    private List<ModuleInstance> moduleInstances; /*these are instances of *other* modules */
     
     public Module() {
         this.name = null;
         this.signals = new ArrayList<>();
         this.interfaceSignals = new ArrayList<>();
         this.assignConnections = new ArrayList<>();
-        this.instances = new ArrayList<>();
+        this.gateInstances = new ArrayList<>();
+        this.moduleInstances = new ArrayList<>();
+    }
+    
+    public Module(Module moduleToCopy, String nameSuffix) {
+        this.name = moduleToCopy.getName();
+        
+        this.signals = new ArrayList<>();
+        for (Signal s: moduleToCopy.getSignals()) this.signals.add(new Signal(s));
+
+        this.interfaceSignals = new ArrayList<>();
+        for (String s: moduleToCopy.getInterfaceSignals()) this.interfaceSignals.add(s);
+        
+        this.assignConnections = new ArrayList<>();
+        for (AssignConnection s: moduleToCopy.getAssignConnections()) {
+            Signal sourceSignal = this.getSignalByName(s.getSourceSignal().getName());
+            Signal destinationSignal = this.getSignalByName(s.getDestinationSignal().getName());
+            this.assignConnections.add(new AssignConnection(sourceSignal, destinationSignal,
+                                       s.getSourceBitIndex(), s.getDestinationBitIndex()));
+        }
+        
+        this.gateInstances = new ArrayList<>();
+        for (GateInstance i : moduleToCopy.getGateInstances()) {
+            List<PinAssignment> newPinAssignments = new ArrayList<>();
+            for (PinAssignment p : i.getPinAssignments()) {
+                Signal signal = this.getSignalByName(p.getSignal().getName());
+                if (p.isPositional()) {
+                    newPinAssignments.add(new PinAssignment(signal, p.getSignalBitIndex(), p.getPinPosition())); 
+                }
+                if (p.isPositional()) {
+                    newPinAssignments.add(new PinAssignment(signal, p.getSignalBitIndex(), p.getPinName()));                    
+                }
+            }
+            //TOOD: gateInstances
+        }
+        
+        //TODO: moduleInstances
     }
     
     public String toVerilog() {
@@ -36,11 +73,11 @@ public class Module {
             verilog += "  " + assignConnection.toVerilog() + "\n";
         }
 
-        if(this.instances.size() > 0) {
+        if(this.getAllInstances().size() > 0) {
             verilog += "\n";            
         }
         
-        for (AbstractInstance instance: this.instances) {
+        for (AbstractInstance instance: this.getAllInstances()) {
             verilog += "  " + instance.toVerilog() + "\n";
         }
         
@@ -50,6 +87,13 @@ public class Module {
     
     public String getName() {
         return name;
+    }
+    
+    public List<AbstractInstance> getAllInstances() {
+        List<AbstractInstance> allInstances = new ArrayList<>();
+        allInstances.addAll(this.gateInstances);
+        allInstances.addAll(this.moduleInstances);
+        return allInstances;
     }
     
     public void setName(String name) {
@@ -63,9 +107,33 @@ public class Module {
     public void addSignal(Signal signal) {
         this.signals.add(signal);
     }
+
+    public void addInstance(ModuleInstance instance) {
+        this.moduleInstances.add(instance);
+    }
     
-    public void addInstance(AbstractInstance instance) {
-        this.instances.add(instance);
+    public void addInstance(GateInstance instance) {
+        this.gateInstances.add(instance);
+    }
+    
+    public List<ModuleInstance> getModuleInstances() {
+        return this.moduleInstances;
+    }
+
+    public List<GateInstance> getGateInstances() {
+        return this.gateInstances;
+    }
+    
+    public List<Signal> getSignals() {
+        return this.signals;
+    }
+    
+    public List<String> getInterfaceSignals() {
+        return this.interfaceSignals;
+    }
+    
+    public List<AssignConnection> getAssignConnections() {
+        return this.assignConnections;
     }
     
     public Signal getSignalByName(String signalName) {

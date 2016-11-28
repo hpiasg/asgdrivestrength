@@ -12,7 +12,7 @@ public class GateInstance extends AbstractInstance {
     }
 
     @Override
-    String definitionName() {
+    String getDefinitionName() {
         return definition;
     }
 

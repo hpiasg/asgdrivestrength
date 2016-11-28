@@ -12,12 +12,12 @@ public abstract class AbstractInstance {
         this.pinAssignments = pinAssignments;
     }
     
-    abstract String definitionName();
+    abstract String getDefinitionName();
     
     String toVerilog() {
-        String verilog = definitionName() + " " + this.getName() + " (";
+        String verilog = getDefinitionName() + " " + this.getName() + " (";
         List<String> pinAssignmentLiterals = new ArrayList<>();
-        for (PinAssignment pc : this.getPinConnections()) {
+        for (PinAssignment pc : this.getPinAssignments()) {
             pinAssignmentLiterals.add(pc.toVerilog());
         }
         verilog += String.join(", ", pinAssignmentLiterals);
@@ -29,7 +29,7 @@ public abstract class AbstractInstance {
         return name;
     }
 
-    public List<PinAssignment> getPinConnections() {
+    public List<PinAssignment> getPinAssignments() {
         return pinAssignments;
     }
 }

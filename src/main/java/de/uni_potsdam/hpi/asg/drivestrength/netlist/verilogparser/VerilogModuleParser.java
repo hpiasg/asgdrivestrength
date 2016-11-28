@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.AbstractInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.AssignConnection;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.GateInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
@@ -154,11 +153,11 @@ public class VerilogModuleParser {
         
         try {
             Module definition = this.netlist.getModuleByName(definitionName);
-            AbstractInstance instance = new ModuleInstance(instanceName, definition, pinAssignments);
+            ModuleInstance instance = new ModuleInstance(instanceName, definition, pinAssignments);
             this.module.addInstance(instance);
         } catch (Error e) {
             String definition = definitionName;
-            AbstractInstance instance = new GateInstance(instanceName, definition, pinAssignments);
+            GateInstance instance = new GateInstance(instanceName, definition, pinAssignments);
             this.module.addInstance(instance);
         }
         

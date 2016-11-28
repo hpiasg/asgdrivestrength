@@ -11,7 +11,11 @@ public class ModuleInstance extends AbstractInstance {
     }
 
     @Override
-    String definitionName() {
+    String getDefinitionName() {
         return definition.getName();
+    }
+    
+    public Module getDefinitionModule() {
+        return this.definition;
     }
 }

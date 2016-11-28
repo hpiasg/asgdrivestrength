@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -53,6 +54,7 @@ public class DrivestrengthMain {
         
         logger.info(netlist.toVerilog());
         
+        new NetlistFlattener(netlist).run();
         
 //        
 //        logger.info("OLD:");
