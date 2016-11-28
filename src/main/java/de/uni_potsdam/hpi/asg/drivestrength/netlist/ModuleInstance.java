@@ -15,7 +15,11 @@ public class ModuleInstance extends AbstractInstance {
         return definition.getName();
     }
     
-    public Module getDefinitionModule() {
+    public Module getDefinition() {
         return this.definition;
+    }
+    
+    public void setDefinition(Module definition) {
+        this.definition = definition;
     }
 }

@@ -54,7 +54,13 @@ public class DrivestrengthMain {
         
         logger.info(netlist.toVerilog());
         
+        logger.info("\n\n\n\n\n");
+        
         new NetlistFlattener(netlist).run();
+        
+        logger.info("\n\n\n\n\n");
+
+        logger.info(netlist.toVerilog());
         
 //        
 //        logger.info("OLD:");

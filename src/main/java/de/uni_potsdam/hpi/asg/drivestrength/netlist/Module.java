@@ -10,7 +10,7 @@ public class Module {
     private List<Signal> signals;
     private List<AssignConnection> assignConnections;
     private List<GateInstance> gateInstances;
-    private List<ModuleInstance> moduleInstances; /*these are instances of *other* modules */
+    private List<ModuleInstance> moduleInstances; /* these are instances of *other* modules */
     
     public Module() {
         this.name = null;
@@ -21,7 +21,7 @@ public class Module {
         this.moduleInstances = new ArrayList<>();
     }
     
-    public Module(Module moduleToCopy, String nameSuffix) {
+    public Module(Module moduleToCopy) {
         this.name = moduleToCopy.getName();
         
         this.signals = new ArrayList<>();
@@ -40,20 +40,29 @@ public class Module {
         
         this.gateInstances = new ArrayList<>();
         for (GateInstance i : moduleToCopy.getGateInstances()) {
-            List<PinAssignment> newPinAssignments = new ArrayList<>();
-            for (PinAssignment p : i.getPinAssignments()) {
-                Signal signal = this.getSignalByName(p.getSignal().getName());
-                if (p.isPositional()) {
-                    newPinAssignments.add(new PinAssignment(signal, p.getSignalBitIndex(), p.getPinPosition())); 
-                }
-                if (p.isPositional()) {
-                    newPinAssignments.add(new PinAssignment(signal, p.getSignalBitIndex(), p.getPinName()));                    
-                }
-            }
-            //TOOD: gateInstances
+            this.gateInstances.add(new GateInstance(i.getName(), i.getDefinitionName(),
+                                   this.copyPinAssignments(i.getPinAssignments())));
         }
         
-        //TODO: moduleInstances
+        this.moduleInstances = new ArrayList<>();
+        for (ModuleInstance i : moduleToCopy.getModuleInstances()) {
+            this.moduleInstances.add(new ModuleInstance(i.getName(), i.getDefinition(),
+                                   this.copyPinAssignments(i.getPinAssignments())));
+        }
+    }
+    
+    private List<PinAssignment> copyPinAssignments(List<PinAssignment> pinAssignments) {
+        List<PinAssignment> newPinAssignments = new ArrayList<>();
+        for (PinAssignment p : pinAssignments) {
+            Signal signal = this.getSignalByName(p.getSignal().getName());
+            if (p.isPositional()) {
+                newPinAssignments.add(new PinAssignment(signal, p.getSignalBitIndex(), p.getPinPosition())); 
+            }
+            if (p.isPositional()) {
+                newPinAssignments.add(new PinAssignment(signal, p.getSignalBitIndex(), p.getPinName()));                    
+            }
+        }
+        return newPinAssignments;
     }
     
     public String toVerilog() {
@@ -150,5 +159,9 @@ public class Module {
     
     public void addAssignConnection(AssignConnection assignConnection) {
         this.assignConnections.add(assignConnection);
+    }
+    
+    public boolean isAssignOnly() {
+        return this.getAllInstances().isEmpty();
     }
 }

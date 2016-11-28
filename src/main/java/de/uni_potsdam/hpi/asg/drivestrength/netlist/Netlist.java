@@ -41,6 +41,10 @@ public class Netlist {
         this.rootModule = newModule;
     }
     
+    public void setModules(List<Module> newModules) {
+        this.modules = newModules;
+    }
+    
     public Module getModuleByName(String moduleName) {
 
         for (Module m : this.modules) {

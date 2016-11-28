@@ -1,5 +1,6 @@
 package de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -19,23 +20,42 @@ public class NetlistFlattener {
         this.netlist = netlist;
     }
     
-    public Netlist run() {
-        this.flattenFromModule(netlist.getRootModule());
+    public void run() {
+        this.flattenedModules = new ArrayList<Module>();
         
-        return this.netlist;
+        this.flattenFromModule(netlist.getRootModule());
+        this.flattenedModules.add(netlist.getRootModule());
+        netlist.setModules(this.flattenedModules);
+    }
+    
+    private void addModuleUnique(Module module) {
+        if (!this.flattenedModules.contains(module)) {
+            this.flattenedModules.add(module);
+        }
     }
     
     private void flattenFromModule(Module module) {
         logger.info("flatten from module "+ module.getName());
         
         for (ModuleInstance instance : module.getModuleInstances()) {
-            logger.info("instance of module " + instance.getDefinitionModule().getName());
-            this.createFlattenedCopy(instance.getDefinitionModule(), instance.getName());
+            Module definition = instance.getDefinition();
+            if (definition.isAssignOnly()) {
+                addModuleUnique(definition);
+                continue;
+            }
+            logger.info("instance of module " + definition.getName());
+            Module flattenedModule = this.createFlattenedCopy(definition, 
+                                                 instance.getName(), module.getName());
+            instance.setDefinition(flattenedModule);
+            flattenFromModule(flattenedModule);
+            flattenedModules.add(flattenedModule);
         }
     }
     
-    private void createFlattenedCopy(Module module, String instanceName) {
-        Module moduleCopy = module.copy();
+    private Module createFlattenedCopy(Module originalModule, String instanceName, String parentName) {
+        Module module = new Module(originalModule);
+        module.setName(parentName + "/" + module.getName() + "___" + instanceName);
+        return module;
     }
     
 }
