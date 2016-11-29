@@ -157,6 +157,11 @@ public class Module {
         throw new Error("Module does not have a Signal named " + signalName);
     }
     
+    public Signal getSignalByInterfacePosition(int position) {
+        String interfaceSignalName = this.interfaceSignals.get(position);
+        return this.getSignalByName(interfaceSignalName);
+    }
+    
     public void addAssignConnection(AssignConnection assignConnection) {
         this.assignConnections.add(assignConnection);
     }
