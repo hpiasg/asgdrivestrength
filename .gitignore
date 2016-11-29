@@ -1,8 +1,8 @@
 target/
 bin/
-src/test
 .project
 .classpath
 .settings
 *.html
 workingdir
+${sys:logFilename}

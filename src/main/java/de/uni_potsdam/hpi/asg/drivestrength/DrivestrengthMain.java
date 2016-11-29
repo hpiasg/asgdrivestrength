@@ -6,8 +6,8 @@ import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
-
-import de.uni_potsdam.hpi.asg.drivestrength.verilogparser.VerilogParser;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -17,44 +17,59 @@ public class DrivestrengthMain {
         int status = main2(args);
         System.exit(status);
     }
-    
+
     public static int main2(String[] args) {
         System.out.println("Hello World from ASGdrivestrength");
-        
+
         try {
             long start = System.currentTimeMillis();
             int status = -1;
             options = new DrivestrengthCommandlineOptions();
-            if(options.parseCmdLine(args)) {
-                logger = LoggerHelper.initLogger(options.getOutputlevel(), options.getLogfile(), options.isDebug());
+            if (options.parseCmdLine(args)) {
+                logger = LoggerHelper.initLogger(options.getOutputlevel(),
+                        options.getLogfile(), options.isDebug());
                 logger.debug("Args: " + Arrays.asList(args).toString());
-                WorkingdirGenerator.getInstance().create(options.getWorkingdir(), "", "drivestrengthwork", null);
-                
+                WorkingdirGenerator.getInstance().create(
+                        options.getWorkingdir(), "", "drivestrengthwork", null);
+
                 status = execute();
             }
             long end = System.currentTimeMillis();
-            if(logger != null) {
+            if (logger != null) {
                 logger.info("Runtime: " + LoggerHelper.formatRuntime(end - start, false));
             }
             return status;
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("An error occurred: " + e.getLocalizedMessage());
             e.printStackTrace();
             return 1;
         }
     }
-    
 
     private static int execute() {
-    	logger.info("Loading verilog netlist");
-        VerilogParser vparser = new VerilogParser();
-        if(!vparser.parseVerilogStructure(options.getNetlistfile())) {
-            return 1;
-        }
-        
-        logger.info("Verilog netlist parsed. Root module name: " +
-                    vparser.getRootModule().getModulename());
+        Netlist netlist = Netlist.newFromVerilog(options.getNetlistfile());
 
-    	return 0;
+        logger.info("Verilog netlist parsed. Root module name: "
+                + netlist.getRootModule().getName());
+        
+        logger.info(netlist.toVerilog());
+        
+        logger.info("\n\n\n\n\n");
+        
+        new NetlistFlattener(netlist).run();
+        
+        logger.info("\n\n\n\n\n");
+
+        logger.info(netlist.toVerilog());
+        
+//        
+//        logger.info("OLD:");
+//        
+//        VerilogParser vparser = new VerilogParser();
+//        if(!vparser.parseVerilogStructure(options.getNetlistfile())) {
+//            return 1;
+//        }
+
+        return 0;
     }
 }
