@@ -25,9 +25,12 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     @Option(name = "-debug")
     private boolean debug = false;
     
+    @Option(name = "-lib", metaVar = "<libertyfile>", usage ="Liberty Cell Library File", required = true)
+    private File libertyFile;
 
     @Argument(metaVar = "Verilog Netlist File", required = true)
-    private File netlistfile;
+    private File netlistFile;
+    
 
 
 
@@ -44,7 +47,11 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     }
 
     public File getNetlistfile() {
-        return netlistfile;
+        return netlistFile;
+    }
+    
+    public File getLibertyFile() {
+        return libertyFile;
     }
     
     public File getWorkingdir() {

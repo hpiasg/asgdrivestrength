@@ -1,13 +1,14 @@
 package de.uni_potsdam.hpi.asg.drivestrength;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -47,7 +48,7 @@ public class DrivestrengthMain {
     }
 
     private static int execute() {
-        Netlist netlist = Netlist.newFromVerilog(options.getNetlistfile());
+        /*Netlist netlist = Netlist.newFromVerilog(options.getNetlistFileName());
 
         logger.info("Verilog netlist parsed. Root module name: "
                 + netlist.getRootModule().getName());
@@ -60,8 +61,14 @@ public class DrivestrengthMain {
         
         logger.info("\n\n\n\n\n");
 
-        logger.info(netlist.toVerilog());
+        logger.info(netlist.toVerilog());*/
         
+        List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
+
+        for(Cell cell: cells) {
+            System.out.println("CELL: " + cell.getName());
+        }
+
 //        
 //        logger.info("OLD:");
 //        
