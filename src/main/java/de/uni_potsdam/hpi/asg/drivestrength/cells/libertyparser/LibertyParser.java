@@ -11,8 +11,8 @@ import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 
 public class LibertyParser {
 
-    private static final Pattern indentPattern = Pattern.compile("(\\s*)(.*)");
-    private static final Pattern startCellPattern = Pattern.compile("(\\s*)cell\\s*\\((.*)\\)\\s*");
+    private static final Pattern indentPattern = Pattern.compile("^(\\s*)(.*)");
+    private static final Pattern startCellPattern = Pattern.compile("^(\\s*)cell\\s*\\((.*)\\)\\s*");
     
     private List<String> statements;
 
