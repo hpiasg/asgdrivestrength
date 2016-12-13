@@ -9,6 +9,7 @@ import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -48,34 +49,43 @@ public class DrivestrengthMain {
     }
 
     private static int execute() {
-        /*Netlist netlist = Netlist.newFromVerilog(options.getNetlistFileName());
+        Netlist netlist = Netlist.newFromVerilog(options.getNetlistFile());
 
-        logger.info("Verilog netlist parsed. Root module name: "
-                + netlist.getRootModule().getName());
+        logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
         
-        logger.info(netlist.toVerilog());
-        
-        logger.info("\n\n\n\n\n");
-        
-        new NetlistFlattener(netlist).run();
-        
-        logger.info("\n\n\n\n\n");
-
-        logger.info(netlist.toVerilog());*/
+//        logger.info(netlist.toVerilog());
+//        
+//        logger.info("\n\n\n\n\n");
+//        
+//        new NetlistFlattener(netlist).run();
+//        
+//        logger.info("\n\n\n\n\n");
+//
+//        logger.info(netlist.toVerilog());
         
         List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
+        
+        logger.info("Library contains " + cells.size() + " cells");
 
-        for(Cell cell: cells) {
-            System.out.println("CELL: " + cell.getName());
-        }
-
-//        
-//        logger.info("OLD:");
-//        
-//        VerilogParser vparser = new VerilogParser();
-//        if(!vparser.parseVerilogStructure(options.getNetlistfile())) {
-//            return 1;
+//        for(Cell cell: cells) {
+//            System.out.println("\nCELL: " + cell.getName());
+//
+//            for (Pin pin : cell.getPins()) {
+//                System.out.println("Pin: " + pin.getName() + " (" + pin.getDirection() + ")");
+//                if (pin.getDirection() == Direction.input) {
+//                    System.out.println("capacitance: " + pin.getCapacitance());
+//                }
+//                if (pin.hasTimings()) {
+//                    for (Timing t : pin.getTimings()) {
+//                        System.out.println("timing with related pin " + t.getRelatedPinName());
+//                        if (t.getFallDelays() != null) {
+//                            System.out.println("delay at 2,0: " + t.getFallDelays().getDelayAt(1, 2));
+//                        }
+//                    }
+//                }
+//            }
 //        }
+
 
         return 0;
     }

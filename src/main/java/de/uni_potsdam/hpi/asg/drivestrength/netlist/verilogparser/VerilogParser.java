@@ -74,6 +74,8 @@ public class VerilogParser {
 
     
     public Netlist createNetlist() {
+        logger.info("Parsing Verilog netlist...");
+        
         Netlist netlist = new Netlist();
         
         List<String> currentModuleStatements = new ArrayList<String>();
@@ -86,6 +88,8 @@ public class VerilogParser {
                 currentModuleStatements = new ArrayList<String>();
             }            
         }
+        
+        logger.info("Parsing Verilog netlist complete");
         
         return netlist;
     }

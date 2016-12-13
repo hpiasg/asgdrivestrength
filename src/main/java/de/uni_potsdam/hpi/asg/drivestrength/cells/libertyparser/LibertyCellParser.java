@@ -9,6 +9,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 public class LibertyCellParser {
 
     private static final Pattern cellNamePattern = Pattern.compile("^(\\s*)cell\\s*\\((.*)\\)\\s*");
+    private static final Pattern startPinPattern = Pattern.compile("^(\\s*)pin\\s*\\((.*)\\)\\s*");
 
     private List<String>statements;
     
@@ -21,6 +22,12 @@ public class LibertyCellParser {
         Matcher m = cellNamePattern.matcher(statements.get(0));
         if(m.matches()) {
             cell.setName(m.group(2));
+        }
+        
+        List<List<String>> pinBlocks = new IndentBlockSeparator(statements, startPinPattern).run();
+
+        for (List<String> pinBlock : pinBlocks) {
+            cell.addPin((new LibertyPinParser(pinBlock).run()));
         }
         
         return cell;

@@ -3,15 +3,17 @@ package de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.common.iohelper.FileHelper;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 
 public class LibertyParser {
+    protected static final Logger logger = LogManager.getLogger();
 
-    private static final Pattern indentPattern = Pattern.compile("^(\\s*)(.*)");
     private static final Pattern startCellPattern = Pattern.compile("^(\\s*)cell\\s*\\((.*)\\)\\s*");
     
     private List<String> statements;
@@ -21,32 +23,21 @@ public class LibertyParser {
     }
     
     public List<Cell> run() {
-        System.out.println("Parsing Liberty File\n");
+        logger.info("Parsing Liberty cell library...");
+
+        /*for(String statement : statements) {
+            System.out.println(statement);
+        }*/
         
         List<Cell> cells = new ArrayList<>();
-
-        List<String> currentCellStatements = new ArrayList<String>();
         
-        boolean isReadingCellBlock = false;
-        int cellBlockIndent = -1;
-        for (String statement : statements) {
-            Matcher m = indentPattern.matcher(statement);
-            if (isReadingCellBlock && m.matches()) {
-                if (m.group(1).length() == cellBlockIndent) {
-                    cells.add(new LibertyCellParser(currentCellStatements).run());
-                    isReadingCellBlock = false;
-                } else {
-                    currentCellStatements.add(statement);
-                }
-            }
-            m = startCellPattern.matcher(statement);
-            if (m.matches()) {
-                isReadingCellBlock = true;
-                cellBlockIndent = m.group(1).length();
-                currentCellStatements = new ArrayList<String>();
-                currentCellStatements.add(statement);
-            }
+        List<List<String>> cellBlocks = new IndentBlockSeparator(statements, startCellPattern).run();
+
+        for (List<String> cellBlock : cellBlocks) {
+            cells.add(new LibertyCellParser(cellBlock).run());
         }
+
+        logger.info("Parsing Liberty cell library complete");
         return cells;
     }
     
@@ -65,6 +56,7 @@ public class LibertyParser {
         boolean trimNext = false;
         for (String line: lines) {
             line = line.replaceAll("\\{|\\}", "");
+            line = line.replaceAll("\\\"", "");
             if (trimNext) {
                 line = line.trim();
                 trimNext = false;

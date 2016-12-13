@@ -46,7 +46,7 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
         return debug;
     }
 
-    public File getNetlistfile() {
+    public File getNetlistFile() {
         return netlistFile;
     }
     
