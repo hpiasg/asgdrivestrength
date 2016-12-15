@@ -31,5 +31,19 @@ public class AggregatedCell {
     public void addCellParasiticDelays(String cellName, Map<String, Double> parasiticDelays) {
         this.parasiticDelays.put(cellName, parasiticDelays);
     }
+
+    public Map<String, Map<String, Double>> getLogicalEfforts() {
+        return logicalEfforts;
+    }
+
+    public Map<String, Map<String, Double>> getInputCapacitances() {
+        return inputCapacitances;
+    }
+
+    public Map<String, Map<String, Double>> getParasiticDelays() {
+        return parasiticDelays;
+    }
+    
+    
     
 }

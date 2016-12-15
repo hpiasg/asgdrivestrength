@@ -2,11 +2,13 @@ package de.uni_potsdam.hpi.asg.drivestrength;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.CellAggregator;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
@@ -67,8 +69,10 @@ public class DrivestrengthMain {
         
         logger.info("Library contains " + cells.size() + " cells");
         
-        new CellAggregator(cells).run();
+        Map<String, AggregatedCell> aggregatedCells = new CellAggregator(cells).run();
 
+        System.out.println("Aggregated to " + aggregatedCells.size() + " distinct (single-output) cells");
+        
         return 0;
     }
 }
