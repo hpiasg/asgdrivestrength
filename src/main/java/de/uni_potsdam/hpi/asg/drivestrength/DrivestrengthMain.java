@@ -7,9 +7,9 @@ import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.CellAggregator;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -49,10 +49,10 @@ public class DrivestrengthMain {
     }
 
     private static int execute() {
-        Netlist netlist = Netlist.newFromVerilog(options.getNetlistFile());
-
-        logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
-        
+//        Netlist netlist = Netlist.newFromVerilog(options.getNetlistFile());
+//
+//        logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
+//        
 //        logger.info(netlist.toVerilog());
 //        
 //        logger.info("\n\n\n\n\n");
@@ -66,29 +66,8 @@ public class DrivestrengthMain {
         List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
         
         logger.info("Library contains " + cells.size() + " cells");
-
-//        for(Cell cell: cells) {
-//            System.out.println("\nCELL: " + cell.getName());
-//
-//            for (Pin pin : cell.getPins()) {
-//                System.out.println("Pin: " + pin.getName() + " (" + pin.getDirection() + ")");
-//                if (pin.getDirection() == Direction.input) {
-//                    System.out.println("capacitance: " + pin.getCapacitance());
-//                }
-//                if (pin.hasTimings()) {
-//                    for (Timing t : pin.getTimings()) {
-//                        System.out.println("timing with related pin " + t.getRelatedPinName());
-//                        if (t.getFallDelays() != null) {
-//                            System.out.println("fall delay at 2,0: " + t.getFallDelays().getDelayAt(1, 2));
-//                        }
-//                        if (t.getRiseDelays() != null) {
-//                            System.out.println("rise delay at 2,0: " + t.getRiseDelays().getDelayAt(1, 2));
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
+        
+        new CellAggregator(cells).run();
 
         return 0;
     }

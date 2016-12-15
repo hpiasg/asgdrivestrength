@@ -6,6 +6,8 @@ import java.util.List;
 public class Cell {
 
     private String name;
+    private String footprint;
+    
     private List<Pin> pins;
     
     public Cell() {
@@ -27,5 +29,12 @@ public class Cell {
     public void addPin(Pin pin) {
         this.pins.add(pin);
     }
-    
+
+    public String getFootprint() {
+        return footprint;
+    }
+
+    public void setFootprint(String footprint) {
+        this.footprint = footprint;
+    }    
 }
