@@ -36,7 +36,6 @@ public class LibertyPinParser {
         
         if (this.pin.getDirection() == Direction.output) {
             List<List<String>> timingBlocks = new IndentBlockSeparator(statements, startTimingPattern).run();
-            System.out.println(timingBlocks.size() + " timing blocks!");
     
             for (List<String> timingBlock : timingBlocks) {
                 this.pin.addTiming(new LibertyTimingParser(timingBlock).run());

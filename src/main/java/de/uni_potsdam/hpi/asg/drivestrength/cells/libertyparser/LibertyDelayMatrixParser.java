@@ -9,7 +9,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix;
 public class LibertyDelayMatrixParser {
     private static final Pattern matrixTypePattern = Pattern.compile("^(\\s*)(.*)\\s*\\((.*)\\)\\s*$");
     private static final Pattern inputSlewSamplesPattern = Pattern.compile("^(\\s*)index_1\\s*\\((.*)\\);\\s*$");
-    private static final Pattern outputCapacitanceSamplesPattern = Pattern.compile("^(\\s*)index_2\\s*\\((.*)\\);\\s*$");
+    private static final Pattern loadCapacitanceSamplesPattern = Pattern.compile("^(\\s*)index_2\\s*\\((.*)\\);\\s*$");
     private static final Pattern delayValuesPattern = Pattern.compile("^(\\s*)values\\s*\\((.*)\\);\\s*$");
     
     private List<String> statements;
@@ -26,7 +26,7 @@ public class LibertyDelayMatrixParser {
 
         for (String statement: this.statements) {
             if (parseInputSlewSamplesStatement(statement)) continue;
-            if (parseOutputCapacitanceSamplesStatement(statement)) continue;
+            if (parseLoadCapacitanceSamplesStatement(statement)) continue;
             if (parseDelayValuesStatement(statement)) continue;
         }
         
@@ -43,12 +43,12 @@ public class LibertyDelayMatrixParser {
         return true;
     }
 
-    private boolean parseOutputCapacitanceSamplesStatement(String statement) {
-        Matcher m = outputCapacitanceSamplesPattern.matcher(statement);
+    private boolean parseLoadCapacitanceSamplesStatement(String statement) {
+        Matcher m = loadCapacitanceSamplesPattern.matcher(statement);
         if (!m.matches()) return false;
         String[] splitValues = m.group(2).split(",");
         for (String value : splitValues) {
-            this.delayMatrix.addOutputCapacitanceSample(Float.valueOf(value.trim()));
+            this.delayMatrix.addLoadCapacitanceSample(Float.valueOf(value.trim()));
         }
         return true;
     }
@@ -57,6 +57,7 @@ public class LibertyDelayMatrixParser {
         Matcher m = delayValuesPattern.matcher(statement);
         if (!m.matches()) return false;
         String[] splitValues = m.group(2).split(",");
+
         for (String value : splitValues) {
             this.delayMatrix.addDelayValue(Float.valueOf(value.trim()));
         }

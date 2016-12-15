@@ -9,6 +9,7 @@ import org.junit.Test;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
+import de.uni_potsdam.hpi.asg.drivestrength.testhelper.TestHelper;
 
 public class VerilogParserTest {
     protected static TestHelper testHelper = new TestHelper();
