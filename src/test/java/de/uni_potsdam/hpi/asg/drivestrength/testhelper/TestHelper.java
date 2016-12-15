@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser;
+package de.uni_potsdam.hpi.asg.drivestrength.testhelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
