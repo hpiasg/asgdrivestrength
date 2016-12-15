@@ -27,8 +27,9 @@ public class IndentBlockSeparator {
         for (String statement : statements) {
             Matcher m = indentPattern.matcher(statement);
             if (isReadingMatchingBlock && m.matches()) {
-                if (m.group(1).length() == blockIndent) {
+                if (m.group(1).length() <= blockIndent) {
                     blocks.add(currentBlockStatements); //add old block if a new one starts
+                    currentBlockStatements = new ArrayList<String>();
                     isReadingMatchingBlock = false;
                 } else {
                     currentBlockStatements.add(statement);
@@ -38,7 +39,6 @@ public class IndentBlockSeparator {
             if (m.matches()) {
                 isReadingMatchingBlock = true;
                 blockIndent = m.group(1).length();
-                currentBlockStatements = new ArrayList<String>();
                 currentBlockStatements.add(statement);
             }
         }
