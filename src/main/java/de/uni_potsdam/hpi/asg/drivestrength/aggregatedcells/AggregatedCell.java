@@ -1,6 +1,8 @@
 package de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AggregatedCell {
@@ -46,6 +48,21 @@ public class AggregatedCell {
             }
         }
         return totalLogicalEffort / count;
+    }
+    
+    public List<Double> getAvgLogicalEffortPerCell() {
+        List<Double> avgLogicalEfforts = new ArrayList<>();
+        for (Map<String, Double> logicalEffortsPerPin: this.logicalEfforts.values()) {
+            int count = 0;
+            double totalLogicalEffort = 0;
+            for (double logicalEffort : logicalEffortsPerPin.values()) {
+                count++;
+                totalLogicalEffort += logicalEffort;
+            }
+            avgLogicalEfforts.add(totalLogicalEffort / count);
+        }
+        
+        return avgLogicalEfforts;
     }
 
     public Map<String, Map<String, Double>> getInputCapacitances() {

@@ -77,7 +77,14 @@ public class DrivestrengthMain {
         
         for (AggregatedCell cell : aggregatedCells.values()) {
             System.out.println("Cell " + cell.getName() + " has average-g = " + cell.getAvgLogicalEffort() / invLogicalEffort);
+            System.out.print("(");
+            for (double logicalEffort: cell.getAvgLogicalEffortPerCell()) {
+                System.out.format("%.3f", logicalEffort / invLogicalEffort);
+                System.out.print("  ");
+            }
+            System.out.print(")\n");
         }
+        
         
         return 0;
     }
