@@ -35,6 +35,18 @@ public class AggregatedCell {
     public Map<String, Map<String, Double>> getLogicalEfforts() {
         return logicalEfforts;
     }
+    
+    public double getAvgLogicalEffort() {
+        int count = 0;
+        double totalLogicalEffort = 0;
+        for (Map<String, Double> logicalEffortsPerPin: this.logicalEfforts.values()) {
+            for (double logicalEffort : logicalEffortsPerPin.values()) {
+                count++;
+                totalLogicalEffort += logicalEffort;
+            }
+        }
+        return totalLogicalEffort / count;
+    }
 
     public Map<String, Map<String, Double>> getInputCapacitances() {
         return inputCapacitances;

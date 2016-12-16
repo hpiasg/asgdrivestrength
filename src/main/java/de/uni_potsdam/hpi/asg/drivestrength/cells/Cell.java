@@ -3,6 +3,8 @@ package de.uni_potsdam.hpi.asg.drivestrength.cells;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin.Direction;
+
 public class Cell {
 
     private String name;
@@ -36,5 +38,14 @@ public class Cell {
 
     public void setFootprint(String footprint) {
         this.footprint = footprint;
-    }    
+    }
+
+    public Pin getOutputPin() {
+        for (Pin pin : this.pins) {
+            if (pin.getDirection() == Direction.output) {
+                return pin;
+            }
+        }
+        throw(new Error("Could not find output pin for cell " + this.name));
+    }
 }
