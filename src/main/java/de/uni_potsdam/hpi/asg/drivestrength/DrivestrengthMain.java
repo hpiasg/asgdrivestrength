@@ -84,7 +84,7 @@ public class DrivestrengthMain {
         for (AggregatedCell cell : aggregatedCells.values()) {
             System.out.println("Cell " + cell.getName() + ":");
             System.out.println("  avg LE:  " + cell.getAvgLogicalEffort() / invLogicalEffort);
-            System.out.println("  stdev LE: " + cell.getStdevLogicalEffort() / invLogicalEffort);
+            System.out.println("  stdev LE: " + cell.getStdevLogicalEffort() / cell.getAvgLogicalEffort());
 //            System.out.print("(");
 //            for (double logicalEffort: cell.getAvgLogicalEffortPerCell()) {
 //                System.out.format("%.3f", logicalEffort / invLogicalEffort);

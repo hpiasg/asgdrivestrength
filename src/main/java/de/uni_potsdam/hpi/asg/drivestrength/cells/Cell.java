@@ -10,7 +10,7 @@ public class Cell {
     private String name;
     private String footprint;
     
-    private List<Pin> pins;
+    private final List<Pin> pins;
     
     public Cell() {
         this.pins = new ArrayList<Pin>();
@@ -48,4 +48,21 @@ public class Cell {
         }
         throw(new Error("Could not find output pin for cell " + this.name));
     }
+    
+    public List<Pin> getInputPins() {
+    	List<Pin> inputPins = new ArrayList<Pin>();
+        for (Pin pin : this.pins) {
+            if (pin.getDirection() == Direction.input) {
+            	inputPins.add(pin);
+            }
+        }
+        return inputPins;
+    }
+    
+    public boolean hasClockPin() {
+		for (Pin pin: this.pins) {
+			if (pin.isClockPin()) return true;
+		}
+	    return false;
+	}
 }

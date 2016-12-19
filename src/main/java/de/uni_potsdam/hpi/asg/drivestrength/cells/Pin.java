@@ -11,11 +11,13 @@ public class Pin {
     private String name;
     private Direction direction;
     private double capacitance;
-    private List<Timing> timings;
+    private final List<Timing> timings;
+    private boolean isClockPin;
     
 
     public Pin() {
         this.timings = new ArrayList<>();
+        this.isClockPin = false;
     }
     
     
@@ -34,7 +36,10 @@ public class Pin {
     public void setCapacitance(double capacitance) {
         this.capacitance = capacitance;
     }
-
+    
+    public void markAsClockPin() {
+    	this.isClockPin = true;
+    }
     
     public boolean hasTimings() {
         return (this.timings != null && this.timings.size() > 0);
@@ -55,4 +60,11 @@ public class Pin {
     public String getName() {
         return this.name;
     }
+
+
+	public boolean isClockPin() {
+		return isClockPin;
+	}
+    
+    
 }

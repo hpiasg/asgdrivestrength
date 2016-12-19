@@ -25,23 +25,24 @@ public class CellAggregator {
         this.aggregatedCells = new HashMap<>();
 
         for (Cell cell : rawCells) {
-            if (!isFitForAggregation(cell)) continue;
+        	if (!isFitForAggregation(cell)) continue;
             String cellName = cell.getName();
             String cellFootprint = cell.getFootprint();
             if (!aggregatedCells.containsKey(cellFootprint)) {
-                System.out.println("\nnew aggregated cell, footprint: " + cellFootprint);
+//                System.out.println("\nnew aggregated cell, footprint: " + cellFootprint);
+                System.out.println(cellFootprint + ": " + (cell.getOutputPin().getTimings().size() / cell.getInputPins().size()) + " timings per input pin");
                 this.aggregatedCells.put(cellFootprint, new AggregatedCell(cellFootprint));
             }
-            System.out.println("\nadding rawCell " + cell.getName() + " to " + cellFootprint);
+//            System.out.println("\nadding rawCell " + cell.getName() + " to " + cellFootprint);
             AggregatedCell aggregatedCell = this.aggregatedCells.get(cellFootprint); 
             Map<String, Double> pinCapacitances = this.extractPinCapacitances(cell);
-            System.out.println("with pinCapacitances: " + pinCapacitances);
+//            System.out.println("with pinCapacitances: " + pinCapacitances);
             aggregatedCell.addCellCapacitances(cellName, pinCapacitances);
             Map<String, Double> logicalEfforts = this.extractLogicalEfforts(cell, pinCapacitances);
-            System.out.println("with logical Efforts: " + logicalEfforts);
+//            System.out.println("with logical Efforts: " + logicalEfforts);
             aggregatedCell.addCellLogicalEfforts(cellName, logicalEfforts);
             Map<String, Double> parasiticDelays = this.extractParasiticDelays(cell, pinCapacitances, logicalEfforts);
-            System.out.println("with parasitic delays: " + parasiticDelays);
+//            System.out.println("with parasitic delays: " + parasiticDelays);
             aggregatedCell.addCellParasiticDelays(cellName, parasiticDelays);
         }
         
@@ -52,10 +53,8 @@ public class CellAggregator {
     private Map<String, Double> extractPinCapacitances(Cell rawCell) {
         Map<String, Double> pinCapacitances = new HashMap<>();
         
-        for (Pin pin : rawCell.getPins()) {
-            if (pin.getDirection() == Direction.input) {
-                pinCapacitances.put(pin.getName(), pin.getCapacitance());
-            }
+        for (Pin pin : rawCell.getInputPins()) {
+            pinCapacitances.put(pin.getName(), pin.getCapacitance());
         }
         
         return pinCapacitances;
@@ -149,6 +148,6 @@ public class CellAggregator {
                 outputPinCount++;
             }
         }
-        return outputPinCount == 1;
+        return outputPinCount == 1 && cell.getInputPins().size() >= 1;
     }
 }
