@@ -11,7 +11,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin.Direction;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Timing;
 
 public class CellAggregator {
-    private List<Cell> rawCells;
+    private final List<Cell> rawCells;
     private Map<String, AggregatedCell> aggregatedCells;
     
     // We use values for input slew = 0.0161238 ns, as it is closest to the 0.0181584ns used in cell pdfs
@@ -29,16 +29,19 @@ public class CellAggregator {
             String cellName = cell.getName();
             String cellFootprint = cell.getFootprint();
             if (!aggregatedCells.containsKey(cellFootprint)) {
-                System.out.println("new aggregated cell, footprint: " + cellFootprint);
+                System.out.println("\nnew aggregated cell, footprint: " + cellFootprint);
                 this.aggregatedCells.put(cellFootprint, new AggregatedCell(cellFootprint));
             }
-            System.out.println("adding rawCell " + cell.getName() + " to " + cellFootprint);
+            System.out.println("\nadding rawCell " + cell.getName() + " to " + cellFootprint);
             AggregatedCell aggregatedCell = this.aggregatedCells.get(cellFootprint); 
             Map<String, Double> pinCapacitances = this.extractPinCapacitances(cell);
+            System.out.println("with pinCapacitances: " + pinCapacitances);
             aggregatedCell.addCellCapacitances(cellName, pinCapacitances);
             Map<String, Double> logicalEfforts = this.extractLogicalEfforts(cell, pinCapacitances);
+            System.out.println("with logical Efforts: " + logicalEfforts);
             aggregatedCell.addCellLogicalEfforts(cellName, logicalEfforts);
             Map<String, Double> parasiticDelays = this.extractParasiticDelays(cell, pinCapacitances, logicalEfforts);
+            System.out.println("with parasitic delays: " + parasiticDelays);
             aggregatedCell.addCellParasiticDelays(cellName, parasiticDelays);
         }
         

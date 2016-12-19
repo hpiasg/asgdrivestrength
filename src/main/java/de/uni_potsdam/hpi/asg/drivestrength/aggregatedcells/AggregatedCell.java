@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 public class AggregatedCell {
-    private String name;
-    private Map<String, Map<String, Double>> logicalEfforts; //cell->pin->value, hopefully nearly cell-and-pin-invariant
-    private Map<String, Map<String, Double>> inputCapacitances; //cell->pin->value, hopefully nearly pin-invariant
-    private Map<String, Map<String, Double>> parasiticDelays; //cell->pin->value, hopefully nearly cell-and-pin-invariant
+    private final String name;
+    private final Map<String, Map<String, Double>> logicalEfforts; //cell->pin->value, hopefully nearly cell-and-pin-invariant
+    private final Map<String, Map<String, Double>> inputCapacitances; //cell->pin->value, hopefully nearly pin-invariant
+    private final Map<String, Map<String, Double>> parasiticDelays; //cell->pin->value, hopefully nearly cell-and-pin-invariant
     
     public String getName() {
         return name;
@@ -48,6 +48,22 @@ public class AggregatedCell {
             }
         }
         return totalLogicalEffort / count;
+    }
+    
+    public double getStdevLogicalEffort() {
+        double average = this.getAvgLogicalEffort();
+        
+        int count = 0;
+        double totalDev = 0;
+        for (Map<String, Double> logicalEffortsPerPin: this.logicalEfforts.values()) {
+            for (double logicalEffort : logicalEffortsPerPin.values()) {
+                count++;
+                totalDev += (logicalEffort - average) * (logicalEffort - average);
+            }
+        }
+        double stdev = Math.sqrt(totalDev / count);
+        
+        return stdev;
     }
     
     public List<Double> getAvgLogicalEffortPerCell() {
