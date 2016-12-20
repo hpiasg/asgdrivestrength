@@ -1,8 +1,12 @@
 package de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix;
@@ -13,12 +17,14 @@ import de.uni_potsdam.hpi.asg.drivestrength.cells.Timing;
 public class CellAggregator {
     private final List<Cell> rawCells;
     private Map<String, AggregatedCell> aggregatedCells;
+    private final Map<String, Map<String, List<Double>>> delaysOverEffort;
     
     // We use values for input slew = 0.0161238 ns, as it is closest to the 0.0181584ns used in cell pdfs
     private final int inputSlewIndex = 0; 
     
     public CellAggregator(List<Cell> rawCells) {
         this.rawCells = rawCells;
+        this.delaysOverEffort = new HashMap<String, Map<String,List<Double>>>();
     }
     
     public Map<String, AggregatedCell> run() {
@@ -30,7 +36,7 @@ public class CellAggregator {
             String cellFootprint = cell.getFootprint();
             if (!aggregatedCells.containsKey(cellFootprint)) {
 //                System.out.println("\nnew aggregated cell, footprint: " + cellFootprint);
-                System.out.println(cellFootprint + ": " + (cell.getOutputPin().getTimings().size() / cell.getInputPins().size()) + " timings per input pin");
+//                System.out.println(cellFootprint + ": " + (cell.getOutputPin().getTimings().size() / cell.getInputPins().size()) + " timings per input pin");
                 this.aggregatedCells.put(cellFootprint, new AggregatedCell(cellFootprint));
             }
 //            System.out.println("\nadding rawCell " + cell.getName() + " to " + cellFootprint);
@@ -38,6 +44,9 @@ public class CellAggregator {
             Map<String, Double> pinCapacitances = this.extractPinCapacitances(cell);
 //            System.out.println("with pinCapacitances: " + pinCapacitances);
             aggregatedCell.addCellCapacitances(cellName, pinCapacitances);
+
+            this.printDelaysAsJson(cell, pinCapacitances);
+            
             Map<String, Double> logicalEfforts = this.extractLogicalEfforts(cell, pinCapacitances);
 //            System.out.println("with logical Efforts: " + logicalEfforts);
             aggregatedCell.addCellLogicalEfforts(cellName, logicalEfforts);
@@ -46,11 +55,48 @@ public class CellAggregator {
             aggregatedCell.addCellParasiticDelays(cellName, parasiticDelays);
         }
         
+
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        System.out.println(gson.toJson(delaysOverEffort));
         
         return this.aggregatedCells;
     }
     
-    private Map<String, Double> extractPinCapacitances(Cell rawCell) {
+    private void printDelaysAsJson(Cell cell, Map<String, Double> pinCapacitances) {
+		Timing firstTiming = cell.getOutputPin().getTimings().get(0);
+        if (firstTiming.getRiseDelays() == null || firstTiming.getFallDelays() == null) return;
+        
+        DelayMatrix delays = firstTiming.getRiseDelays();
+        
+        double inputCapacitance = pinCapacitances.get(firstTiming.getRelatedPinName());
+
+        List<Double> delaysForOneSlew = new ArrayList<Double>();
+        List<Double> electricalEfforts = new ArrayList<Double>();
+        
+        for (int loadIndex = 0; loadIndex < 7; loadIndex++) {
+	        double loadCapacitance = delays.getLoadCapacitanceAt(loadIndex);
+	        double electricalEffort = loadCapacitance / inputCapacitance;
+	        double delay = delays.getDelayAt(this.inputSlewIndex, loadIndex);
+
+	        delaysForOneSlew.add(delay);
+	        electricalEfforts.add(electricalEffort);
+        }
+        
+        HashMap<String, List<Double>> packed = new HashMap<>();
+
+        packed.put("electricalEfforts", electricalEfforts);
+        packed.put("delays", delaysForOneSlew);
+        
+        String key = cell.getFootprint() + "." + cell.getName();
+        
+        delaysOverEffort.put(key, packed);
+        
+		
+		
+	}
+
+	private Map<String, Double> extractPinCapacitances(Cell rawCell) {
         Map<String, Double> pinCapacitances = new HashMap<>();
         
         for (Pin pin : rawCell.getInputPins()) {
