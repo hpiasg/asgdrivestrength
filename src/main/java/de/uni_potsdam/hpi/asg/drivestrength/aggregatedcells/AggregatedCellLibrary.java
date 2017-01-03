@@ -13,8 +13,12 @@ public class AggregatedCellLibrary {
         this.aggregatedCells = aggregatedCells;
     }
     
+    //Only used in test (to make verilog netlist parser tests independent of library, hence the dummygate
     public AggregatedCellLibrary() {
         this.aggregatedCells = new HashMap<String, AggregatedCell>();
+        AggregatedCell dummygate = new AggregatedCell("DUMMYGATE");
+        dummygate.addCellSizeName("DUMMYGATE");
+        this.aggregatedCells.put("DUMMYGATE", dummygate);
     }
 
     public AggregatedCell get(String aggregatedCellName) {

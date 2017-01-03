@@ -76,9 +76,6 @@ public class DrivestrengthMain {
         
         
         
-        
-        
-        
 
         Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary).createNetlist();
 
@@ -93,8 +90,7 @@ public class DrivestrengthMain {
 //        logger.info("\n\n\n\n\n");
 //
 //        logger.info(netlist.toVerilog());
-        
-        
+
         return 0;
     }
 }

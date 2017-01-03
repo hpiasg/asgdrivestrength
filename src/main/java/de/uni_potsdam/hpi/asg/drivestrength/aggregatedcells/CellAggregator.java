@@ -1,5 +1,6 @@
 package de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,21 +12,23 @@ import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin.Direction;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Timing;
 
 public class CellAggregator {
-    private List<Cell> rawCells;
+    private final List<Cell> rawCells;
     private Map<String, AggregatedCell> aggregatedCells;
+    private final Map<String, Map<String, List<Double>>> delaysOverEffort;
     
     // We use values for input slew = 0.0161238 ns, as it is closest to the 0.0181584ns used in cell pdfs
     private final int inputSlewIndex = 0; 
     
     public CellAggregator(List<Cell> rawCells) {
         this.rawCells = rawCells;
+        this.delaysOverEffort = new HashMap<String, Map<String,List<Double>>>();
     }
     
     public AggregatedCellLibrary run() {
         this.aggregatedCells = new HashMap<>();
 
         for (Cell cell : rawCells) {
-            if (!isFitForAggregation(cell)) continue;
+        	if (!isFitForAggregation(cell)) continue;
             String cellName = cell.getName();
             String cellFootprint = cell.getFootprint();
             if (!aggregatedCells.containsKey(cellFootprint)) {
@@ -37,22 +40,61 @@ public class CellAggregator {
             aggregatedCell.addCellSizeName(cellName);
             Map<String, Double> pinCapacitances = this.extractPinCapacitances(cell);
             aggregatedCell.addCellCapacitances(cellName, pinCapacitances);
+
+            this.printDelaysAsJson(cell, pinCapacitances);
+            
             Map<String, Double> logicalEfforts = this.extractLogicalEfforts(cell, pinCapacitances);
             aggregatedCell.addCellLogicalEfforts(cellName, logicalEfforts);
             Map<String, Double> parasiticDelays = this.extractParasiticDelays(cell, pinCapacitances, logicalEfforts);
             aggregatedCell.addCellParasiticDelays(cellName, parasiticDelays);
         }
         
+
+//        GsonBuilder builder = new GsonBuilder();
+//        Gson gson = builder.create();
+//        System.out.println(gson.toJson(delaysOverEffort));
+    
         return new AggregatedCellLibrary(aggregatedCells);
     }
     
-    private Map<String, Double> extractPinCapacitances(Cell rawCell) {
+    private void printDelaysAsJson(Cell cell, Map<String, Double> pinCapacitances) {
+		Timing firstTiming = cell.getOutputPin().getTimings().get(0);
+        if (firstTiming.getRiseDelays() == null || firstTiming.getFallDelays() == null) return;
+        
+        DelayMatrix delays = firstTiming.getRiseDelays();
+        
+        double inputCapacitance = pinCapacitances.get(firstTiming.getRelatedPinName());
+
+        List<Double> delaysForOneSlew = new ArrayList<Double>();
+        List<Double> electricalEfforts = new ArrayList<Double>();
+        
+        for (int loadIndex = 0; loadIndex < 7; loadIndex++) {
+	        double loadCapacitance = delays.getLoadCapacitanceAt(loadIndex);
+	        double electricalEffort = loadCapacitance / inputCapacitance;
+	        double delay = delays.getDelayAt(this.inputSlewIndex, loadIndex);
+
+	        delaysForOneSlew.add(delay);
+	        electricalEfforts.add(electricalEffort);
+        }
+        
+        HashMap<String, List<Double>> packed = new HashMap<>();
+
+        packed.put("electricalEfforts", electricalEfforts);
+        packed.put("delays", delaysForOneSlew);
+        
+        String key = cell.getFootprint() + "." + cell.getName();
+        
+        delaysOverEffort.put(key, packed);
+        
+		
+		
+	}
+
+	private Map<String, Double> extractPinCapacitances(Cell rawCell) {
         Map<String, Double> pinCapacitances = new HashMap<>();
         
-        for (Pin pin : rawCell.getPins()) {
-            if (pin.getDirection() == Direction.input) {
-                pinCapacitances.put(pin.getName(), pin.getCapacitance());
-            }
+        for (Pin pin : rawCell.getInputPins()) {
+            pinCapacitances.put(pin.getName(), pin.getCapacitance());
         }
         
         return pinCapacitances;
@@ -146,6 +188,6 @@ public class CellAggregator {
                 outputPinCount++;
             }
         }
-        return outputPinCount == 1;
+        return outputPinCount == 1 && cell.getInputPins().size() >= 1;
     }
 }
