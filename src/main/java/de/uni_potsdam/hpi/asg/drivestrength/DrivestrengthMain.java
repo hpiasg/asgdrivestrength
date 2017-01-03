@@ -2,16 +2,18 @@ package de.uni_potsdam.hpi.asg.drivestrength;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.CellAggregator;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -51,31 +53,18 @@ public class DrivestrengthMain {
     }
 
     private static int execute() {
-//        Netlist netlist = Netlist.newFromVerilog(options.getNetlistFile());
-//
-//        logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
-//        
-//        logger.info(netlist.toVerilog());
-//        
-//        logger.info("\n\n\n\n\n");
-//        
-//        new NetlistFlattener(netlist).run();
-//        
-//        logger.info("\n\n\n\n\n");
-//
-//        logger.info(netlist.toVerilog());
         
         List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
         
         logger.info("Library contains " + cells.size() + " cells");
         
-        Map<String, AggregatedCell> aggregatedCells = new CellAggregator(cells).run();
+        AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells).run();
 
-        System.out.println("Aggregated to " + aggregatedCells.size() + " distinct (single-output) cells");
+        System.out.println("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
         
-        double invLogicalEffort = aggregatedCells.get("DSC_INV").getAvgLogicalEffort();
+        double invLogicalEffort = aggregatedCellLibrary.get("DSC_INV").getAvgLogicalEffort();
         
-        for (AggregatedCell cell : aggregatedCells.values()) {
+        for (AggregatedCell cell : aggregatedCellLibrary.getAll()) {
             System.out.println("Cell " + cell.getName() + " has average-g = " + cell.getAvgLogicalEffort() / invLogicalEffort);
             System.out.print("(");
             for (double logicalEffort: cell.getAvgLogicalEffortPerCell()) {
@@ -84,6 +73,26 @@ public class DrivestrengthMain {
             }
             System.out.print(")\n");
         }
+        
+        
+        
+        
+        
+        
+
+        Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary).createNetlist();
+
+        logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
+        
+        logger.info(netlist.toVerilog());
+//        
+//        logger.info("\n\n\n\n\n");
+//        
+//        new NetlistFlattener(netlist).run();
+//        
+//        logger.info("\n\n\n\n\n");
+//
+//        logger.info(netlist.toVerilog());
         
         
         return 0;

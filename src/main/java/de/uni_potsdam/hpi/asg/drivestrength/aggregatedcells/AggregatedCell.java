@@ -10,6 +10,7 @@ public class AggregatedCell {
     private Map<String, Map<String, Double>> logicalEfforts; //cell->pin->value, hopefully nearly cell-and-pin-invariant
     private Map<String, Map<String, Double>> inputCapacitances; //cell->pin->value, hopefully nearly pin-invariant
     private Map<String, Map<String, Double>> parasiticDelays; //cell->pin->value, hopefully nearly cell-and-pin-invariant
+    private List<String> sizeNames;
     
     public String getName() {
         return name;
@@ -20,6 +21,15 @@ public class AggregatedCell {
         this.logicalEfforts = new HashMap<>();
         this.inputCapacitances = new HashMap<>();
         this.parasiticDelays = new HashMap<>();
+        this.sizeNames = new ArrayList<>();
+    }
+    
+    public void addCellSizeName(String cellName) {
+        this.sizeNames.add(cellName);
+    }
+    
+    public boolean containsSizeName(String cellName) {
+        return this.sizeNames.contains(cellName);
     }
     
     public void addCellCapacitances(String cellName, Map<String, Double> inputCapacitances) {
@@ -73,6 +83,9 @@ public class AggregatedCell {
         return parasiticDelays;
     }
     
+    public String getSizeNameFor(double inputPinCapacitance) {
+        return this.sizeNames.get(0);
+    }
     
     
 }

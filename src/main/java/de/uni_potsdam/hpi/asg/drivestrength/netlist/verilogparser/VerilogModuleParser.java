@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.AssignConnection;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.GateInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
@@ -36,13 +38,15 @@ public class VerilogModuleParser {
     
     private Module module;
     private Netlist netlist;
+    private AggregatedCellLibrary aggregatedCellLibrary;
 
-    public VerilogModuleParser(List<String> statements, Netlist netlist) {
+    public VerilogModuleParser(List<String> statements, Netlist netlist, AggregatedCellLibrary aggregatedCellLibrary) {
         this.statements = statements;
         this.netlist = netlist;
+        this.aggregatedCellLibrary = aggregatedCellLibrary;
     }
     
-    public Module createModule() {
+    public Module run() {
         this.module = new Module();
         
         for (String statement : this.statements) {
@@ -156,7 +160,7 @@ public class VerilogModuleParser {
             ModuleInstance instance = new ModuleInstance(instanceName, definition, pinAssignments);
             this.module.addInstance(instance);
         } catch (Error e) {
-            String definition = definitionName;
+            AggregatedCell definition = this.aggregatedCellLibrary.getByCellName(definitionName);            
             GateInstance instance = new GateInstance(instanceName, definition, pinAssignments);
             this.module.addInstance(instance);
         }

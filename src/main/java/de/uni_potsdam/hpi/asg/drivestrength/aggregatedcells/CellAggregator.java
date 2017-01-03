@@ -21,7 +21,7 @@ public class CellAggregator {
         this.rawCells = rawCells;
     }
     
-    public Map<String, AggregatedCell> run() {
+    public AggregatedCellLibrary run() {
         this.aggregatedCells = new HashMap<>();
 
         for (Cell cell : rawCells) {
@@ -29,11 +29,12 @@ public class CellAggregator {
             String cellName = cell.getName();
             String cellFootprint = cell.getFootprint();
             if (!aggregatedCells.containsKey(cellFootprint)) {
-                System.out.println("new aggregated cell, footprint: " + cellFootprint);
+                //System.out.println("new aggregated cell, footprint: " + cellFootprint);
                 this.aggregatedCells.put(cellFootprint, new AggregatedCell(cellFootprint));
             }
-            System.out.println("adding rawCell " + cell.getName() + " to " + cellFootprint);
-            AggregatedCell aggregatedCell = this.aggregatedCells.get(cellFootprint); 
+            //System.out.println("adding rawCell " + cell.getName() + " to " + cellFootprint);
+            AggregatedCell aggregatedCell = this.aggregatedCells.get(cellFootprint);
+            aggregatedCell.addCellSizeName(cellName);
             Map<String, Double> pinCapacitances = this.extractPinCapacitances(cell);
             aggregatedCell.addCellCapacitances(cellName, pinCapacitances);
             Map<String, Double> logicalEfforts = this.extractLogicalEfforts(cell, pinCapacitances);
@@ -42,8 +43,7 @@ public class CellAggregator {
             aggregatedCell.addCellParasiticDelays(cellName, parasiticDelays);
         }
         
-        
-        return this.aggregatedCells;
+        return new AggregatedCellLibrary(aggregatedCells);
     }
     
     private Map<String, Double> extractPinCapacitances(Cell rawCell) {

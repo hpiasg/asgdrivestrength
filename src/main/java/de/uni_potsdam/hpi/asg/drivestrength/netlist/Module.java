@@ -40,7 +40,7 @@ public class Module {
         
         this.gateInstances = new ArrayList<>();
         for (GateInstance i : moduleToCopy.getGateInstances()) {
-            this.gateInstances.add(new GateInstance(i.getName(), i.getDefinitionName(),
+            this.gateInstances.add(new GateInstance(i.getName(), i.getDefinition(),
                                    this.copyPinAssignments(i.getPinAssignments())));
         }
         
