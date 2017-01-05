@@ -101,8 +101,33 @@ public class AggregatedCell {
     }
     
     public String getSizeNameFor(double inputPinCapacitance) {
-        return this.sizeNames.get(0);
+        double bestAbsDiff = Double.POSITIVE_INFINITY;
+        String bestSizeName = null; 
+        for (String sizeName : this.inputCapacitances.keySet()) {
+            double cellAvgInputCapacitance = averageInputCapacitance(sizeName);
+            double absDiff = Math.abs(inputPinCapacitance - cellAvgInputCapacitance);
+            if (absDiff < bestAbsDiff) {
+                bestAbsDiff = absDiff;
+                bestSizeName = sizeName;
+            }
+        }
+        if (bestSizeName == null) {
+            throw(new Error("Could not find " + this.getName() + " cell size for desired input pin capacitance " + inputPinCapacitance));
+        }
+        return bestSizeName;
     }
     
+    private double averageInputCapacitance(String sizeName) {
+        Map<String, Double> cellInputCapacitances = this.inputCapacitances.get(sizeName);
+        
+        double sum = 0;
+        int count = 0;
+        for (double capacitance: cellInputCapacitances.values()) {
+            sum += capacitance;
+            count += 1;
+        }
+        
+        return sum / count;
+    }
     
 }

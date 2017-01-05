@@ -12,7 +12,7 @@ public class GateInstance extends AbstractInstance {
     public GateInstance(String name, AggregatedCell definition, List<PinAssignment> pinAssignments) {
         super(name, pinAssignments);
         this.definition = definition;
-        this.inputPinCapacitance = 1.0;
+        this.inputPinCapacitance = 100.0;
     }
 
     @Override
