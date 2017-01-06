@@ -57,8 +57,7 @@ public class Module {
             Signal signal = this.getSignalByName(p.getSignal().getName());
             if (p.isPositional()) {
                 newPinAssignments.add(new PinAssignment(signal, p.getSignalBitIndex(), p.getPinPosition())); 
-            }
-            if (p.isPositional()) {
+            } else {
                 newPinAssignments.add(new PinAssignment(signal, p.getSignalBitIndex(), p.getPinName()));                    
             }
         }
