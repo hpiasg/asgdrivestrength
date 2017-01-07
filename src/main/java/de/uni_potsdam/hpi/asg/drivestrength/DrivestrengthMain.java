@@ -13,6 +13,8 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.CellAggregator;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.inliner.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
 
 public class DrivestrengthMain {
@@ -62,6 +64,30 @@ public class DrivestrengthMain {
 
         System.out.println("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
         
+        //printCellInformation(aggregatedCellLibrary);
+        
+        
+
+        Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary).createNetlist();
+
+        logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
+        
+//        logger.info(netlist.toVerilog());
+//        
+//        logger.info("\n\n\n\n\n");
+//        
+        new NetlistFlattener(netlist).run();
+        
+        Netlist inlinedNetlist = new NetlistInliner(netlist).run();
+//        
+//        logger.info("\n\n\n\n\n");
+//
+//        logger.info(netlist.toVerilog());
+
+        return 0;
+    }
+    
+    private void printCellInformation(AggregatedCellLibrary aggregatedCellLibrary) {
         double invLogicalEffort = aggregatedCellLibrary.get("DSC_INV").getAvgLogicalEffort();
         
         for (AggregatedCell cell : aggregatedCellLibrary.getAll()) {
@@ -74,23 +100,5 @@ public class DrivestrengthMain {
             System.out.print(")\n");
         }
         
-        
-        
-
-        Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary).createNetlist();
-
-        logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
-        
-        logger.info(netlist.toVerilog());
-//        
-//        logger.info("\n\n\n\n\n");
-//        
-//        new NetlistFlattener(netlist).run();
-//        
-//        logger.info("\n\n\n\n\n");
-//
-//        logger.info(netlist.toVerilog());
-
-        return 0;
     }
 }
