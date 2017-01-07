@@ -50,4 +50,18 @@ public class Netlist {
         }
         return verilog;
     }
+    
+    public boolean isFlat() {
+    	List<Module> instanciatedModuleDefinitions = new ArrayList<Module>();
+    	for (Module module : this.getModules()) {
+    		for (ModuleInstance i : module.getModuleInstances()) {
+    			Module definition = i.getDefinition();
+    			if (instanciatedModuleDefinitions.contains(definition) && !definition.hasAssignStatementsOnly()) {
+    				return false;
+    			}
+    			instanciatedModuleDefinitions.add(i.getDefinition());
+    		}
+    	}
+    	return true;
+    }
 }

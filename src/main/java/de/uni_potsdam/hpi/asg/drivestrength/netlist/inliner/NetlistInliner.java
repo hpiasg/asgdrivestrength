@@ -25,7 +25,9 @@ public class NetlistInliner {
     }
     
     private void assertNetlistIsFlat() {
-    	logger.warn("TODO: create netlistIsFlat assertion function");
+    	if (!this.originalNetlist.isFlat()) {
+        	logger.warn("NetlistInliner called on non-flat netlist (meaning it has submodule definition instanciated more than once)");    		
+    	}
     }
     
     private Module createInlinedModuleRecursively(Module currentModule) {
