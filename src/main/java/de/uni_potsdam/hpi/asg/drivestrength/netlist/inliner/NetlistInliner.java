@@ -32,11 +32,16 @@ public class NetlistInliner {
     
     private Module createInlinedModuleRecursively(Module currentModule) {
     	Module inlinedModule = new Module(currentModule);
+        int nextInstanceId = 0;
+        int nextWireId = 0;
     	for (ModuleInstance instance : currentModule.getModuleInstances()) {
     		System.out.println("inlining " + instance.getDefinition().getName() + " into " + inlinedModule.getName());
     		Module inlinedChild = createInlinedModuleRecursively(instance.getDefinition());
+    		//TODO: rename i/o signals to parent signals (or rather, assign corresponding parent signals to gate instance pins)
+    		//TODO: rename wire signals with unique
+    		//TODO: copy assign statements
     		for (GateInstance childGateInstance : inlinedChild.getGateInstances()) {
-    			System.out.println("adding gate instance " + childGateInstance.getName() + " to " + inlinedModule.getName());
+    			System.out.println("todo: adding gate instance " + childGateInstance.getName() + " to " + inlinedModule.getName());
     		}
     	}
     	return inlinedModule;
