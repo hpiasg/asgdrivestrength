@@ -20,7 +20,7 @@ public class GateInstance extends AbstractInstance {
         return definition.getSizeNameFor(this.inputPinCapacitance);
     }
     
-    AggregatedCell getDefinition() {
+    public AggregatedCell getDefinition() {
         return definition;
     }
 

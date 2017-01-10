@@ -82,7 +82,7 @@ public class DrivestrengthMain {
 //        
 //        logger.info("\n\n\n\n\n");
 //
-//        logger.info(netlist.toVerilog());
+        logger.info(inlinedNetlist.toVerilog());
 
         return 0;
     }

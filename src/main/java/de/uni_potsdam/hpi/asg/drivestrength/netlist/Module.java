@@ -168,4 +168,8 @@ public class Module {
     public boolean hasAssignStatementsOnly() {
         return this.getAllInstances().isEmpty();
     }
+    
+    public void removeAllModuleInstances() {
+    	this.moduleInstances = new ArrayList<ModuleInstance>();
+    }
 }

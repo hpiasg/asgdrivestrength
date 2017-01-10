@@ -31,6 +31,21 @@ public class AssignConnection {
         this.destinationBitIndex = destinationBitIndex;
     }
     
+    public AssignConnection(AssignConnection assignConnectionToCopy) {
+        this.sourceSignal = assignConnectionToCopy.getSourceSignal();
+        this.sourceBitIndex = assignConnectionToCopy.getSourceBitIndex();
+        this.destinationSignal = assignConnectionToCopy.getDestinationSignal();
+        this.destinationBitIndex = assignConnectionToCopy.getDestinationBitIndex();
+    }
+    
+    public void setSourceSignal(Signal newSourceSignal) {
+    	this.sourceSignal = newSourceSignal;
+    }
+    
+    public void setDestinationSignal(Signal newDestinationSignal) {
+    	this.destinationSignal = newDestinationSignal;
+    }
+    
     public String toVerilog() {
         String verilog = "assign ";
         verilog += destinationSignal.getName();
