@@ -6,3 +6,4 @@ bin/
 *.html
 workingdir
 ${sys:logFilename}
+drivestrength.log
