@@ -29,7 +29,7 @@ public class ModuleInliner {
     }
 
     public Module run() {
-        this.inlinedModule = new Module(this.sourceModule);
+        this.inlinedModule = new Module(this.sourceModule, true);
         
         for (ModuleInstance childInstance : this.sourceModule.getModuleInstances()) {
             Module inlinedChild = new ModuleInliner(childInstance.getDefinition()).run();
@@ -115,6 +115,7 @@ public class ModuleInliner {
                 }
             }
             CellInstance newCellInstance = new CellInstance(name, cellDefinition, cellPinAssignments);
+            newCellInstance.setAvatar(childCellInstance.getAvatarOrSelf());
             inlinedModule.addInstance(newCellInstance);
         }
     }

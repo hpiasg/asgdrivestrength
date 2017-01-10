@@ -22,6 +22,10 @@ public class Module {
     }
     
     public Module(Module moduleToCopy) {
+        this(moduleToCopy, false);
+    }
+    
+    public Module(Module moduleToCopy, boolean keepCellAvatars) {
         this.name = moduleToCopy.getName();
         
         this.signals = new ArrayList<>();
@@ -40,8 +44,12 @@ public class Module {
         
         this.cellInstances = new ArrayList<>();
         for (CellInstance i : moduleToCopy.getCellInstances()) {
-            this.cellInstances.add(new CellInstance(i.getName(), i.getDefinition(),
-                                   this.copyPinAssignments(i.getPinAssignments())));
+            CellInstance newCellInstance = new CellInstance(i.getName(), i.getDefinition(),
+                    this.copyPinAssignments(i.getPinAssignments()));
+            if (keepCellAvatars) {
+                newCellInstance.setAvatar(i.getAvatarOrSelf());
+            }
+            this.cellInstances.add(newCellInstance);
         }
         
         this.moduleInstances = new ArrayList<>();

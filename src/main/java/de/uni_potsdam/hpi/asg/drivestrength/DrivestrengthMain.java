@@ -12,6 +12,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrar
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.CellAggregator;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.CellInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.inliner.NetlistInliner;
@@ -85,9 +86,17 @@ public class DrivestrengthMain {
         
         Netlist inlinedNetlist = new NetlistInliner(netlist).run();
         
+        for (CellInstance c : inlinedNetlist.getRootModule().getCellInstances()) {
+            c.setInputPinCapacitance(100);
+        }
+        
         logger.info("\n\n\n\n\n");
 
         logger.info("inlined:\n" + inlinedNetlist.toVerilog());
+        logger.info("\n\n\n\n\n");
+        
+
+        logger.info("flattened:\n" + netlist.toVerilog());
 
         return 0;
     }
