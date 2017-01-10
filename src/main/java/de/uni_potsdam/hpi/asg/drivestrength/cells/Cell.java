@@ -3,10 +3,14 @@ package de.uni_potsdam.hpi.asg.drivestrength.cells;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin.Direction;
+
 public class Cell {
 
     private String name;
-    private List<Pin> pins;
+    private String footprint;
+    
+    private final List<Pin> pins;
     
     public Cell() {
         this.pins = new ArrayList<Pin>();
@@ -27,5 +31,38 @@ public class Cell {
     public void addPin(Pin pin) {
         this.pins.add(pin);
     }
+
+    public String getFootprint() {
+        return footprint;
+    }
+
+    public void setFootprint(String footprint) {
+        this.footprint = footprint;
+    }
+
+    public Pin getOutputPin() {
+        for (Pin pin : this.pins) {
+            if (pin.getDirection() == Direction.output) {
+                return pin;
+            }
+        }
+        throw(new Error("Could not find output pin for cell " + this.name));
+    }
     
+    public List<Pin> getInputPins() {
+    	List<Pin> inputPins = new ArrayList<Pin>();
+        for (Pin pin : this.pins) {
+            if (pin.getDirection() == Direction.input) {
+            	inputPins.add(pin);
+            }
+        }
+        return inputPins;
+    }
+    
+    public boolean hasClockPin() {
+		for (Pin pin: this.pins) {
+			if (pin.isClockPin()) return true;
+		}
+	    return false;
+	}
 }

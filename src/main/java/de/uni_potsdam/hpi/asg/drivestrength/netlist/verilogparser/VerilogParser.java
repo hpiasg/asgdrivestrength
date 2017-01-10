@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.common.iohelper.FileHelper;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 
@@ -20,13 +21,16 @@ public class VerilogParser {
     private static final Pattern statementPattern = Pattern.compile("^.*;$");
     
     private List<String> statements;
+    private AggregatedCellLibrary aggregatedCellLibrary;
 
-    public VerilogParser(File verilogFile) {
+    public VerilogParser(File verilogFile, AggregatedCellLibrary aggregatedCellLibrary) {
         this.statements = readVerilogStatementsFromFile(verilogFile);
+        this.aggregatedCellLibrary = aggregatedCellLibrary;
     }
     
-    public VerilogParser(List<String> statements) {
+    public VerilogParser(List<String> statements, AggregatedCellLibrary aggregatedCellLibrary) {
         this.statements = statements;
+        this.aggregatedCellLibrary = aggregatedCellLibrary;
     }
     
     private List<String> readVerilogStatementsFromFile(File verilogFile) {
@@ -83,10 +87,10 @@ public class VerilogParser {
         for (String statement: statements) {
             currentModuleStatements.add(statement);
             if (matches(statement, endmodulePattern)) {
-                Module module = new VerilogModuleParser(currentModuleStatements, netlist).createModule();
+                Module module = new VerilogModuleParser(currentModuleStatements, netlist, aggregatedCellLibrary).run();
                 netlist.addModule(module);
                 currentModuleStatements = new ArrayList<String>();
-            }            
+            }
         }
         
         logger.info("Parsing Verilog netlist complete");

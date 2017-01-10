@@ -52,7 +52,7 @@ public class NetlistFlattener {
     
     private Module createFlattenedCopy(Module originalModule, String instanceName, String parentName) {
         Module module = new Module(originalModule);
-        module.setName(parentName + "/" + module.getName() + "___" + instanceName);
+        module.setName(parentName + "__" + module.getName() + "___" + instanceName);
         return module;
     }
     

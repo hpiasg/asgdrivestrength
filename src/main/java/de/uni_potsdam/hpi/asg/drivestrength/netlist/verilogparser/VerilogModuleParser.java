@@ -9,8 +9,10 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.AssignConnection;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.GateInstance;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.CellInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.ModuleInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
@@ -36,13 +38,15 @@ public class VerilogModuleParser {
     
     private Module module;
     private Netlist netlist;
+    private AggregatedCellLibrary aggregatedCellLibrary;
 
-    public VerilogModuleParser(List<String> statements, Netlist netlist) {
+    public VerilogModuleParser(List<String> statements, Netlist netlist, AggregatedCellLibrary aggregatedCellLibrary) {
         this.statements = statements;
         this.netlist = netlist;
+        this.aggregatedCellLibrary = aggregatedCellLibrary;
     }
     
-    public Module createModule() {
+    public Module run() {
         this.module = new Module();
         
         for (String statement : this.statements) {
@@ -156,8 +160,8 @@ public class VerilogModuleParser {
             ModuleInstance instance = new ModuleInstance(instanceName, definition, pinAssignments);
             this.module.addInstance(instance);
         } catch (Error e) {
-            String definition = definitionName;
-            GateInstance instance = new GateInstance(instanceName, definition, pinAssignments);
+            AggregatedCell definition = this.aggregatedCellLibrary.getByCellName(definitionName);            
+            CellInstance instance = new CellInstance(instanceName, definition, pinAssignments);
             this.module.addInstance(instance);
         }
         
@@ -176,9 +180,9 @@ public class VerilogModuleParser {
                 //mapped
                 String pinName = mappedMatcher.group(1);
                 String signalLiteral = mappedMatcher.group(2).trim();
+                int bitIndex = extractBitIndex(signalLiteral);
                 signalLiteral = signalLiteral.replaceAll("\\[.*\\]", "");
                 String signalName = extractSignalName(signalLiteral);
-                int bitIndex = extractBitIndex(signalLiteral);
                 Signal connectedSignal = this.module.getSignalByName(signalName);
                 pinAssignments.add(new PinAssignment(connectedSignal, bitIndex, pinName));
             } else {
@@ -186,7 +190,6 @@ public class VerilogModuleParser {
                 String signalName = extractSignalName(pinAssignmentLiteral);
                 int bitIndex = extractBitIndex(pinAssignmentLiteral);
                 Signal connectedSignal = this.module.getSignalByName(signalName);
-
                 pinAssignments.add(new PinAssignment(connectedSignal, bitIndex, pinPosition));
                 pinPosition++;
             }

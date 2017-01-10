@@ -39,6 +39,10 @@ public class Signal {
     public String getName() {
         return name;
     }
+    
+    public void setName(String newName) {
+    	this.name = newName;
+    }
 
     public int getWidth() {
         return width;
@@ -83,5 +87,9 @@ public class Signal {
 
     public Direction getDirection() {
         return direction;
+    }
+    
+    public boolean isIOSignal() {
+    	return (direction == Direction.input || direction == Direction.output);
     }
 }

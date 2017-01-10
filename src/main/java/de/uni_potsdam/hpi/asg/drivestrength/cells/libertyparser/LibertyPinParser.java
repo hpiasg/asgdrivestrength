@@ -12,9 +12,10 @@ public class LibertyPinParser {
     private static final Pattern namePattern = Pattern.compile("^(\\s*)pin\\s*\\((.*)\\)\\s*");
     private static final Pattern directionPattern = Pattern.compile("^(\\s*)direction\\s*\\:\\s*(.*)\\;\\s*$");
     private static final Pattern capacitancePattern = Pattern.compile("^(\\s*)capacitance\\s*\\:\\s*(.*)\\;\\s*$");
+    private static final Pattern clockPattern = Pattern.compile("^(\\s*)clock\\s*\\:\\s*(.*)\\;\\s*$");
     private static final Pattern startTimingPattern = Pattern.compile("^(\\s*)timing\\s*\\((.*)\\)\\s*");
 
-    private List<String>statements;
+    private final List<String>statements;
     private Pin pin;
     
     public LibertyPinParser(List<String> statements) {
@@ -32,6 +33,7 @@ public class LibertyPinParser {
         for (String statement : statements) {
             if (parseDirectionStatement(statement)) continue;
             if (parseCapacitanceStatement(statement)) continue;
+            if (parseClockStatement(statement)) continue;
         }
         
         if (this.pin.getDirection() == Direction.output) {
@@ -70,5 +72,12 @@ public class LibertyPinParser {
         if (!capacitanceMatcher.matches()) return false;
         this.pin.setCapacitance(Double.parseDouble(capacitanceMatcher.group(2)));
         return true;
+    }
+    
+    private boolean parseClockStatement(String statement) {
+    	Matcher clockMatcher = clockPattern.matcher(statement);
+    	if (!clockMatcher.matches()) return false;
+    	this.pin.markAsClockPin();
+    	return true;
     }
 }

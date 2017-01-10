@@ -1,24 +1,11 @@
 package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
 
 public class Netlist {
     private List<Module> modules;
     private Module rootModule;
-    
-    public static Netlist newFromVerilog(File verilogFile) {
-        VerilogParser p = new VerilogParser(verilogFile);
-        return p.createNetlist();
-    }
-    
-    public static Netlist newFromVerilog(List<String> statements) {
-        VerilogParser p = new VerilogParser(statements);
-        return p.createNetlist();
-    }
     
     public Netlist() {
         modules = new ArrayList<Module>();
@@ -62,5 +49,19 @@ public class Netlist {
             verilog += "\n\n";
         }
         return verilog;
+    }
+    
+    public boolean isFlat() {
+    	List<Module> instanciatedModuleDefinitions = new ArrayList<Module>();
+    	for (Module module : this.getModules()) {
+    		for (ModuleInstance i : module.getModuleInstances()) {
+    			Module definition = i.getDefinition();
+    			if (instanciatedModuleDefinitions.contains(definition) && !definition.hasAssignStatementsOnly()) {
+    				return false;
+    			}
+    			instanciatedModuleDefinitions.add(i.getDefinition());
+    		}
+    	}
+    	return true;
     }
 }

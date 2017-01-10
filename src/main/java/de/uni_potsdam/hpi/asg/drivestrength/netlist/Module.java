@@ -9,7 +9,7 @@ public class Module {
     private List<String> interfaceSignals;
     private List<Signal> signals;
     private List<AssignConnection> assignConnections;
-    private List<GateInstance> gateInstances;
+    private List<CellInstance> cellInstances;
     private List<ModuleInstance> moduleInstances; /* these are instances of *other* modules */
     
     public Module() {
@@ -17,11 +17,15 @@ public class Module {
         this.signals = new ArrayList<>();
         this.interfaceSignals = new ArrayList<>();
         this.assignConnections = new ArrayList<>();
-        this.gateInstances = new ArrayList<>();
+        this.cellInstances = new ArrayList<>();
         this.moduleInstances = new ArrayList<>();
     }
     
     public Module(Module moduleToCopy) {
+        this(moduleToCopy, false);
+    }
+    
+    public Module(Module moduleToCopy, boolean keepCellAvatars) {
         this.name = moduleToCopy.getName();
         
         this.signals = new ArrayList<>();
@@ -38,10 +42,14 @@ public class Module {
                                        s.getSourceBitIndex(), s.getDestinationBitIndex()));
         }
         
-        this.gateInstances = new ArrayList<>();
-        for (GateInstance i : moduleToCopy.getGateInstances()) {
-            this.gateInstances.add(new GateInstance(i.getName(), i.getDefinitionName(),
-                                   this.copyPinAssignments(i.getPinAssignments())));
+        this.cellInstances = new ArrayList<>();
+        for (CellInstance i : moduleToCopy.getCellInstances()) {
+            CellInstance newCellInstance = new CellInstance(i.getName(), i.getDefinition(),
+                    this.copyPinAssignments(i.getPinAssignments()));
+            if (keepCellAvatars) {
+                newCellInstance.setAvatar(i.getAvatarOrSelf());
+            }
+            this.cellInstances.add(newCellInstance);
         }
         
         this.moduleInstances = new ArrayList<>();
@@ -57,8 +65,7 @@ public class Module {
             Signal signal = this.getSignalByName(p.getSignal().getName());
             if (p.isPositional()) {
                 newPinAssignments.add(new PinAssignment(signal, p.getSignalBitIndex(), p.getPinPosition())); 
-            }
-            if (p.isPositional()) {
+            } else {
                 newPinAssignments.add(new PinAssignment(signal, p.getSignalBitIndex(), p.getPinName()));                    
             }
         }
@@ -100,7 +107,7 @@ public class Module {
     
     public List<AbstractInstance> getAllInstances() {
         List<AbstractInstance> allInstances = new ArrayList<>();
-        allInstances.addAll(this.gateInstances);
+        allInstances.addAll(this.cellInstances);
         allInstances.addAll(this.moduleInstances);
         return allInstances;
     }
@@ -121,16 +128,16 @@ public class Module {
         this.moduleInstances.add(instance);
     }
     
-    public void addInstance(GateInstance instance) {
-        this.gateInstances.add(instance);
+    public void addInstance(CellInstance instance) {
+        this.cellInstances.add(instance);
     }
     
     public List<ModuleInstance> getModuleInstances() {
         return this.moduleInstances;
     }
 
-    public List<GateInstance> getGateInstances() {
-        return this.gateInstances;
+    public List<CellInstance> getCellInstances() {
+        return this.cellInstances;
     }
     
     public List<Signal> getSignals() {
@@ -168,5 +175,9 @@ public class Module {
     
     public boolean hasAssignStatementsOnly() {
         return this.getAllInstances().isEmpty();
+    }
+    
+    public void removeAllModuleInstances() {
+    	this.moduleInstances = new ArrayList<ModuleInstance>();
     }
 }
