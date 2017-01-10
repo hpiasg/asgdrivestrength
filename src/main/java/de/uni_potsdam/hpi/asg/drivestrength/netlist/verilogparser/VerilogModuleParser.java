@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.AssignConnection;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.GateInstance;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.CellInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.ModuleInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
@@ -161,7 +161,7 @@ public class VerilogModuleParser {
             this.module.addInstance(instance);
         } catch (Error e) {
             AggregatedCell definition = this.aggregatedCellLibrary.getByCellName(definitionName);            
-            GateInstance instance = new GateInstance(instanceName, definition, pinAssignments);
+            CellInstance instance = new CellInstance(instanceName, definition, pinAssignments);
             this.module.addInstance(instance);
         }
         
@@ -180,9 +180,9 @@ public class VerilogModuleParser {
                 //mapped
                 String pinName = mappedMatcher.group(1);
                 String signalLiteral = mappedMatcher.group(2).trim();
+                int bitIndex = extractBitIndex(signalLiteral);
                 signalLiteral = signalLiteral.replaceAll("\\[.*\\]", "");
                 String signalName = extractSignalName(signalLiteral);
-                int bitIndex = extractBitIndex(signalLiteral);
                 Signal connectedSignal = this.module.getSignalByName(signalName);
                 pinAssignments.add(new PinAssignment(connectedSignal, bitIndex, pinName));
             } else {
@@ -190,7 +190,6 @@ public class VerilogModuleParser {
                 String signalName = extractSignalName(pinAssignmentLiteral);
                 int bitIndex = extractBitIndex(pinAssignmentLiteral);
                 Signal connectedSignal = this.module.getSignalByName(signalName);
-
                 pinAssignments.add(new PinAssignment(connectedSignal, bitIndex, pinPosition));
                 pinPosition++;
             }

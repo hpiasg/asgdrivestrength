@@ -72,17 +72,22 @@ public class DrivestrengthMain {
 
         logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
         
-//        logger.info(netlist.toVerilog());
-//        
-//        logger.info("\n\n\n\n\n");
-//        
-        new NetlistFlattener(netlist).run();
+        logger.info("parsed:\n" + netlist.toVerilog());
+        
+        
+        new NetlistFlattener(netlist).run();        
+        
+        
+        logger.info("\n\n\n\n\n");
+        
+
+        logger.info("flattened:\n" + netlist.toVerilog());
         
         Netlist inlinedNetlist = new NetlistInliner(netlist).run();
-//        
-//        logger.info("\n\n\n\n\n");
-//
-        logger.info(inlinedNetlist.toVerilog());
+        
+        logger.info("\n\n\n\n\n");
+
+        logger.info("inlined:\n" + inlinedNetlist.toVerilog());
 
         return 0;
     }

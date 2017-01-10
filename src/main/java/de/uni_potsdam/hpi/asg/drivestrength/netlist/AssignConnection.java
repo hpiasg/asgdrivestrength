@@ -23,6 +23,14 @@ public class AssignConnection {
         return destinationBitIndex;
     }
 
+    public void setSourceBitIndex(int sourceBitIndex) {
+        this.sourceBitIndex = sourceBitIndex;
+    }
+
+    public void setDestinationBitIndex(int destinationBitIndex) {
+        this.destinationBitIndex = destinationBitIndex;
+    }
+
     public AssignConnection(Signal sourceSignal, Signal destinationSignal, 
                             int sourceBitIndex, int destinationBitIndex) {
         this.sourceSignal = sourceSignal;
