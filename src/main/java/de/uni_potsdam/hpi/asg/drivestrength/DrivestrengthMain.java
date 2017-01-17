@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.CellAggregator;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
@@ -69,10 +68,6 @@ public class DrivestrengthMain {
 
         System.out.println("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
         
-        printCellInformation(aggregatedCellLibrary);
-//        
-//        
-//
 //        Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary).createNetlist();
 //
 //        logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
@@ -105,19 +100,4 @@ public class DrivestrengthMain {
         return 0;
     }
     
-    private static void printCellInformation(AggregatedCellLibrary aggregatedCellLibrary) {
-//        double invLogicalEffort = aggregatedCellLibrary.get("DSC_INV").getAvgLogicalEffort();
-//        
-//        for (AggregatedCell cell : aggregatedCellLibrary.getAll()) {
-//            System.out.println("Cell " + cell.getName() + " has average-g = " + cell.getAvgLogicalEffort() / invLogicalEffort);
-//            System.out.print("(");
-//            for (double logicalEffort: cell.getAvgLogicalEffortPerCell()) {
-//                System.out.format("%.3f", logicalEffort / invLogicalEffort);
-//                System.out.print("  ");
-//            }
-//            System.out.print(")\n");
-//            System.out.println("StageCounts: " + cell.getStageCounts());
-//        }
-        
-    }
 }
