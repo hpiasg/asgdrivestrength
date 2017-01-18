@@ -5,14 +5,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin;
-import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin.Direction;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Timing;
 
 public class CellAggregator {
+    protected static final Logger logger = LogManager.getLogger();
+    
     private final List<Cell> rawCells;
     private Map<String, AggregatedCell> aggregatedCells;
     private StageCountsContainer stageCounts;
@@ -58,13 +62,24 @@ public class CellAggregator {
     }
 
     private boolean isFitForAggregation(Cell rawCell) {
-        int outputPinCount = 0;
-        for (Pin pin : rawCell.getPins()) {
-            if (pin.getDirection() == Direction.output) {
-                outputPinCount++;
-            }
+        String logPrefix = "Skipping cell " + rawCell.getName() + " ";
+        if (!rawCell.hasSingleOutputPin()) {
+            logger.debug(logPrefix + "(multiple output pins)");
+            return false;
         }
-        return outputPinCount == 1 && rawCell.getInputPins().size() >= 1;
+        if (rawCell.getInputPins().size() < 1) {
+            logger.debug(logPrefix + "(no input pins)");
+            return false;
+        }
+        if (!this.stageCounts.getFootprintDefaults().containsKey(rawCell.getFootprint())) {
+            logger.debug(logPrefix + "(no stage count information)");
+            return false;
+        }
+        if (this.stageCounts.getDeviatingSizes().containsKey(rawCell.getName())) {
+            logger.debug(logPrefix + "(size with deviating cell count)");
+            return false;
+        }
+        return true;
     }
 
     private List<String> extractInputPinNames(Cell rawCell) {
@@ -162,6 +177,7 @@ public class CellAggregator {
                Map<String, Map<String, DelayLine>> delayLines, Map<String, Integer> stageCounts) {
         
         Map<String, DelayParameterTriple> delayParameterTriplesPerPin = new HashMap<>();
+        
         
         for (String pinName : delayLines.keySet()) {
             delayParameterTriplesPerPin.put(pinName, new DelayParametersExtractor(delayLines.get(pinName), stageCounts.get(pinName)).run());

@@ -13,7 +13,7 @@ public class StageCountsContainer {
 		return this.footprintDefaults;
 	}
 	
-	public HashMap<String, HashMap<String, Integer>> deviatingSizes() { 
+	public HashMap<String, HashMap<String, Integer>> getDeviatingSizes() { 
 		return this.deviatingSizes;
 	}
 }
