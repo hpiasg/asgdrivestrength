@@ -27,7 +27,7 @@ public class DelayParametersExtractor {
         sortDelayLinesBySlope();
         
         List<DelayPoint> intersections = new ArrayList<>();
-        intersections.add(new DelayPoint(0, findLowestDelayOffset()));
+        intersections.add(new DelayPoint(0, findLowestDelayOffset())); // add additional point to the left
         for (int i = 0; i < delayLines.size() - 1; i++) {
             DelayPoint intersection = delayLines.get(i).getIntersectionPoint(delayLines.get(i+1));
             if (intersection.isPositive()) {
@@ -35,12 +35,24 @@ public class DelayParametersExtractor {
                 intersections.add(intersection);
             }
         }
+        if (intersections.size() < 2) {
+            throw new Error("cannot extract multi-stage delay parameters with no intersection");
+        }
+        
+        /* <add additional point to the right> */
+        double rightmostIntersectionX = intersections.get(intersections.size() - 1).getX();
+        double deltaX = rightmostIntersectionX - intersections.get(intersections.size() - 2).getX();
+        double newPointX = rightmostIntersectionX + deltaX;
+                intersections.add(new DelayPoint(newPointX, delayLines.get(delayLines.size() - 1).valueAtX(newPointX)));
+        /* </add additional point to the right> */
         
         List<DelayPoint> middlePoints = new ArrayList<>();
         for (int i = 0; i < intersections.size() - 1; i++) {
             DelayPoint middlePoint = DelayPoint.centerBetween(intersections.get(i), intersections.get(i+1));
             middlePoints.add(middlePoint);
         }
+        
+        
         System.out.println("Middle points: " + middlePoints);
 
         /* let us define x := nth-root(H) and a := N * nth-root(G) */
@@ -53,6 +65,10 @@ public class DelayParametersExtractor {
         SimpleRegression s = new SimpleRegression();
         for (DelayPoint p : linearizedPoints) {
             s.addData(p.getX(), p.getY());
+        }
+        if (linearizedPoints.size() == 2) {
+            DelayPoint center = DelayPoint.centerBetween(linearizedPoints.get(0), linearizedPoints.get(1));
+            s.addData(center.getX(), center.getY());
         }
         s.regress();
         double a = s.getSlope();
