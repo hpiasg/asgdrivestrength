@@ -94,4 +94,12 @@ public class AggregatedCell {
         }
         return bestSizeName;
     }
+    
+    public int getSizeCount() {
+        return this.sizeNames.size();
+    }
+    
+    public String toString() {
+        return "AggregatedCell with " + this.getSizeCount() + " cell sizes";
+    }
 }

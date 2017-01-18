@@ -37,4 +37,8 @@ public class AggregatedCellLibrary {
     public int size() {
         return this.aggregatedCells.size();
     }
+    
+    public String toString() {
+        return "AggregatedCellLibrary (hashCode " + hashCode() +") with " + this.size() + " cells: " + this.aggregatedCells.toString();  
+    }
 }

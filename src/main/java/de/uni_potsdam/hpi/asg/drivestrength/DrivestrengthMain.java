@@ -68,6 +68,8 @@ public class DrivestrengthMain {
 
         System.out.println("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
         
+        System.out.println(aggregatedCellLibrary);
+        
 //        Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary).createNetlist();
 //
 //        logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
