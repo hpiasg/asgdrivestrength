@@ -61,9 +61,10 @@ public class DrivestrengthMain {
         
         AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts).run();
 
-        System.out.println("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
+        logger.info("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
         
-        System.out.println(aggregatedCellLibrary);
+        aggregatedCellLibrary.printDelayParameterTable();
+        
         
 //        Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary).createNetlist();
 //

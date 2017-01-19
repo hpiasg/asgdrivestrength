@@ -40,4 +40,15 @@ public class AggregatedCellLibrary {
     public String toString() {
         return "AggregatedCellLibrary (hashCode " + hashCode() +") with " + this.size() + " cells: " + this.aggregatedCells.toString();  
     }
+    
+    public void printDelayParameterTable() {
+        System.out.println("Printing library delay paramters. Columns: ");
+        System.out.println("CellFootprint, Pin, LogicalEffort, ParasiticDelay, StageCount");
+        for (AggregatedCell cell : this.aggregatedCells.values()) {
+            for (String pinName : cell.getDelayParameterTriples().keySet()) {
+                DelayParameterTriple d = cell.getDelayParameterTriples().get(pinName);
+                System.out.println(cell.getName() + ", " + pinName + ", " + d.getLogicalEffort() + ", " + d.getParasiticDelay() + ", " + d.getStageCount());
+            }
+        }
+    }
 }

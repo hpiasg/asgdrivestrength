@@ -35,8 +35,6 @@ public class DelayParametersExtractor {
         double a = f.getSlope();
         double logicalEffort = Math.pow(a / stageCount, stageCount);
 
-        System.out.println("estimated delay: " + stageCount + " * (" + logicalEffort + " * H)^(1.0/" + stageCount + ") + " + parasiticDelay);
-        
         return new DelayParameterTriple(logicalEffort, parasiticDelay, stageCount);
     }
     

@@ -52,12 +52,8 @@ public class CellAggregator {
             Map<String, Map<String, DelayLine>> delayLines = 
                     this.extractDelayLinesFor(rawSizes, aggregatedCell.getInputPinNames(), aggregatedCell.getSizeCapacitances());
             
-            System.out.println("\n<" + aggregatedCell.getName() + ">");
-            
             Map<String, Integer> stageCountsPerPin = this.stageCounts.getFootprintDefaults().get(aggregatedCell.getName());
             aggregatedCell.setDelayParameterTriples(this.extractDelayParameters(delayLines, stageCountsPerPin));;
-            
-            System.out.println("</" + aggregatedCell.getName() + ">");
         }
    
         return new AggregatedCellLibrary(aggregatedCells);
@@ -128,9 +124,6 @@ public class CellAggregator {
                 sizeDelayLines.get(pinName).put(sizeName, delayLine);
             }
         }
-
-        System.out.println("Delay Lines for " + rawSizes.get(0).getFootprint());
-        System.out.println(sizeDelayLines);
         
         return sizeDelayLines;
     }
@@ -168,7 +161,6 @@ public class CellAggregator {
         for (String pinName : delayLines.keySet()) {
             Map<String, DelayLine> delayLinesForPin = delayLines.get(pinName);
             int stageCountForPin = stageCounts.get(pinName);
-            System.out.print("Pin " + pinName + ": ");
             delayParameterTriplesPerPin.put(pinName, new DelayParametersExtractor(delayLinesForPin, stageCountForPin).run());
         }
         
