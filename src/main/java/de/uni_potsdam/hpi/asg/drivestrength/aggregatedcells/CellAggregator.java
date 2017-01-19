@@ -36,17 +36,15 @@ public class CellAggregator {
             if (!isFitForAggregation(rawCell)) continue;
             String cellFootprint = rawCell.getFootprint();
             if (!aggregatedCells.containsKey(cellFootprint)) {
-                //System.out.println("new aggregated cell, footprint: " + cellFootprint);
                 this.aggregatedCells.put(cellFootprint, new AggregatedCell(cellFootprint));
             }
-            //System.out.println("adding rawCell " + cell.getName() + " to " + cellFootprint);
             AggregatedCell aggregatedCell = this.aggregatedCells.get(cellFootprint);
             aggregatedCell.addCellSize(rawCell);
         }
         
         for (AggregatedCell aggregatedCell : aggregatedCells.values()) {
             
-            List<Cell> rawSizes = aggregatedCell.getSizesRaw();
+            List<Cell> rawSizes = aggregatedCell.getRawSizes();
             
             aggregatedCell.setInputPinNames(this.extractInputPinNames(rawSizes.get(0)));
             aggregatedCell.setSizeCapacitances(this.extractSizeCapacitances(rawSizes));
@@ -116,8 +114,6 @@ public class CellAggregator {
         }
         return pinCapacitances;
     }
-    
-    
 
     //returns map:  pin->size->value
     private Map<String, Map<String, DelayLine>> extractDelayLinesFor(List<Cell> rawSizes, List<String> pinNames,
@@ -151,44 +147,28 @@ public class CellAggregator {
     }
     
     private DelayLine extractDelayLine(DelayMatrix delayMatrix, double inputCapacitance) {
-        int leftIndex = 0;
-        int rightIndex = 6;
-        
-        double loadCapacitanceLeft = delayMatrix.getLoadCapacitanceAt(leftIndex);
-        double electricalEffortLeft = loadCapacitanceLeft / inputCapacitance;
-        double delayLeft = delayMatrix.getDelayAt(this.inputSlewIndex, leftIndex);
-        
-        double loadCapacitanceRight = delayMatrix.getLoadCapacitanceAt(rightIndex);
-        double electricalEffortRight = loadCapacitanceRight / inputCapacitance;
-        double delayRight = delayMatrix.getDelayAt(this.inputSlewIndex, rightIndex);
-        
-        double deltaY = delayRight - delayLeft;
-        double deltaX = electricalEffortRight - electricalEffortLeft;
-        
-        double slope = deltaY / deltaX; 
-        
-        
-        double deltaXToZero = -electricalEffortLeft;
-        double deltaYToZero = deltaXToZero * slope;
-        double offset = delayLeft + deltaYToZero;
-        
-        return new DelayLine(slope, offset);
-    }
-    
+        List<DelayPoint> delayPoints = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            double loadCapacitance = delayMatrix.getLoadCapacitanceAt(i);
+            double electricalEffort = loadCapacitance / inputCapacitance;
+            double delay = delayMatrix.getDelayAt(this.inputSlewIndex, i);
+            
+            delayPoints.add(new DelayPoint(electricalEffort, delay));            
+        }
 
-    
+        LinearFunctionFitter f = new LinearFunctionFitter(delayPoints);
+        return f.getDelayLine();
+    }
+
     private Map<String, DelayParameterTriple> extractDelayParameters(
                Map<String, Map<String, DelayLine>> delayLines, Map<String, Integer> stageCounts) {
         
         Map<String, DelayParameterTriple> delayParameterTriplesPerPin = new HashMap<>();
         
-        
         for (String pinName : delayLines.keySet()) {
             Map<String, DelayLine> delayLinesForPin = delayLines.get(pinName);
-            if (!stageCounts.containsKey(pinName)) {
-                System.out.println("No stage count information for pin " + pinName);
-            }
             int stageCountForPin = stageCounts.get(pinName);
+            System.out.print("Pin " + pinName + ": ");
             delayParameterTriplesPerPin.put(pinName, new DelayParametersExtractor(delayLinesForPin, stageCountForPin).run());
         }
         

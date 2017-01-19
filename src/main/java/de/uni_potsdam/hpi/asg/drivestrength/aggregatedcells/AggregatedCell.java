@@ -40,7 +40,7 @@ public class AggregatedCell {
         this.sizeNames.add(cellSizeRaw.getName());
     }
     
-    public List<Cell> getSizesRaw() {
+    public List<Cell> getRawSizes() {
     	return this.sizesRaw;
     }
     

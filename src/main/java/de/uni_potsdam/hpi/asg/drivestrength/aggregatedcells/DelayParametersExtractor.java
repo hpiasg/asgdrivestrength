@@ -6,9 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.math3.stat.regression.RegressionResults;
-import org.apache.commons.math3.stat.regression.SimpleRegression;
-
 public class DelayParametersExtractor {
     private List<DelayLine> delayLines;
     private int stageCount;
@@ -25,70 +22,22 @@ public class DelayParametersExtractor {
         }
         
         sortDelayLinesBySlope();
+        List<DelayPoint> intersections = extractDelayLineIntersections();
+        List<DelayPoint> middlePoints = calculateMiddlePointsBetween(intersections);
         
-        List<DelayPoint> intersections = new ArrayList<>();
-        intersections.add(new DelayPoint(0, findLowestDelayOffset())); // add additional point to the left
-        for (int i = 0; i < delayLines.size() - 1; i++) {
-            DelayPoint intersection = delayLines.get(i).getIntersectionPoint(delayLines.get(i+1));
-            if (intersection.isPositive()) {
-                System.out.println("intersection at " + intersection);
-                intersections.add(intersection);
-            }
-        }
-        if (intersections.size() < 2) {
-            throw new Error("cannot extract multi-stage delay parameters with no intersection");
-        }
+        /* let us define x := nth-root(H) and a := N * nth-root(G).
+         * Thus, after transforming the points we can fit a linear function */
         
-        /* <add additional point to the right> */
-        double rightmostIntersectionX = intersections.get(intersections.size() - 1).getX();
-        double deltaX = rightmostIntersectionX - intersections.get(intersections.size() - 2).getX();
-        double newPointX = rightmostIntersectionX + deltaX;
-                intersections.add(new DelayPoint(newPointX, delayLines.get(delayLines.size() - 1).valueAtX(newPointX)));
-        /* </add additional point to the right> */
-        
-        List<DelayPoint> middlePoints = new ArrayList<>();
-        for (int i = 0; i < intersections.size() - 1; i++) {
-            DelayPoint middlePoint = DelayPoint.centerBetween(intersections.get(i), intersections.get(i+1));
-            middlePoints.add(middlePoint);
-        }
-        
-        
-        System.out.println("Middle points: " + middlePoints);
+        List<DelayPoint> linearizedPoints = transformPointsToLinear(middlePoints);
 
-        /* let us define x := nth-root(H) and a := N * nth-root(G) */
-        //Transform x values with new x := nth-root(H) so the data becomes linear
-        List<DelayPoint> linearizedPoints = new ArrayList<>();
-        for (DelayPoint p : middlePoints) {
-            linearizedPoints.add(new DelayPoint(Math.pow(p.getElectricalEffort(), 1.0 / stageCount), p.getDelay()));
-        }
-        System.out.println("Lizearized: " + linearizedPoints);
-        SimpleRegression s = new SimpleRegression();
-        for (DelayPoint p : linearizedPoints) {
-            s.addData(p.getX(), p.getY());
-        }
-        if (linearizedPoints.size() == 2) {
-            DelayPoint center = DelayPoint.centerBetween(linearizedPoints.get(0), linearizedPoints.get(1));
-            s.addData(center.getX(), center.getY());
-        }
-        s.regress();
-        double a = s.getSlope();
-        double parasiticDelay = s.getIntercept();
-        System.out.println("estimated function:" + a + " * x + " + parasiticDelay);
+        LinearFunctionFitter f = new LinearFunctionFitter(linearizedPoints);
+        double parasiticDelay = f.getIntercept();
+        double a = f.getSlope();
         double logicalEffort = Math.pow(a / stageCount, stageCount);
 
         System.out.println("estimated delay: " + stageCount + " * (" + logicalEffort + " * H)^(1.0/" + stageCount + ") + " + parasiticDelay);
         
         return new DelayParameterTriple(logicalEffort, parasiticDelay, stageCount);
-    }
-    
-    private double findLowestDelayOffset() {
-        double lowestOffset = Double.MAX_VALUE;
-        for (DelayLine delayLine : delayLines) {
-            if (delayLine.getOffset() < lowestOffset) {
-                lowestOffset = delayLine.getOffset();
-            }
-        }
-        return lowestOffset;
     }
     
     private void sortDelayLinesBySlope() {
@@ -101,8 +50,56 @@ public class DelayParametersExtractor {
         });
     }
 
+    private List<DelayPoint> extractDelayLineIntersections() {
+        List<DelayPoint> intersections = new ArrayList<>();
+        
+        // heuristic: add additional point to the left
+        intersections.add(new DelayPoint(0, this.findLowestDelayOffset()));
+        
+        for (int i = 0; i < delayLines.size() - 1; i++) {
+            DelayPoint intersection = delayLines.get(i).getIntersectionPoint(delayLines.get(i+1));
+            if (intersection.isPositive()) {
+                intersections.add(intersection);
+            }
+        }
+        
+        if (intersections.size() < 2) {
+            throw new Error("cannot extract multi-stage delay parameters with no intersection");
+        }
+        
+        // heuristic: add additional point further to the right (on least-slope delayLine)
+        double rightmostIntersectionX = intersections.get(intersections.size() - 1).getX();
+        double deltaX = rightmostIntersectionX - intersections.get(intersections.size() - 2).getX();
+        double newPointX = rightmostIntersectionX + deltaX;
+        intersections.add(new DelayPoint(newPointX, delayLines.get(delayLines.size() - 1).valueAtX(newPointX)));
+        
+        return intersections;
+    }
     
-    private double nthRootValue(int stageCount, double parasiticDelay, double logicalEffort, double electricalEffort) {
-        return parasiticDelay + stageCount * Math.pow(logicalEffort * electricalEffort, stageCount);
+    private List<DelayPoint> calculateMiddlePointsBetween(List<DelayPoint> originalPoints) {
+        List<DelayPoint> middlePoints = new ArrayList<>();
+        for (int i = 0; i < originalPoints.size() - 1; i++) {
+            DelayPoint middlePoint = DelayPoint.centerBetween(originalPoints.get(i), originalPoints.get(i+1));
+            middlePoints.add(middlePoint);
+        }
+        return middlePoints;
+    }
+
+    private List<DelayPoint> transformPointsToLinear(List<DelayPoint> originalNthRootFunctionPoints) {
+        List<DelayPoint> linearizedPoints = new ArrayList<>();
+        for (DelayPoint p : originalNthRootFunctionPoints) {
+            linearizedPoints.add(new DelayPoint(Math.pow(p.getElectricalEffort(), 1.0 / stageCount), p.getDelay()));
+        }
+        return linearizedPoints;        
+    }
+    
+    private double findLowestDelayOffset() {
+        double lowestOffset = Double.MAX_VALUE;
+        for (DelayLine delayLine : delayLines) {
+            if (delayLine.getOffset() < lowestOffset) {
+                lowestOffset = delayLine.getOffset();
+            }
+        }
+        return lowestOffset;
     }
 }
