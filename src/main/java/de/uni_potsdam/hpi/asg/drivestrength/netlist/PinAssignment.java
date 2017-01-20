@@ -35,7 +35,7 @@ public class PinAssignment {
     }
     
     public void setSignal(Signal newSignal) {
-        this.signal = signal;
+        this.signal = newSignal;
     }
     
     public void setSignalBitIndex(int newSignalBitIndex) {
