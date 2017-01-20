@@ -7,6 +7,21 @@ public class AssignConnection {
     private int sourceBitIndex;
     private int destinationBitIndex;
     
+    public AssignConnection(Signal sourceSignal, Signal destinationSignal, 
+                            int sourceBitIndex, int destinationBitIndex) {
+        this.sourceSignal = sourceSignal;
+        this.sourceBitIndex = sourceBitIndex;
+        this.destinationSignal = destinationSignal;
+        this.destinationBitIndex = destinationBitIndex;
+    }
+    
+    public AssignConnection(AssignConnection assignConnectionToCopy) {
+        this.sourceSignal = assignConnectionToCopy.getSourceSignal();
+        this.sourceBitIndex = assignConnectionToCopy.getSourceBitIndex();
+        this.destinationSignal = assignConnectionToCopy.getDestinationSignal();
+        this.destinationBitIndex = assignConnectionToCopy.getDestinationBitIndex();
+    }
+    
     public Signal getSourceSignal() {
         return sourceSignal;
     }
@@ -29,21 +44,6 @@ public class AssignConnection {
 
     public void setDestinationBitIndex(int destinationBitIndex) {
         this.destinationBitIndex = destinationBitIndex;
-    }
-
-    public AssignConnection(Signal sourceSignal, Signal destinationSignal, 
-                            int sourceBitIndex, int destinationBitIndex) {
-        this.sourceSignal = sourceSignal;
-        this.sourceBitIndex = sourceBitIndex;
-        this.destinationSignal = destinationSignal;
-        this.destinationBitIndex = destinationBitIndex;
-    }
-    
-    public AssignConnection(AssignConnection assignConnectionToCopy) {
-        this.sourceSignal = assignConnectionToCopy.getSourceSignal();
-        this.sourceBitIndex = assignConnectionToCopy.getSourceBitIndex();
-        this.destinationSignal = assignConnectionToCopy.getDestinationSignal();
-        this.destinationBitIndex = assignConnectionToCopy.getDestinationBitIndex();
     }
     
     public void setSourceSignal(Signal newSourceSignal) {

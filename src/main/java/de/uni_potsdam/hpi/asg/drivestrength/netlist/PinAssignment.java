@@ -2,7 +2,7 @@ package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 
 public class PinAssignment {
     private Signal signal;
-    private int signalBitIndex;
+    private int signalBitIndex; // -1 for "has no selected bit"
     private int pinPosition;
     private String pinName;
 
@@ -32,6 +32,14 @@ public class PinAssignment {
     }
     public boolean isPositional() {
         return pinName == null;
+    }
+    
+    public void setSignal(Signal newSignal) {
+        this.signal = newSignal;
+    }
+    
+    public void setSignalBitIndex(int newSignalBitIndex) {
+        this.signalBitIndex = newSignalBitIndex;
     }
     
     public boolean hasSelectedBit() {
