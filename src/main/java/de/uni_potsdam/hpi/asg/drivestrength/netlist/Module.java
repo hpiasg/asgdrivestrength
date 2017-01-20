@@ -164,6 +164,16 @@ public class Module {
         return wires;
     }
     
+    public List<Signal> getIOSignals() {
+        List<Signal> ioSignals = new ArrayList<>();
+        for (Signal s : this.signals) {
+            if (s.getDirection() == Direction.input || s.getDirection() == Direction.output) {
+                ioSignals.add(s);
+            }
+        }
+        return ioSignals;
+    }
+    
     public Signal getSignalByName(String signalName) {
         if (signalName.equals("0")) {
             return Signal.getZeroInstance();

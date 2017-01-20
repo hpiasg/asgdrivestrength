@@ -92,4 +92,8 @@ public class Signal {
     public boolean isIOSignal() {
     	return (direction == Direction.input || direction == Direction.output);
     }
+    
+    public boolean isWire() {
+        return (direction == Direction.wire);
+    }
 }

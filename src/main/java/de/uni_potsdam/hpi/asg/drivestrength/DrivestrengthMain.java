@@ -84,7 +84,7 @@ public class DrivestrengthMain {
         new NetlistBundleSplitter(inlinedNetlist).run();
         
 
-      logger.info("inlined:\n" + inlinedNetlist.toVerilog());
+      logger.info("flattened, inlined, debundled:\n" + inlinedNetlist.toVerilog());
       logger.info("\n\n\n\n\n");
 
         return 0;
