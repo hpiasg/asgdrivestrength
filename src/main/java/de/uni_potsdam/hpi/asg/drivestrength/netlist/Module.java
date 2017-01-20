@@ -3,6 +3,8 @@ package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal.Direction;
+
 public class Module {
 
     private String name;
@@ -152,6 +154,16 @@ public class Module {
         return this.assignConnections;
     }
     
+    public List<Signal> getWires() {
+        List<Signal> wires = new ArrayList<>();
+        for (Signal s : this.signals) {
+            if (s.getDirection() == Direction.wire) {
+                wires.add(s);
+            }
+        }
+        return wires;
+    }
+    
     public Signal getSignalByName(String signalName) {
         if (signalName.equals("0")) {
             return Signal.getZeroInstance();
@@ -179,5 +191,9 @@ public class Module {
     
     public void removeAllModuleInstances() {
     	this.moduleInstances = new ArrayList<ModuleInstance>();
+    }
+    
+    public void removeSignal(Signal signalToRemove) {
+        this.signals.remove(signalToRemove);
     }
 }
