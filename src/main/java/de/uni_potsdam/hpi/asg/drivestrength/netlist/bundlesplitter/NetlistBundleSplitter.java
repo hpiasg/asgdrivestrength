@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.netlist.bundleSplitter;
+package de.uni_potsdam.hpi.asg.drivestrength.netlist.bundlesplitter;
 
 import java.util.ArrayList;
 import java.util.List;
