@@ -86,8 +86,8 @@ public class DrivestrengthMain {
         new NetlistAssignCleaner(inlinedNetlist).run();
         
 
-//      logger.info("flattened, inlined, debundled:\n" + inlinedNetlist.toVerilog());
-//      logger.info("\n\n\n\n\n");
+      logger.info("flattened, inlined, debundled:\n" + inlinedNetlist.toVerilog());
+      logger.info("\n\n\n\n\n");
 
         return 0;
     }

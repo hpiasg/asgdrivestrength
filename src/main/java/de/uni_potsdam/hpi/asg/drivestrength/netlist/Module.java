@@ -203,6 +203,10 @@ public class Module {
     	this.moduleInstances = new ArrayList<ModuleInstance>();
     }
     
+    public void removeAssignConnection(AssignConnection assignConnectionToRemove) {
+        this.assignConnections.remove(assignConnectionToRemove);
+    }
+    
     public void removeSignal(Signal signalToRemove) {
         this.signals.remove(signalToRemove);
     }
