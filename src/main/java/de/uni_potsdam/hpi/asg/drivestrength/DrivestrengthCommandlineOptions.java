@@ -24,9 +24,12 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     
     @Option(name = "-debug")
     private boolean debug = false;
-    
+
     @Option(name = "-lib", metaVar = "<libertyfile>", usage ="Liberty Cell Library File", required = true)
     private File libertyFile;
+    
+    @Option(name = "-stage", metaVar = "<stageCountsFile>", usage ="Cell Stage Counts JSON File", required = true)
+    private File stageCountsFile;
 
     @Argument(metaVar = "Verilog Netlist File", required = true)
     private File netlistFile;
@@ -54,9 +57,12 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
         return libertyFile;
     }
     
+    public File getStageCountsFile() {
+        return stageCountsFile;
+    }
+
     public File getWorkingdir() {
         return workingdir;
     }
-
 
 }

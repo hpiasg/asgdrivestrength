@@ -160,9 +160,12 @@ public class VerilogModuleParser {
             ModuleInstance instance = new ModuleInstance(instanceName, definition, pinAssignments);
             this.module.addInstance(instance);
         } catch (Error e) {
-            AggregatedCell definition = this.aggregatedCellLibrary.getByCellName(definitionName);            
-            CellInstance instance = new CellInstance(instanceName, definition, pinAssignments);
-            this.module.addInstance(instance);
+            if (this.aggregatedCellLibrary == null) {
+                this.module.addInstance(new CellInstance(instanceName, definitionName, pinAssignments));
+            } else {
+                AggregatedCell definition = this.aggregatedCellLibrary.getByCellName(definitionName);
+                this.module.addInstance(new CellInstance(instanceName, definition, pinAssignments));
+            }
         }
         
         return true;

@@ -49,6 +49,16 @@ public class Cell {
         throw(new Error("Could not find output pin for cell " + this.name));
     }
     
+    public boolean hasSingleOutputPin() {
+        int outputPinCount = 0;
+        for (Pin pin : this.pins) {
+            if (pin.getDirection() == Direction.output) {
+                outputPinCount++;
+            }
+        }
+        return outputPinCount == 1;
+    }
+    
     public List<Pin> getInputPins() {
     	List<Pin> inputPins = new ArrayList<Pin>();
         for (Pin pin : this.pins) {

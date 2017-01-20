@@ -28,9 +28,8 @@ public class VerilogParser {
         this.aggregatedCellLibrary = aggregatedCellLibrary;
     }
     
-    public VerilogParser(List<String> statements, AggregatedCellLibrary aggregatedCellLibrary) {
-        this.statements = statements;
-        this.aggregatedCellLibrary = aggregatedCellLibrary;
+    public VerilogParser(File verilogFile) {
+        this.statements = readVerilogStatementsFromFile(verilogFile);
     }
     
     private List<String> readVerilogStatementsFromFile(File verilogFile) {

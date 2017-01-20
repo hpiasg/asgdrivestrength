@@ -7,12 +7,18 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
 public class CellInstance extends AbstractInstance {
     
     private AggregatedCell definition;
+    private String definitionName;
     private double inputPinCapacitance;
     private CellInstance avatar; //the CellInstance this one was copied from (if copy was called accordingly). Capacitance setter also modifies avatar
-    
+
     public CellInstance(String name, AggregatedCell definition, List<PinAssignment> pinAssignments) {
         super(name, pinAssignments);
         this.definition = definition;
+        this.inputPinCapacitance = 0;
+    }
+    public CellInstance(String name, String definitionName, List<PinAssignment> pinAssignments) {
+        super(name, pinAssignments);
+        this.definitionName = definitionName;
         this.inputPinCapacitance = 0;
     }
     
@@ -29,6 +35,9 @@ public class CellInstance extends AbstractInstance {
 
     @Override
     String getDefinitionName() {
+        if (definitionName != null) {
+            return definitionName;
+        }
         return definition.getSizeNameFor(this.inputPinCapacitance);
     }
     

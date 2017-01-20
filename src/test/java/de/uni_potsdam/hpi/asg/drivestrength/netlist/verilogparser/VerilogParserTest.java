@@ -6,7 +6,6 @@ import java.io.File;
 
 import org.junit.Test;
 
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
@@ -18,7 +17,7 @@ public class VerilogParserTest {
     @Test
     public void testVerilogParser() {
         File verilogFile = testHelper.getResourceAsFile("/minimalNetlist.v");        
-        Netlist aNetlist = new VerilogParser(verilogFile, new AggregatedCellLibrary()).createNetlist();
+        Netlist aNetlist = new VerilogParser(verilogFile).createNetlist();
         
         assertEquals(aNetlist.getRootModule().getName(), "aModule");
     }
@@ -26,7 +25,7 @@ public class VerilogParserTest {
     @Test
     public void testNetlistFlattener() {
         File verilogFile = testHelper.getResourceAsFile("/netlistWithSubmodules.v");
-        Netlist aNetlist = new VerilogParser(verilogFile, new AggregatedCellLibrary()).createNetlist();
+        Netlist aNetlist = new VerilogParser(verilogFile).createNetlist();
 
         assertEquals(aNetlist.getModules().size(), 2);
         
@@ -38,7 +37,7 @@ public class VerilogParserTest {
     @Test
     public void testSignalMappingPositional() {
         File verilogFile = testHelper.getResourceAsFile("/netlistWithSubmodules.v");
-        Netlist aNetlist = new VerilogParser(verilogFile, new AggregatedCellLibrary()).createNetlist();
+        Netlist aNetlist = new VerilogParser(verilogFile).createNetlist();
         Module submodule = aNetlist.getRootModule().getModuleInstances().get(0).getDefinition();
         assertEquals(submodule.getSignalByInterfacePosition(0).getName(), "in"); 
     }
@@ -46,7 +45,7 @@ public class VerilogParserTest {
     @Test
     public void testSignalMappingNamed() {
         File verilogFile = testHelper.getResourceAsFile("/netlistWithSubmodules.v");
-        Netlist aNetlist = new VerilogParser(verilogFile, new AggregatedCellLibrary()).createNetlist();
+        Netlist aNetlist = new VerilogParser(verilogFile).createNetlist();
         Module submodule = aNetlist.getRootModule().getModuleInstances().get(0).getDefinition();
         assertEquals(submodule.getSignalByName("in").getName(), "in"); 
     }

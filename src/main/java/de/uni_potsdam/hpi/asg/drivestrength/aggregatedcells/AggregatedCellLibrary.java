@@ -1,7 +1,6 @@
 package de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,14 +10,6 @@ public class AggregatedCellLibrary {
     
     public AggregatedCellLibrary(Map<String, AggregatedCell> aggregatedCells) {
         this.aggregatedCells = aggregatedCells;
-    }
-    
-    //Only used in test (to make verilog netlist parser tests independent of library, hence the dummygate
-    public AggregatedCellLibrary() {
-        this.aggregatedCells = new HashMap<String, AggregatedCell>();
-        AggregatedCell dummygate = new AggregatedCell("DUMMYGATE");
-        dummygate.addCellSizeName("DUMMYGATE");
-        this.aggregatedCells.put("DUMMYGATE", dummygate);
     }
 
     public AggregatedCell get(String aggregatedCellName) {
@@ -44,5 +35,20 @@ public class AggregatedCellLibrary {
     
     public int size() {
         return this.aggregatedCells.size();
+    }
+    
+    public String toString() {
+        return "AggregatedCellLibrary (hashCode " + hashCode() +") with " + this.size() + " cells: " + this.aggregatedCells.toString();  
+    }
+    
+    public void printDelayParameterTable() {
+        System.out.println("Printing library delay paramters. Columns: ");
+        System.out.println("CellFootprint, Pin, LogicalEffort, ParasiticDelay, StageCount");
+        for (AggregatedCell cell : this.aggregatedCells.values()) {
+            for (String pinName : cell.getDelayParameterTriples().keySet()) {
+                DelayParameterTriple d = cell.getDelayParameterTriples().get(pinName);
+                System.out.println(cell.getName() + ", " + pinName + ", " + d.getLogicalEffort() + ", " + d.getParasiticDelay() + ", " + d.getStageCount());
+            }
+        }
     }
 }
