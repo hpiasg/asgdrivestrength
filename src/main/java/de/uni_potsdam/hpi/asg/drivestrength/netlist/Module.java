@@ -175,8 +175,11 @@ public class Module {
     }
     
     public Signal getSignalByName(String signalName) {
-        if (signalName.equals("0")) {
+        if (signalName.equals("0") || signalName.equals("1'b0")) {
             return Signal.getZeroInstance();
+        }
+        if (signalName.equals("1") || signalName.equals("1'b1")) {
+            return Signal.getOneInstance();
         }
         for (Signal s : this.signals) {
             if (s.getName().equals(signalName)) {
@@ -201,6 +204,10 @@ public class Module {
     
     public void removeAllModuleInstances() {
     	this.moduleInstances = new ArrayList<ModuleInstance>();
+    }
+    
+    public void removeAssignConnection(AssignConnection assignConnectionToRemove) {
+        this.assignConnections.remove(assignConnectionToRemove);
     }
     
     public void removeSignal(Signal signalToRemove) {

@@ -14,7 +14,8 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCou
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.bundleSplitter.NetlistBundleSplitter;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.assigncleaner.NetlistAssignCleaner;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.bundlesplitter.NetlistBundleSplitter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.inliner.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
@@ -82,6 +83,7 @@ public class DrivestrengthMain {
 //        logger.info("\n\n\n\n\n");
 
         new NetlistBundleSplitter(inlinedNetlist).run();
+        new NetlistAssignCleaner(inlinedNetlist).run();
         
 
       logger.info("flattened, inlined, debundled:\n" + inlinedNetlist.toVerilog());
