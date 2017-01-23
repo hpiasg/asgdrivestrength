@@ -16,12 +16,20 @@ public class Signal {
 
 
     private static Signal zeroInstance;
+    private static Signal oneInstance;
 
     public static Signal getZeroInstance() {
         if (zeroInstance == null) {
-            zeroInstance = new Signal("0", Direction.constant, 1);
+            zeroInstance = new Signal("1'b0", Direction.constant, 1);
         }
         return zeroInstance;
+    }
+    
+    public static Signal getOneInstance() {
+        if (oneInstance == null) {
+            oneInstance = new Signal("1'b1", Direction.constant, 1);
+        }
+        return oneInstance;
     }
     
     public Signal(String name, Direction direction, int width) {

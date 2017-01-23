@@ -51,7 +51,7 @@ public class ModuleInliner {
         for (Signal s : childDefinition.getSignals()) {
             if (!s.isIOSignal()) {
                 Signal newSignal = new Signal(s);
-                newSignal.setName("inlinedSignal" + nextNonIOSignalId++);
+                newSignal.setName("inlS" + nextNonIOSignalId++);
                 signalTransformation.put(s.getName(), newSignal);
                 inlinedModule.addSignal(newSignal);
             }
@@ -98,7 +98,7 @@ public class ModuleInliner {
     
     private void inlineCellInstancesOf(Module childDefinition) {
         for (CellInstance childCellInstance : childDefinition.getCellInstances()) {
-            String name = "inlinedCell" + nextInstanceId++;
+            String name = "inlC" + nextInstanceId++;
             AggregatedCell cellDefinition = childCellInstance.getDefinition();
             List<PinAssignment> cellPinAssignments = new ArrayList<PinAssignment>();
             for (PinAssignment a : childCellInstance.getPinAssignments()) {
