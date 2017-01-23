@@ -1,7 +1,7 @@
 package de.uni_potsdam.hpi.asg.drivestrength.netlist.bundlesplitter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.AssignConnection;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.CellInstance;
@@ -13,12 +13,12 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal.Direction;
 
 public class NetlistBundleSplitter {
     private Module netlistModule;
-    private List<Signal> replacedBundles;
+    private Set<Signal> replacedBundles;
     
     public NetlistBundleSplitter(Netlist netlist) {
         assertIsInlined(netlist);
         this.netlistModule = netlist.getRootModule();
-        this.replacedBundles = new ArrayList<>();
+        this.replacedBundles = new HashSet<>();
     }
     
     public void run() {

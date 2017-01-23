@@ -1,7 +1,9 @@
 package de.uni_potsdam.hpi.asg.drivestrength.netlist.assigncleaner;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.AssignConnection;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.CellInstance;
@@ -13,6 +15,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal.Direction;
 
 public class NetlistAssignCleaner {
     private Module netlistModule;
+    private Set<Signal> obsoleteSignals;
     
     public NetlistAssignCleaner(Netlist netlist) {
         assertIsInlined(netlist);
@@ -20,20 +23,20 @@ public class NetlistAssignCleaner {
     }
     
     public void run() {
+        obsoleteSignals = new HashSet<>();
         createConstantsIfNecessary();
         List<AssignConnection> assignConnections = new ArrayList<>(netlistModule.getAssignConnections());
         for (AssignConnection a : assignConnections) {
             if (a.getSourceSignal().isWire() && a.getDestinationSignal().isWire()) {
-                System.out.println("wire-only assign " + a.getDestinationSignal().getName() + " = " + a.getSourceSignal().getName());
                 netlistModule.removeSignal(a.getDestinationSignal());
                 netlistModule.removeAssignConnection(a);
                 replaceSignal(a.getDestinationSignal(), a.getSourceSignal());
             }
         }
+        removeUnusedSignals();
     }
     
     public void createConstantsIfNecessary() {
-        List<Signal> obsoleteSignals = new ArrayList<>();
         Signal constantZeroWire = new Signal("constantZero", Direction.wire, 1);
         Signal constantOneWire = new Signal("constantOne", Direction.wire, 1);
         boolean hasZero = false;
@@ -58,9 +61,6 @@ public class NetlistAssignCleaner {
             netlistModule.addSignal(constantOneWire);
             netlistModule.addAssignConnection(new AssignConnection(Signal.getOneInstance(), constantOneWire, 0, 0));
         }
-        for (Signal obsoleteSignal : obsoleteSignals) {
-            netlistModule.removeSignal(obsoleteSignal);
-        }
     }
     
     private void replaceSignal(Signal oldSignal, Signal newSignal) {
@@ -75,6 +75,27 @@ public class NetlistAssignCleaner {
                     a.setSignal(newSignal);
                 }
             }
+        }
+    }
+    
+    private void removeUnusedSignals() {
+        Set<String> usedSignals = new HashSet<>();
+        for (AssignConnection a : netlistModule.getAssignConnections()) {
+            usedSignals.add(a.getSourceSignal().getName());
+            usedSignals.add(a.getDestinationSignal().getName());
+        }
+        for (CellInstance c : netlistModule.getCellInstances()) {
+            for (PinAssignment a : c.getPinAssignments()) {
+                usedSignals.add(a.getSignal().getName());
+            }
+        }
+        for (Signal wire : netlistModule.getWires()) {
+            if (!usedSignals.contains(wire.getName())) {
+                obsoleteSignals.add(wire);
+            }
+        }
+        for (Signal obsoleteSignal : obsoleteSignals) {
+            netlistModule.removeSignal(obsoleteSignal);
         }
     }
 
