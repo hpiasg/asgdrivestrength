@@ -90,6 +90,14 @@ public class AggregatedCell {
         return this.delayParameterTriples.get(pinName).getLogicalEffort();
     }
     
+    public double getAvgLogicalEffort() {
+        double sum = 0;
+        for (DelayParameterTriple t: this.delayParameterTriples.values()) {
+            sum += t.getLogicalEffort();
+        }
+        return sum / this.delayParameterTriples.size();
+    }
+    
     public double getStageCountForPin(String pinName) {
     	return this.delayParameterTriples.get(pinName).getStageCount();
     }
@@ -119,6 +127,21 @@ public class AggregatedCell {
     
     public String getPinNameAtPosition(int position) {
         return this.orderedPinNames.get(position);
+    }
+    
+    public double getDefaultCapacitanceForPin(String pinName) {
+        Cell rawCell = this.getDefaultSize();
+        return rawCell.getCapacitanceForPin(pinName);
+    }
+    
+    private Cell getDefaultSize() {
+        //TODO: read this from another json file? don't do this based on the name!
+        for (Cell rawCell : this.sizesRaw) {
+            if (rawCell.getName().endsWith("_1")) {
+                return rawCell;
+            }
+        }
+        return this.sizesRaw.get(0);
     }
     
     public String toString() {

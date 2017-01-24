@@ -75,4 +75,13 @@ public class Cell {
 		}
 	    return false;
 	}
+    
+    public double getCapacitanceForPin(String pinName) {
+        for (Pin pin : this.pins) {
+            if (pin.getName().equals(pinName)) {
+                return pin.getCapacitance();
+            }
+        }
+        throw new Error("Could not find capacitance for pin " + pinName + " in rawCell " + this.getName());
+    }
 }

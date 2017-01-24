@@ -227,23 +227,25 @@ public class Module {
     }
     
     public void findLoad(CellInstance cellInstance) {
-        System.out.println("Load for CellInstance " + cellInstance.getName() + ":");
         Signal signal = cellInstance.getOutputSignal();
         double totalLoadCapacitance = 0.0;
-        int count = 0;
         for (CellInstance c : this.cellInstances) {
             if (c.isInputSignal(signal)) {
-                count++;
-                String pinName = c.pinNameForConnectedSignal(signal);
                 double capacitance = c.getAverageInputPinCapacitance();
                 totalLoadCapacitance += capacitance;
-                System.out.println("   Pin " + pinName + " of CellInstance " + c.getName() + " (C=" + capacitance + ")");
+                //System.out.println("   Pin " + c.pinNameForConnectedSignal(signal) + " of CellInstance " + c.getName() + " (C=" + capacitance + ")");
             }
         }
-        if (count == 0) {
-            System.out.println("NO LOAD______________________");
+        //System.out.println("  total load capacitance: " + totalLoadCapacitance);
+        double electricalEffort = totalLoadCapacitance / cellInstance.getAverageInputPinCapacitance();
+        //double stageEffort = electricalEffort * cellInstance.getDefinition().getAvgLogicalEffort();
+        if (electricalEffort > 1.5) {
+            for (String pinName : cellInstance.getInputPinNames()) {
+                double oldCapacitance = cellInstance.getInputPinCapacitance(pinName);
+                cellInstance.setInputPinCapacitance(pinName, oldCapacitance * 1.5);
+            }
         }
-        System.out.println("  total load capacitance: " + totalLoadCapacitance);
+        System.out.println(cellInstance.getName() + " h=" + electricalEffort);
     }
     
     public void findDrivers(CellInstance cellInstance) {

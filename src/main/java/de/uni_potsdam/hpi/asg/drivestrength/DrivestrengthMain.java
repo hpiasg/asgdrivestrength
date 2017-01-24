@@ -98,7 +98,11 @@ public class DrivestrengthMain {
 //        }
 
         inlinedNetlist.getRootModule().findLoads();
-        inlinedNetlist.getRootModule().findDrivers();
+        //inlinedNetlist.getRootModule().findDrivers();
+        
+
+        logger.info("with adjusted strengths:\n" + netlist.toVerilog());
+        logger.info("\n\n\n\n\n");
 
         return 0;
     }

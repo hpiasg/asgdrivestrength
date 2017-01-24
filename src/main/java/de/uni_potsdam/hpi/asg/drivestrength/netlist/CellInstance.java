@@ -38,7 +38,7 @@ public class CellInstance extends AbstractInstance {
     private void initializeInputPinCapacitances() {
         this.inputPinCapacitances = new HashMap<>();
         for (String pinName : this.getInputPinNames()) {
-            this.inputPinCapacitances.put(pinName, 0.0);
+            this.inputPinCapacitances.put(pinName, this.definition.getDefaultCapacitanceForPin(pinName));
         }
     }
 
@@ -59,6 +59,10 @@ public class CellInstance extends AbstractInstance {
         if (this.avatar != null) {
             this.avatar.setInputPinCapacitance(inputPin, newInputPinCapacitance);
         }
+    }
+    
+    public double getInputPinCapacitance(String inputPinName) {
+        return this.inputPinCapacitances.get(inputPinName);
     }
     
     public double getAverageInputPinCapacitance() {
