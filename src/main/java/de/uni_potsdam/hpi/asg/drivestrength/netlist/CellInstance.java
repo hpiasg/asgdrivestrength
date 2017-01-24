@@ -1,5 +1,6 @@
 package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +13,14 @@ public class CellInstance extends AbstractInstance {
     private String definitionName;
     private Map<String, Double> inputPinCapacitances;
     private CellInstance avatar; //the CellInstance this one was copied from (if copy was called accordingly). Capacitance setter also modifies avatar
+    private List<Load> loads;
 
     public CellInstance(String name, AggregatedCell definition, List<PinAssignment> pinAssignments) {
         super(name, pinAssignments);
         this.definition = definition;
         initializeInputPinCapacitances();
         this.nameAllPinAssignments();
+        this.loads = new ArrayList<>();
     }
     public CellInstance(String name, String definitionName, List<PinAssignment> pinAssignments) {
         super(name, pinAssignments);
@@ -33,6 +36,18 @@ public class CellInstance extends AbstractInstance {
             return this;
         else
             return this.avatar;
+    }
+    
+    public void addLoad(Load aLoad) {
+        this.loads.add(aLoad);
+    }
+    
+    public double getLoadCapacitance() {
+        double totalCapacitance = 0.0;
+        for (Load l : this.loads) {
+            totalCapacitance += l.getCapacitance();
+        }
+        return totalCapacitance;
     }
     
     private void initializeInputPinCapacitances() {

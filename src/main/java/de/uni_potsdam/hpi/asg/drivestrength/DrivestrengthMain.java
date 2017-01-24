@@ -18,7 +18,9 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.assigncleaner.NetlistAssignC
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.bundlesplitter.NetlistBundleSplitter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.inliner.NetlistInliner;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.loadAnnotator.LoadAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.NaiveOptimizer;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -79,29 +81,18 @@ public class DrivestrengthMain {
         new NetlistFlattener(netlist).run();
         Netlist inlinedNetlist = new NetlistInliner(netlist).run();
 
-//        logger.info("inlined:\n" + inlinedNetlist.toVerilog());
-//        logger.info("\n\n\n\n\n");
-
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
         
+        new LoadAnnotator(inlinedNetlist).run();
 
         logger.info("flattened, inlined, debundled:\n" + inlinedNetlist.toVerilog());
         logger.info("\n\n\n\n\n");
-
-          
-//        for (CellInstance c : inlinedNetlist.getRootModule().getCellInstances()) {
-//            for (String inputPinName : c.getInputPinNames()) {
-//                System.out.println("input " + inputPinName + " of Cellinstance " + c.getName() + " is connected to signal " + c.getInputSignal(inputPinName).getName());
-//            }
-//            System.out.println("output of CellInstance " + c.getName() + " is connected to signal " + c.getOutputSignal().getName());
-//        }
-
-        inlinedNetlist.getRootModule().findLoads();
-        //inlinedNetlist.getRootModule().findDrivers();
         
+        
+        new NaiveOptimizer(inlinedNetlist, 1).run();
 
-        logger.info("with adjusted strengths:\n" + netlist.toVerilog());
+        logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
         logger.info("\n\n\n\n\n");
 
         return 0;

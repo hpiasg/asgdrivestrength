@@ -214,48 +214,4 @@ public class Module {
         this.signals.remove(signalToRemove);
     }
     
-    public void findLoads() {
-        for (CellInstance c : this.cellInstances) {
-            findLoad(c);
-        }
-    }
-    
-    public void findDrivers() {
-        for (CellInstance c : this.cellInstances) {
-            findDrivers(c);
-        }
-    }
-    
-    public void findLoad(CellInstance cellInstance) {
-        Signal signal = cellInstance.getOutputSignal();
-        double totalLoadCapacitance = 0.0;
-        for (CellInstance c : this.cellInstances) {
-            if (c.isInputSignal(signal)) {
-                double capacitance = c.getAverageInputPinCapacitance();
-                totalLoadCapacitance += capacitance;
-                //System.out.println("   Pin " + c.pinNameForConnectedSignal(signal) + " of CellInstance " + c.getName() + " (C=" + capacitance + ")");
-            }
-        }
-        //System.out.println("  total load capacitance: " + totalLoadCapacitance);
-        double electricalEffort = totalLoadCapacitance / cellInstance.getAverageInputPinCapacitance();
-        //double stageEffort = electricalEffort * cellInstance.getDefinition().getAvgLogicalEffort();
-        if (electricalEffort > 1.5) {
-            for (String pinName : cellInstance.getInputPinNames()) {
-                double oldCapacitance = cellInstance.getInputPinCapacitance(pinName);
-                cellInstance.setInputPinCapacitance(pinName, oldCapacitance * 1.5);
-            }
-        }
-        System.out.println(cellInstance.getName() + " h=" + electricalEffort);
-    }
-    
-    public void findDrivers(CellInstance cellInstance) {
-        for (String pinName : cellInstance.getInputPinNames()) {
-            Signal drivingSignal = cellInstance.getInputSignal(pinName);
-            for (CellInstance c : this.cellInstances) {
-                if (drivingSignal == c.getOutputSignal()) {
-                    System.out.println(cellInstance.getName() + " pin " + pinName + " driven by " + c.getName());
-                }
-            }
-        }
-    }
 }
