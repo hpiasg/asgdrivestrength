@@ -13,7 +13,6 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCou
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsParser;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.CellInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.assigncleaner.NetlistAssignCleaner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.bundlesplitter.NetlistBundleSplitter;
@@ -89,14 +88,17 @@ public class DrivestrengthMain {
 
         logger.info("flattened, inlined, debundled:\n" + inlinedNetlist.toVerilog());
         logger.info("\n\n\n\n\n");
+
           
-          
-        for (CellInstance c : inlinedNetlist.getRootModule().getCellInstances()) {
-            for (String inputPinName : c.getInputPinNames()) {
-                System.out.println("input " + inputPinName + " of Cellinstance " + c.getName() + " is connected to signal " + c.getInputSignal(inputPinName).getName());
-            }
-            System.out.println("output of CellInstance " + c.getName() + " is connected to signal " + c.getOutputSignal().getName());
-        }
+//        for (CellInstance c : inlinedNetlist.getRootModule().getCellInstances()) {
+//            for (String inputPinName : c.getInputPinNames()) {
+//                System.out.println("input " + inputPinName + " of Cellinstance " + c.getName() + " is connected to signal " + c.getInputSignal(inputPinName).getName());
+//            }
+//            System.out.println("output of CellInstance " + c.getName() + " is connected to signal " + c.getOutputSignal().getName());
+//        }
+
+        inlinedNetlist.getRootModule().findLoads();
+        inlinedNetlist.getRootModule().findDrivers();
 
         return 0;
     }

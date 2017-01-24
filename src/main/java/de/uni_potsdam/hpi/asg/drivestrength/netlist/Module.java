@@ -213,4 +213,47 @@ public class Module {
     public void removeSignal(Signal signalToRemove) {
         this.signals.remove(signalToRemove);
     }
+    
+    public void findLoads() {
+        for (CellInstance c : this.cellInstances) {
+            findLoad(c);
+        }
+    }
+    
+    public void findDrivers() {
+        for (CellInstance c : this.cellInstances) {
+            findDrivers(c);
+        }
+    }
+    
+    public void findLoad(CellInstance cellInstance) {
+        System.out.println("Load for CellInstance " + cellInstance.getName() + ":");
+        Signal signal = cellInstance.getOutputSignal();
+        double totalLoadCapacitance = 0.0;
+        int count = 0;
+        for (CellInstance c : this.cellInstances) {
+            if (c.isInputSignal(signal)) {
+                count++;
+                String pinName = c.pinNameForConnectedSignal(signal);
+                double capacitance = c.getAverageInputPinCapacitance();
+                totalLoadCapacitance += capacitance;
+                System.out.println("   Pin " + pinName + " of CellInstance " + c.getName() + " (C=" + capacitance + ")");
+            }
+        }
+        if (count == 0) {
+            System.out.println("NO LOAD______________________");
+        }
+        System.out.println("  total load capacitance: " + totalLoadCapacitance);
+    }
+    
+    public void findDrivers(CellInstance cellInstance) {
+        for (String pinName : cellInstance.getInputPinNames()) {
+            Signal drivingSignal = cellInstance.getInputSignal(pinName);
+            for (CellInstance c : this.cellInstances) {
+                if (drivingSignal == c.getOutputSignal()) {
+                    System.out.println(cellInstance.getName() + " pin " + pinName + " driven by " + c.getName());
+                }
+            }
+        }
+    }
 }
