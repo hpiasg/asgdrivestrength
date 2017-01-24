@@ -12,7 +12,9 @@ public class AggregatedCell {
     private String name;
     private Map<String, Map<String, Double>> sizeCapacitances; //pin->size->value
     private Map<String, DelayParameterTriple> delayParameterTriples; //pin->triple
+    private List<String> orderedPinNames;
     private List<String> inputPinNames;
+    private String outputPinName;
     private List<String> sizeNames;
     private List<Cell> sizesRaw;
     
@@ -35,6 +37,22 @@ public class AggregatedCell {
         return this.inputPinNames;
     }
     
+    public String getOutputPinName() {
+        return outputPinName;
+    }
+
+    public void setOutputPinName(String outputPinName) {
+        this.outputPinName = outputPinName;
+    }
+    
+    public List<String> getOrderedPinNames() {
+        return orderedPinNames;
+    }
+
+    public void setOrderedPinNames(List<String> orderedPinNames) {
+        this.orderedPinNames = orderedPinNames;
+    }
+
     public void addCellSize(Cell cellSizeRaw) {
     	this.sizesRaw.add(cellSizeRaw);
         this.sizeNames.add(cellSizeRaw.getName());
@@ -97,6 +115,10 @@ public class AggregatedCell {
     
     public int getSizeCount() {
         return this.sizeNames.size();
+    }
+    
+    public String getPinNameAtPosition(int position) {
+        return this.orderedPinNames.get(position);
     }
     
     public String toString() {

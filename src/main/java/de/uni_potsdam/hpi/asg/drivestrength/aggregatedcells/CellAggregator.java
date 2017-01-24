@@ -45,8 +45,10 @@ public class CellAggregator {
         for (AggregatedCell aggregatedCell : aggregatedCells.values()) {
             
             List<Cell> rawSizes = aggregatedCell.getRawSizes();
-            
+
+            aggregatedCell.setOrderedPinNames(this.getOrderedPinNames(rawSizes.get(0)));
             aggregatedCell.setInputPinNames(this.extractInputPinNames(rawSizes.get(0)));
+            aggregatedCell.setOutputPinName(this.extractOutputPinName(rawSizes.get(0)));
             aggregatedCell.setSizeCapacitances(this.extractSizeCapacitances(rawSizes));
             
             Map<String, Map<String, DelayLine>> delayLines = 
@@ -79,6 +81,14 @@ public class CellAggregator {
         }
         return true;
     }
+    
+    private List<String> getOrderedPinNames(Cell rawCell) {
+        List<String> pinNames = new ArrayList<>();
+        for (Pin p : rawCell.getPins()) {
+            pinNames.add(p.getName());
+        }
+        return pinNames;
+    }
 
     private List<String> extractInputPinNames(Cell rawCell) {
         List<String> pinNames = new ArrayList<>();
@@ -86,6 +96,10 @@ public class CellAggregator {
             pinNames.add(p.getName());
         }
         return pinNames;
+    }
+
+    private String extractOutputPinName(Cell rawCell) {
+        return rawCell.getOutputPin().getName();
     }
 
     //returns map:  pin->size->value

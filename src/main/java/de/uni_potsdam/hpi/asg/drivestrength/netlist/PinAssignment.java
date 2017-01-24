@@ -38,6 +38,10 @@ public class PinAssignment {
         this.signal = newSignal;
     }
     
+    public void setPinName(String pinName) {
+        this.pinName = pinName;
+    }
+    
     public void setSignalBitIndex(int newSignalBitIndex) {
         this.signalBitIndex = newSignalBitIndex;
     }
