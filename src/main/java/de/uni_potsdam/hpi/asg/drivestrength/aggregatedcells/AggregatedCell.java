@@ -107,23 +107,31 @@ public class AggregatedCell {
     	return this.delayParameterTriples.get(pinName).getStageCount();
     }
     
-    public String getSizeNameFor(double inputPinCapacitance) {
-    	String inputPinName = this.inputPinNames.get(0); 
-
-        double bestAbsDiff = Double.POSITIVE_INFINITY;
-        String bestSizeName = null; 
-        for (String sizeName : this.sizeCapacitances.get(inputPinName).keySet()) {
-            double cellAvgInputCapacitance = this.sizeCapacitances.get(inputPinName).get(sizeName);
-            double absDiff = Math.abs(inputPinCapacitance - cellAvgInputCapacitance);
-            if (absDiff < bestAbsDiff) {
-                bestAbsDiff = absDiff;
+    public String getSizeNameFor(Map<String, Double> desiredInputPinCapacitances) {
+        double lowestDeviation = Double.POSITIVE_INFINITY;
+        String bestSizeName = null;
+        
+        for (String sizeName : this.sizeNames) {
+            double deviation = computeDeviationToDesiredCapacitances(sizeName, desiredInputPinCapacitances);
+            if (deviation < lowestDeviation) {
+                lowestDeviation = deviation;
                 bestSizeName = sizeName;
             }
         }
         if (bestSizeName == null) {
-            throw(new Error("Could not find " + this.getName() + " cell size for desired input pin capacitance " + inputPinCapacitance));
+            throw(new Error("Could not find " + this.getName() + " cell size for desired input pin capacitances"));
         }
         return bestSizeName;
+    }
+    
+    private double computeDeviationToDesiredCapacitances(String sizeName, Map<String, Double> desiredCapacitances) {
+        double deviation = 0.0;
+        for (String pinName : desiredCapacitances.keySet()) {
+            double actual = this.sizeCapacitances.get(pinName).get(sizeName);
+            double desired = desiredCapacitances.get(pinName);
+            deviation += Math.abs(actual - desired);
+        }
+        return deviation;
     }
     
     public int getSizeCount() {

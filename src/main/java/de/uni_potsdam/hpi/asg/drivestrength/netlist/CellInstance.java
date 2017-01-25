@@ -62,7 +62,7 @@ public class CellInstance extends AbstractInstance {
         if (definitionName != null) {
             return definitionName;
         }
-        return definition.getSizeNameFor(this.getAverageInputPinCapacitance());
+        return definition.getSizeNameFor(this.inputPinCapacitances);
     }
     
     public AggregatedCell getDefinition() {
