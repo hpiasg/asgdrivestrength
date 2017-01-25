@@ -9,6 +9,8 @@ import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.CellAggregator;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesContainer;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesParser;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsParser;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
@@ -66,8 +68,9 @@ public class DrivestrengthMain {
         logger.info("Library contains " + cells.size() + " cells");
         
         StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
+        DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
         
-        AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts).run();
+        AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts, defaultSizes).run();
 
         logger.info("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
         

@@ -17,6 +17,7 @@ public class AggregatedCell {
     private String outputPinName;
     private List<String> sizeNames;
     private List<Cell> sizesRaw;
+    private String defaultSizeName;
     
     public String getName() {
         return name;
@@ -27,6 +28,10 @@ public class AggregatedCell {
         this.delayParameterTriples = new HashMap<>();
         this.sizeNames = new ArrayList<>();
         this.sizesRaw = new ArrayList<>();
+    }
+    
+    public void setDefaultSizeName(String defaultSizeName) {
+        this.defaultSizeName = defaultSizeName;
     }
     
     public void setInputPinNames(List<String> inputPinNames) {
@@ -135,9 +140,8 @@ public class AggregatedCell {
     }
     
     private Cell getDefaultSize() {
-        //TODO: read this from another json file? don't do this based on the name!
         for (Cell rawCell : this.sizesRaw) {
-            if (rawCell.getName().endsWith("_1")) {
+            if (rawCell.getName().equals(this.defaultSizeName)) {
                 return rawCell;
             }
         }

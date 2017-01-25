@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix;
@@ -20,13 +21,15 @@ public class CellAggregator {
     private final List<Cell> rawCells;
     private Map<String, AggregatedCell> aggregatedCells;
     private StageCountsContainer stageCounts;
+    private DefaultSizesContainer defaultSizes;
     
     // We use values for input slew = 0.0161238 ns, as it is closest to the 0.0181584ns used in cell pdfs
     private final int inputSlewIndex = 0; 
     
-    public CellAggregator(List<Cell> rawCells, StageCountsContainer stageCounts) {
+    public CellAggregator(List<Cell> rawCells, StageCountsContainer stageCounts, DefaultSizesContainer defaultSizes) {
         this.rawCells = rawCells;
         this.stageCounts = stageCounts;
+        this.defaultSizes = defaultSizes;
     }
     
     public AggregatedCellLibrary run() {
@@ -50,6 +53,7 @@ public class CellAggregator {
             aggregatedCell.setInputPinNames(this.extractInputPinNames(rawSizes.get(0)));
             aggregatedCell.setOutputPinName(this.extractOutputPinName(rawSizes.get(0)));
             aggregatedCell.setSizeCapacitances(this.extractSizeCapacitances(rawSizes));
+            aggregatedCell.setDefaultSizeName(this.defaultSizes.get(aggregatedCell.getName()));
             
             Map<String, Map<String, DelayLine>> delayLines = 
                     this.extractDelayLinesFor(rawSizes, aggregatedCell.getInputPinNames(), aggregatedCell.getSizeCapacitances());
