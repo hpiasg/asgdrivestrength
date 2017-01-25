@@ -103,7 +103,7 @@ public class AggregatedCell {
         return sum / this.delayParameterTriples.size();
     }
     
-    public double getStageCountForPin(String pinName) {
+    public int getStageCountForPin(String pinName) {
     	return this.delayParameterTriples.get(pinName).getStageCount();
     }
     
