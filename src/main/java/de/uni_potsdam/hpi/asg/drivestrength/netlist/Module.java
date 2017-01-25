@@ -213,4 +213,5 @@ public class Module {
     public void removeSignal(Signal signalToRemove) {
         this.signals.remove(signalToRemove);
     }
+    
 }

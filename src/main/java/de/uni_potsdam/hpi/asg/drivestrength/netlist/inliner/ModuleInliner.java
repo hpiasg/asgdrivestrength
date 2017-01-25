@@ -64,12 +64,12 @@ public class ModuleInliner {
             if (p.isPositional()) {
                 int pinPosition = p.getPinPosition();
                 String pinName = childDefinition.getInterfaceSignals().get(pinPosition);
-                signalTransformation.put(pinName, p.getSignal());
+                signalTransformation.put(pinName, this.inlinedModule.getSignalByName(p.getSignal().getName()));
                 if (p.hasSelectedBit()) {
                     signalBitIndexTransformation.put(pinName, p.getSignalBitIndex());
                 }
             } else {
-                signalTransformation.put(p.getPinName(), p.getSignal());
+                signalTransformation.put(p.getPinName(), this.inlinedModule.getSignalByName(p.getSignal().getName()));
                 if (p.hasSelectedBit()) {
                     signalBitIndexTransformation.put(p.getPinName(), p.getSignalBitIndex());
                 }

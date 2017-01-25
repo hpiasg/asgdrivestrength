@@ -9,6 +9,8 @@ import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.CellAggregator;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesContainer;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesParser;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsParser;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
@@ -18,7 +20,9 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.assigncleaner.NetlistAssignC
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.bundlesplitter.NetlistBundleSplitter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.inliner.NetlistInliner;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.loadAnnotator.LoadAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.NaiveOptimizer;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -64,8 +68,9 @@ public class DrivestrengthMain {
         logger.info("Library contains " + cells.size() + " cells");
         
         StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
+        DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
         
-        AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts).run();
+        AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts, defaultSizes).run();
 
         logger.info("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
         
@@ -79,15 +84,21 @@ public class DrivestrengthMain {
         new NetlistFlattener(netlist).run();
         Netlist inlinedNetlist = new NetlistInliner(netlist).run();
 
-//        logger.info("inlined:\n" + inlinedNetlist.toVerilog());
-//        logger.info("\n\n\n\n\n");
-
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
         
+        double outputPinCapacitance = 1.003;
+        
+        new LoadAnnotator(inlinedNetlist, outputPinCapacitance).run();
 
-      logger.info("flattened, inlined, debundled:\n" + inlinedNetlist.toVerilog());
-      logger.info("\n\n\n\n\n");
+//        logger.info("flattened, inlined, debundled:\n" + inlinedNetlist.toVerilog());
+//        logger.info("\n\n\n\n\n");
+        
+        
+        new NaiveOptimizer(inlinedNetlist, 1).run();
+
+        logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
+        logger.info("\n\n\n\n\n");
 
         return 0;
     }
