@@ -87,10 +87,12 @@ public class DrivestrengthMain {
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
         
-        new LoadAnnotator(inlinedNetlist).run();
+        double outputPinCapacitance = 1.003;
+        
+        new LoadAnnotator(inlinedNetlist, outputPinCapacitance).run();
 
-        logger.info("flattened, inlined, debundled:\n" + inlinedNetlist.toVerilog());
-        logger.info("\n\n\n\n\n");
+//        logger.info("flattened, inlined, debundled:\n" + inlinedNetlist.toVerilog());
+//        logger.info("\n\n\n\n\n");
         
         
         new NaiveOptimizer(inlinedNetlist, 1).run();
