@@ -15,9 +15,23 @@ public class Load {
     }
     
     public double getCapacitance() {
-        if (this.cellInstance == null) {
+        if (this.isStaticLoad()) {
             return this.staticCapacitance;
         }
         return this.cellInstance.getInputPinCapacitance(pinName);
     }
+    
+    public boolean isStaticLoad() {
+        return this.cellInstance == null;
+    }
+
+    public CellInstance getCellInstance() {
+        return cellInstance;
+    }
+
+    public String getPinName() {
+        return pinName;
+    }
+    
+    
 }

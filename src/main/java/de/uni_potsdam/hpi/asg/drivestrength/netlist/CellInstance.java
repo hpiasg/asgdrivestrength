@@ -42,6 +42,10 @@ public class CellInstance extends AbstractInstance {
         this.loads.add(aLoad);
     }
     
+    public List<Load> getLoads() {
+        return this.loads;
+    }
+    
     public double getLoadCapacitance() {
         double totalCapacitance = 0.0;
         for (Load l : this.loads) {

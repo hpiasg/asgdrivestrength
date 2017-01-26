@@ -36,7 +36,7 @@ public class EqualStageEffortOptimizer {
             double loadCapacitance = c.getLoadCapacitance();
             for (String pinName : c.getInputPinNames()) {
                 double stageEffort = stageEffort(c, pinName, loadCapacitance);
-                System.out.println(c.getName() + " " + pinName + " f=" + stageEffort);
+                //System.out.println(c.getName() + " " + pinName + " f=" + stageEffort);
                 double error = stageEffort/avgStageEffort;
                 errorSum += Math.abs(error - 1);
                 errorCount++;
