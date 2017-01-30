@@ -162,13 +162,32 @@ public class VerilogModuleParser {
         } catch (Error e) {
             if (this.aggregatedCellLibrary == null) {
                 this.module.addInstance(new CellInstance(instanceName, definitionName, pinAssignments));
-            } else {
-                AggregatedCell definition = this.aggregatedCellLibrary.getByCellName(definitionName);
-                this.module.addInstance(new CellInstance(instanceName, definition, pinAssignments));
+                return true;
             }
+            if (this.aggregatedCellLibrary.isTie0(definitionName)) {
+                this.handleTie0(pinAssignments);
+                return true;
+            }
+            if (this.aggregatedCellLibrary.isTie1(definitionName)) {
+                this.handleTie1(pinAssignments);
+                return true;
+            }
+            AggregatedCell definition = this.aggregatedCellLibrary.getByCellName(definitionName);
+            this.module.addInstance(new CellInstance(instanceName, definition, pinAssignments));
         }
         
         return true;
+    }
+    
+    private void handleTie0(List<PinAssignment> pinAssignments) {
+        Signal s = pinAssignments.get(0).getSignal();
+        AssignConnection a = new AssignConnection(Signal.getZeroInstance(), pinAssignments.get(0).getSignal(), 0, 0);
+        this.module.addAssignConnection(a);
+    }
+    
+    private void handleTie1(List<PinAssignment> pinAssignments) {
+        AssignConnection a = new AssignConnection(Signal.getOneInstance(), pinAssignments.get(0).getSignal(), 0, 0);
+        this.module.addAssignConnection(a);
     }
     
     private List<PinAssignment> parsePinAssignments(String pinAssignmentsLiteral) {

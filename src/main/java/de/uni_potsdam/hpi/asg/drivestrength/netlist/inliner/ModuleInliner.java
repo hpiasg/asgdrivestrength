@@ -49,7 +49,7 @@ public class ModuleInliner {
     
     private void inlineNonIOSignalsOf(Module childDefinition) {
         for (Signal s : childDefinition.getSignals()) {
-            if (!s.isIOSignal()) {
+            if (!s.isIOSignal() && !s.isConstant()) {
                 Signal newSignal = new Signal(s);
                 newSignal.setName("inlS" + nextNonIOSignalId++);
                 signalTransformation.put(s.getName(), newSignal);
@@ -80,12 +80,15 @@ public class ModuleInliner {
     private void inlineAssignConnectionsOf(Module childDefinition) {
         for (AssignConnection a : childDefinition.getAssignConnections()) {
             AssignConnection newAssignConnection = new AssignConnection(a);
-            String oldSourceName = a.getSourceSignal().getName();
-            Signal sourceSignal = signalTransformation.get(oldSourceName);
-            newAssignConnection.setSourceSignal(sourceSignal);
-            if (signalBitIndexTransformation.containsKey(oldSourceName)) {
-                newAssignConnection.setSourceBitIndex(signalBitIndexTransformation.get(oldSourceName));
+            Signal sourceSignal = a.getSourceSignal();
+            if (!a.getSourceSignal().isConstant()) {
+                String oldSourceName = a.getSourceSignal().getName();
+                sourceSignal = signalTransformation.get(oldSourceName);
+                if (signalBitIndexTransformation.containsKey(oldSourceName)) {
+                    newAssignConnection.setSourceBitIndex(signalBitIndexTransformation.get(oldSourceName));
+                }
             }
+            newAssignConnection.setSourceSignal(sourceSignal);
             String oldDestinationName = a.getDestinationSignal().getName();
             Signal destinationSignal = signalTransformation.get(oldDestinationName);
             newAssignConnection.setDestinationSignal(destinationSignal);

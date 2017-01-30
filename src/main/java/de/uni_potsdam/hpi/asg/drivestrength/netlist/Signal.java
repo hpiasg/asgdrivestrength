@@ -104,4 +104,8 @@ public class Signal {
     public boolean isWire() {
         return (direction == Direction.wire);
     }
+    
+    public boolean isConstant() {
+        return (direction == Direction.constant);
+    }
 }

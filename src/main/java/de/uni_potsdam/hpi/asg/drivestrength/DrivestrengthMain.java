@@ -81,10 +81,15 @@ public class DrivestrengthMain {
         Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary).createNetlist();
 
         logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
+
+        logger.info(netlist.toVerilog());
         
         new NetlistFlattener(netlist).run();
-        Netlist inlinedNetlist = new NetlistInliner(netlist).run();
 
+        
+        Netlist inlinedNetlist = new NetlistInliner(netlist).run();
+        
+        
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
         
@@ -96,10 +101,10 @@ public class DrivestrengthMain {
 //        logger.info("\n\n\n\n\n");
         
         
-        new EqualStageEffortOptimizer(inlinedNetlist, 100, true).run();
-
-        logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
-        logger.info("\n\n\n\n\n");
+//        new EqualStageEffortOptimizer(inlinedNetlist, 100, true).run();
+//
+//        logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
+//        logger.info("\n\n\n\n\n");
 
         System.out.println(new LoadGraphExporter(inlinedNetlist).run());
         
