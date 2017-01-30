@@ -3,6 +3,7 @@ package de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +20,7 @@ public class VerilogParser {
     
     private static final Pattern endmodulePattern = Pattern.compile("^\\s*endmodule\\s*$");
     private static final Pattern statementPattern = Pattern.compile("^.*;$");
+    private static final Pattern escapeLiteralPattern = Pattern.compile("\\\\([^ ]*) ");
     
     private List<String> statements;
     private AggregatedCellLibrary aggregatedCellLibrary;
@@ -36,6 +38,7 @@ public class VerilogParser {
         List<String> lines = FileHelper.getInstance().readFile(verilogFile);
         assert(lines != null);
         List<String> statements = mergeMultilineStatements(lines);
+        replaceEscapeLiterals(statements);
         return statements;
     }
     
@@ -67,6 +70,22 @@ public class VerilogParser {
         }
         
         return statements;
+    }
+    
+    private void replaceEscapeLiterals(List<String> statements) {
+        for (ListIterator<String> i = statements.listIterator(); i.hasNext();) {
+            String statement = i.next();
+            Matcher m = escapeLiteralPattern.matcher(statement);
+            while (m.find()) {
+                String escapeLiteral = m.group(1);
+                statement = statement.replace("\\"+escapeLiteral+" ", cleanLiteral(escapeLiteral));
+            }
+            i.set(statement);
+        }
+    }
+    
+    private String cleanLiteral(String aLiteral) {
+        return aLiteral.replaceAll("[^A-Za-z0-9 ]", "_");
     }
     
     private boolean matches(String aString, Pattern aPattern) {
