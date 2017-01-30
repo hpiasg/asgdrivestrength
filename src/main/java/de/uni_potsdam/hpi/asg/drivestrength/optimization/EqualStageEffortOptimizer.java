@@ -21,26 +21,19 @@ public class EqualStageEffortOptimizer {
     }
     
     public void run() {
-        //System.out.println("avgVal, avgErr");
         for (int i = 0; i < this.roundCount; i++) {
             optimizeOneRound();
         }
     }
     
     private void optimizeOneRound() {
-        double errorSum = 0.0;
-        double errorCount = 0;
         double targetEffort = avgStageEffort();
         
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
             double loadCapacitance = c.getLoadCapacitance();
             for (String pinName : c.getInputPinNames()) {
                 double stageEffort = stageEffort(c, pinName, loadCapacitance);
-                //System.out.println(c.getName() + " " + pinName + " f=" + stageEffort);
-                double error = stageEffort/targetEffort;
-                errorSum += Math.abs(error - 1);
-                errorCount++;
-                //System.out.println(c.getName() + "_" + pinName + "," + error + "," + c.getInputPinCapacitance(pinName) + "," + loadCapacitance);
+                double error = stageEffort / targetEffort;
                 if (error > 1) { //too much stage effort, make stronger
                     c.setInputPinCapacitance(pinName, c.getInputPinCapacitance(pinName) * Math.min(error, 1.2), false);
                 }
@@ -49,7 +42,6 @@ public class EqualStageEffortOptimizer {
                 }
             }
         }
-        //System.out.println(avgStageEffort() + "," + errorSum / errorCount);
     }
     
     private double avgStageEffort() {
