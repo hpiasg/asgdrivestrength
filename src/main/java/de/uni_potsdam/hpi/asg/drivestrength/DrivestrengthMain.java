@@ -15,6 +15,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCou
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsParser;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.LoadGraphExporter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.assigncleaner.NetlistAssignCleaner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.bundlesplitter.NetlistBundleSplitter;
@@ -22,7 +23,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.inliner.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.loadAnnotator.LoadAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.NaiveOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -87,7 +88,7 @@ public class DrivestrengthMain {
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
         
-        double outputPinCapacitance = 1.003;
+        double outputPinCapacitance = 0.003;
         
         new LoadAnnotator(inlinedNetlist, outputPinCapacitance).run();
 
@@ -95,11 +96,13 @@ public class DrivestrengthMain {
 //        logger.info("\n\n\n\n\n");
         
         
-        new NaiveOptimizer(inlinedNetlist, 1).run();
+        new EqualStageEffortOptimizer(inlinedNetlist, 100).run();
 
         logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
         logger.info("\n\n\n\n\n");
 
+        System.out.println(new LoadGraphExporter(inlinedNetlist).run());
+        
         return 0;
     }
     

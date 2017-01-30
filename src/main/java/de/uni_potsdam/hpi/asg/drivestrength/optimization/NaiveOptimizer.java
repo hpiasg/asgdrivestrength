@@ -32,7 +32,7 @@ public class NaiveOptimizer {
                 double inputCapacitance = c.getInputPinCapacitance(pinName);
                 double electricalEffort = loadCapacitance / inputCapacitance;
                 if (electricalEffort > 1.5) {
-                    c.setInputPinCapacitance(pinName, inputCapacitance * 1.5);
+                    c.setInputPinCapacitance(pinName, inputCapacitance * 1.5, false);
                 }
             }
         }

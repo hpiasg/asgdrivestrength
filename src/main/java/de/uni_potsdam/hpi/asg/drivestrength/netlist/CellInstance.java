@@ -42,6 +42,10 @@ public class CellInstance extends AbstractInstance {
         this.loads.add(aLoad);
     }
     
+    public List<Load> getLoads() {
+        return this.loads;
+    }
+    
     public double getLoadCapacitance() {
         double totalCapacitance = 0.0;
         for (Load l : this.loads) {
@@ -69,10 +73,14 @@ public class CellInstance extends AbstractInstance {
         return definition;
     }
     
-    public void setInputPinCapacitance(String inputPin, double newInputPinCapacitance) {
+    public void setInputPinCapacitance(String inputPin, double newInputPinCapacitance, boolean clampToPossible) {
+        if (clampToPossible) {
+            newInputPinCapacitance = Math.min(newInputPinCapacitance, this.definition.getLargestPossibleCapacitance(inputPin));
+            newInputPinCapacitance = Math.max(newInputPinCapacitance, this.definition.getSmallestPossibleCapacitance(inputPin));
+        }
         this.inputPinCapacitances.put(inputPin, newInputPinCapacitance);
         if (this.avatar != null) {
-            this.avatar.setInputPinCapacitance(inputPin, newInputPinCapacitance);
+            this.avatar.setInputPinCapacitance(inputPin, newInputPinCapacitance, false);
         }
     }
     
