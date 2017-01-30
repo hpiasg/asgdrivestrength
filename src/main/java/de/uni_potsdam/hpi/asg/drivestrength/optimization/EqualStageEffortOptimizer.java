@@ -7,10 +7,12 @@ public class EqualStageEffortOptimizer {
 
     private Netlist netlist;
     private int roundCount;
+    private boolean clampToImplementableCapacitances;
     
-    public EqualStageEffortOptimizer(Netlist netlist, int rounds) {
+    public EqualStageEffortOptimizer(Netlist netlist, int rounds, boolean clampToImplementableCapacitances) {
         this.netlist = netlist;
         this.roundCount = rounds;
+        this.clampToImplementableCapacitances = clampToImplementableCapacitances;
         assertNetlistFitness();
     }
     
@@ -35,10 +37,10 @@ public class EqualStageEffortOptimizer {
                 double stageEffort = stageEffort(c, pinName, loadCapacitance);
                 double error = stageEffort / targetEffort;
                 if (error > 1) { //too much stage effort, make stronger
-                    c.setInputPinCapacitance(pinName, c.getInputPinCapacitance(pinName) * Math.min(error, 1.2), false);
+                    c.setInputPinCapacitance(pinName, c.getInputPinCapacitance(pinName) * Math.min(error, 1.2), clampToImplementableCapacitances);
                 }
                 if (error < 1) { //too little stage effort, make weaker
-                    c.setInputPinCapacitance(pinName, c.getInputPinCapacitance(pinName) * Math.max(error,  0.8), false);
+                    c.setInputPinCapacitance(pinName, c.getInputPinCapacitance(pinName) * Math.max(error,  0.8), clampToImplementableCapacitances);
                 }
             }
         }
