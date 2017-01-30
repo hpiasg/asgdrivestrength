@@ -98,8 +98,8 @@ public class DrivestrengthMain {
         
         new EqualStageEffortOptimizer(inlinedNetlist, 100).run();
 
-//        logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
-//        logger.info("\n\n\n\n\n");
+        logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
+        logger.info("\n\n\n\n\n");
 
         System.out.println(new LoadGraphExporter(inlinedNetlist).run());
         

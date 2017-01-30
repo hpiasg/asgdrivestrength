@@ -133,6 +133,26 @@ public class AggregatedCell {
         }
         return deviation;
     }
+
+    public double getLargestPossibleCapacitance(String pinName) {
+        double largestC = 0.0;
+        for (Cell rawCell : this.sizesRaw) {
+            if (rawCell.getCapacitanceForPin(pinName) > largestC) {
+                largestC = rawCell.getCapacitanceForPin(pinName);
+            }
+        }
+        return largestC;
+    }
+    
+    public double getSmallestPossibleCapacitance(String pinName) {
+        double smallestC = Double.MAX_VALUE;
+        for (Cell rawCell : this.sizesRaw) {
+            if (rawCell.getCapacitanceForPin(pinName) < smallestC) {
+                smallestC = rawCell.getCapacitanceForPin(pinName);
+            }
+        }
+        return smallestC;
+    }
     
     public int getSizeCount() {
         return this.sizeNames.size();

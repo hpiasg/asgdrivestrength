@@ -21,7 +21,7 @@ public class EqualStageEffortOptimizer {
     }
     
     public void run() {
-        System.out.println("avgVal, avgErr");
+        //System.out.println("avgVal, avgErr");
         for (int i = 0; i < this.roundCount; i++) {
             optimizeOneRound();
         }
@@ -30,26 +30,26 @@ public class EqualStageEffortOptimizer {
     private void optimizeOneRound() {
         double errorSum = 0.0;
         double errorCount = 0;
-        double avgStageEffort = avgStageEffort();
+        double targetEffort = avgStageEffort();
         
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
             double loadCapacitance = c.getLoadCapacitance();
             for (String pinName : c.getInputPinNames()) {
                 double stageEffort = stageEffort(c, pinName, loadCapacitance);
                 //System.out.println(c.getName() + " " + pinName + " f=" + stageEffort);
-                double error = stageEffort/avgStageEffort;
+                double error = stageEffort/targetEffort;
                 errorSum += Math.abs(error - 1);
                 errorCount++;
-                //System.out.println(c.getName() + " " + pinName + " error" + error);
+                //System.out.println(c.getName() + "_" + pinName + "," + error + "," + c.getInputPinCapacitance(pinName) + "," + loadCapacitance);
                 if (error > 1) { //too much stage effort, make stronger
-                    c.setInputPinCapacitance(pinName, c.getInputPinCapacitance(pinName) * Math.min(error, 1.2));
+                    c.setInputPinCapacitance(pinName, c.getInputPinCapacitance(pinName) * Math.min(error, 1.2), false);
                 }
                 if (error < 1) { //too little stage effort, make weaker
-                    c.setInputPinCapacitance(pinName, c.getInputPinCapacitance(pinName) * Math.max(error,  0.8));
+                    c.setInputPinCapacitance(pinName, c.getInputPinCapacitance(pinName) * Math.max(error,  0.8), false);
                 }
             }
         }
-        System.out.println(avgStageEffort + "," + errorSum / errorCount);
+        //System.out.println(avgStageEffort() + "," + errorSum / errorCount);
     }
     
     private double avgStageEffort() {
