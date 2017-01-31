@@ -15,6 +15,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCou
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsParser;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.LoadGraphExporter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.assigncleaner.NetlistAssignCleaner;
@@ -94,12 +95,14 @@ public class DrivestrengthMain {
         double outputPinCapacitance = .003;
         new LoadAnnotator(inlinedNetlist, outputPinCapacitance).run();
         
-        new EqualStageEffortOptimizer(inlinedNetlist, 100, false).run();
+        new EqualStageEffortOptimizer(inlinedNetlist, 100, true).run();
 
         logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
         logger.info("\n\n\n\n\n");
 
         logger.info(new LoadGraphExporter(inlinedNetlist).run());
+        
+        new DelayEstimator(inlinedNetlist).run();
         
         return 0;
     }
