@@ -1,5 +1,6 @@
 package de.uni_potsdam.hpi.asg.drivestrength;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,8 +16,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCou
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsParser;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.LoadGraphExporter;
+import de.uni_potsdam.hpi.asg.drivestrength.delayfiles.DelayFileParser;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.assigncleaner.NetlistAssignCleaner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.bundlesplitter.NetlistBundleSplitter;
@@ -97,12 +97,14 @@ public class DrivestrengthMain {
         
         new EqualStageEffortOptimizer(inlinedNetlist, 100, true).run();
 
-        logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
-        logger.info("\n\n\n\n\n");
+//        logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
+//        logger.info("\n\n\n\n\n");
 
-        logger.info(new LoadGraphExporter(inlinedNetlist).run());
+        //logger.info(new LoadGraphExporter(inlinedNetlist).run());
         
-        new DelayEstimator(inlinedNetlist).run();
+        //new DelayEstimator(inlinedNetlist).run();
+        
+        new DelayFileParser(new File("delays.sdf")).run();
         
         return 0;
     }
