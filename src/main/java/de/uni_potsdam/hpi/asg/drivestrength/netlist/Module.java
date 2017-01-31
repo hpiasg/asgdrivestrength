@@ -174,6 +174,18 @@ public class Module {
         return ioSignals;
     }
     
+    public boolean hasSignalOfName(String signalName) {
+        if (Signal.isConstantName(signalName)) {
+            return true;
+        }
+        for (Signal s : this.signals) {
+            if (s.getName().equals(signalName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public Signal getSignalByName(String signalName) {
         if (signalName.equals("0") || signalName.equals("1'b0")) {
             return Signal.getZeroInstance();
