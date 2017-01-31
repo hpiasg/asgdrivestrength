@@ -31,7 +31,7 @@ public class VerilogModuleParser {
     private static final Pattern assignPattern = Pattern.compile("assign\\s*(.*)\\s*=\\s*(.*)\\s*;");
     private static final Pattern signalBitIndexPattern = Pattern.compile("(.*)\\[(\\d+)\\]");
 
-    private static final Pattern instancePattern       = Pattern.compile("\\s*(.*)\\s+([A-Za-z0-9]+)\\s+\\((.*)\\);\\s*");
+    private static final Pattern instancePattern       = Pattern.compile("\\s*(.*)\\s+([_A-Za-z0-9]+)\\s+\\((.*)\\);\\s*");
     private static final Pattern mappedPositionPattern = Pattern.compile("\\.(.*)\\((.*)\\)");
     
     private List<String>statements;
@@ -164,11 +164,11 @@ public class VerilogModuleParser {
                 this.module.addInstance(new CellInstance(instanceName, definitionName, pinAssignments));
                 return true;
             }
-            if (this.aggregatedCellLibrary.isTie0(definitionName)) {
+            if (this.aggregatedCellLibrary.isTieZero(definitionName)) {
                 this.handleTie0(pinAssignments);
                 return true;
             }
-            if (this.aggregatedCellLibrary.isTie1(definitionName)) {
+            if (this.aggregatedCellLibrary.isTieOne(definitionName)) {
                 this.handleTie1(pinAssignments);
                 return true;
             }
@@ -180,7 +180,6 @@ public class VerilogModuleParser {
     }
     
     private void handleTie0(List<PinAssignment> pinAssignments) {
-        Signal s = pinAssignments.get(0).getSignal();
         AssignConnection a = new AssignConnection(Signal.getZeroInstance(), pinAssignments.get(0).getSignal(), 0, 0);
         this.module.addAssignConnection(a);
     }

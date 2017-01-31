@@ -32,6 +32,10 @@ public class Signal {
         return oneInstance;
     }
     
+    public static boolean isConstantName(String signalName) {
+        return signalName.equals("0") || signalName.equals("1") || signalName.equals("1'b0") || signalName.equals("1'b1");
+    }
+    
     public Signal(String name, Direction direction, int width) {
         this.direction = direction;
         this.name = name;

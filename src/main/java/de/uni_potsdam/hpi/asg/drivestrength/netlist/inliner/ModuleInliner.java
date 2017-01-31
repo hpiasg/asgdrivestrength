@@ -12,6 +12,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.ModuleInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.PinAssignment;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal.Direction;
 
 public class ModuleInliner {
     private Module sourceModule;
@@ -39,6 +40,8 @@ public class ModuleInliner {
             
             inlineNonIOSignalsOf(inlinedChild);
             addPinTransformationsFor(inlinedChild, childInstance);
+            inlineUnconnectedIOSignalsOf(inlinedChild);
+                        
             inlineAssignConnectionsOf(inlinedChild);
             inlineCellInstancesOf(inlinedChild);
         }
@@ -52,6 +55,16 @@ public class ModuleInliner {
             if (!s.isIOSignal() && !s.isConstant()) {
                 Signal newSignal = new Signal(s);
                 newSignal.setName("inlS" + nextNonIOSignalId++);
+                signalTransformation.put(s.getName(), newSignal);
+                inlinedModule.addSignal(newSignal);
+            }
+        }
+    }
+    
+    private void inlineUnconnectedIOSignalsOf(Module childDefinition) {
+        for (Signal s : childDefinition.getSignals()) {
+            if (s.isIOSignal() && getNewSignalFor(s) == null) {
+                Signal newSignal = new Signal("inlS" + nextNonIOSignalId++, Direction.wire, s.getWidth());
                 signalTransformation.put(s.getName(), newSignal);
                 inlinedModule.addSignal(newSignal);
             }
@@ -80,21 +93,17 @@ public class ModuleInliner {
     private void inlineAssignConnectionsOf(Module childDefinition) {
         for (AssignConnection a : childDefinition.getAssignConnections()) {
             AssignConnection newAssignConnection = new AssignConnection(a);
-            Signal sourceSignal = a.getSourceSignal();
-            if (!a.getSourceSignal().isConstant()) {
-                String oldSourceName = a.getSourceSignal().getName();
-                sourceSignal = signalTransformation.get(oldSourceName);
-                if (signalBitIndexTransformation.containsKey(oldSourceName)) {
-                    newAssignConnection.setSourceBitIndex(signalBitIndexTransformation.get(oldSourceName));
-                }
-            }
+            
+            Signal sourceSignal = getNewSignalFor(a.getSourceSignal());
             newAssignConnection.setSourceSignal(sourceSignal);
-            String oldDestinationName = a.getDestinationSignal().getName();
-            Signal destinationSignal = signalTransformation.get(oldDestinationName);
+            int sourceBitIndex = getNewBitIndexFor(a.getSourceSignal(), a.getSourceBitIndex());
+            newAssignConnection.setSourceBitIndex(sourceBitIndex);
+            
+            Signal destinationSignal = getNewSignalFor(a.getDestinationSignal());
             newAssignConnection.setDestinationSignal(destinationSignal);
-            if (signalBitIndexTransformation.containsKey(oldDestinationName)) {
-                newAssignConnection.setDestinationBitIndex(signalBitIndexTransformation.get(oldDestinationName));
-            }
+            int destinationBitIndex = getNewBitIndexFor(destinationSignal, a.getDestinationBitIndex());
+            newAssignConnection.setDestinationBitIndex(destinationBitIndex);
+            
             inlinedModule.addAssignConnection(newAssignConnection);
         }
     }
@@ -105,11 +114,11 @@ public class ModuleInliner {
             AggregatedCell cellDefinition = childCellInstance.getDefinition();
             List<PinAssignment> cellPinAssignments = new ArrayList<PinAssignment>();
             for (PinAssignment a : childCellInstance.getPinAssignments()) {
-                String oldSignalName = a.getSignal().getName();
-                Signal newSignal = signalTransformation.get(oldSignalName);
-                int signalBitIndex = a.getSignalBitIndex();
-                if (signalBitIndexTransformation.containsKey(oldSignalName)) {
-                    signalBitIndex = signalBitIndexTransformation.get(oldSignalName);
+                Signal newSignal = getNewSignalFor(a.getSignal());
+                int signalBitIndex = getNewBitIndexFor(a.getSignal(), a.getSignalBitIndex());
+                if (newSignal == null) {
+                    System.out.println("newSignal null in " + childDefinition.getName() + " for oldSignal " + a.getSignal().getName() + " for pin " + a.getPinName() + " of cell " + childCellInstance.getName());
+                    newSignal = makeWire(a.getSignal());
                 }
                 if (a.isPositional()) {
                     cellPinAssignments.add(new PinAssignment(newSignal, signalBitIndex, a.getPinPosition()));
@@ -123,4 +132,25 @@ public class ModuleInliner {
         }
     }
     
+    private Signal makeWire(Signal oldSignal) {
+        String wireName = oldSignal.getName() + "_toWire";
+        if (!inlinedModule.hasSignalOfName(wireName)) {
+            inlinedModule.addSignal(new Signal(wireName, Direction.wire, 1));
+        }
+        return inlinedModule.getSignalByName(wireName);
+    }
+    
+    private Signal getNewSignalFor(Signal oldSignal) {
+        if (oldSignal.isConstant()) {
+            return oldSignal;
+        }
+        return signalTransformation.get(oldSignal.getName());
+    }
+    
+    private int getNewBitIndexFor(Signal oldSignal, int defaultIndex) {
+        if (signalBitIndexTransformation.containsKey(oldSignal.getName())) {
+            return signalBitIndexTransformation.get(oldSignal.getName());
+        }
+        return defaultIndex;
+    }
 }

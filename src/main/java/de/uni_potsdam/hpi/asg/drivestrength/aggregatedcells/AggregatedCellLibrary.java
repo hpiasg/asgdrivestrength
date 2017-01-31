@@ -32,13 +32,12 @@ public class AggregatedCellLibrary {
         }
         throw(new Error("No aggregated cell for cell size name " + cellName));
     }
-
-    public boolean isTie0(String cellName) {
-        return cellName.equals("SDN_TIE0_1");
+    public boolean isTieZero(String cellName) {
+        return cellName.contains("TIE0");
     }
     
-    public boolean isTie1(String cellName) {
-        return cellName.equals("SDN_TIE1_1");
+    public boolean isTieOne(String cellName) {
+        return cellName.contains("TIE1");
     }
     
     public int size() {
