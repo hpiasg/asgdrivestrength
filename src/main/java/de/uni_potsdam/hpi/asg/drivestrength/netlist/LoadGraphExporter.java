@@ -17,7 +17,7 @@ public class LoadGraphExporter {
             this.nodesJson +=  makeNodeJson(id(c), c.getAverageInputPinCapacitance());
             for (Load l : c.getLoads()) {
                 if (l.isStaticLoad()) {
-                    this.nodesJson += makeNodeJson("staticLoad"+staticLoadId, c.getAverageInputPinCapacitance());
+                    this.nodesJson += makeNodeJson("staticLoad"+staticLoadId, l.getCapacitance());
                     this.linksJson += makeLinkJson(id(c), "staticLoad"+staticLoadId, "static", true);
                     staticLoadId++;
                 } else {

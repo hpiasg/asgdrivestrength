@@ -88,20 +88,16 @@ public class DrivestrengthMain {
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
         
-        double outputPinCapacitance = 0.003;
-        
+
+        double outputPinCapacitance = .003;
         new LoadAnnotator(inlinedNetlist, outputPinCapacitance).run();
 
-//        logger.info("flattened, inlined, debundled:\n" + inlinedNetlist.toVerilog());
-//        logger.info("\n\n\n\n\n");
-        
-        
         new EqualStageEffortOptimizer(inlinedNetlist, 100, true).run();
 
         logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
         logger.info("\n\n\n\n\n");
 
-        System.out.println(new LoadGraphExporter(inlinedNetlist).run());
+        logger.info(new LoadGraphExporter(inlinedNetlist).run());
         
         return 0;
     }
