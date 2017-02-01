@@ -110,7 +110,7 @@ public class DrivestrengthMain {
         
         logger.info("from delayfile:\n");
         
-        new DelayFileParser(new File("delayfiles/count10-optimizedESE-clamped.sdf")).run();
+        new DelayFileParser(new File("delayfiles/count10-optimizedESE-clamped_newmux.sdf")).run();
         
         return 0;
     }
