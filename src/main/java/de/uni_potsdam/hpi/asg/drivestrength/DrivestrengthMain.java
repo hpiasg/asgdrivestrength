@@ -18,6 +18,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
 import de.uni_potsdam.hpi.asg.drivestrength.delayfiles.DelayFileParser;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.LoadGraphExporter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.assigncleaner.NetlistAssignCleaner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.bundlesplitter.NetlistBundleSplitter;
@@ -45,7 +46,7 @@ public class DrivestrengthMain {
             options = new DrivestrengthCommandlineOptions();
             if (options.parseCmdLine(args)) {
                 logger = LoggerHelper.initLogger(options.getOutputlevel(),
-                        options.getLogfile(), options.isDebug());
+                        options.getLogfile(), options.isDebug(), "/log4j2.xml");
                 logger.debug("Args: " + Arrays.asList(args).toString());
                 WorkingdirGenerator.getInstance().create(
                         options.getWorkingdir(), "", "drivestrengthwork", null);
@@ -101,7 +102,7 @@ public class DrivestrengthMain {
         logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
         logger.info("\n\n\n\n\n");
 
-        //logger.info(new LoadGraphExporter(inlinedNetlist).run());
+        logger.info(new LoadGraphExporter(inlinedNetlist).run());
 
         logger.info("estimated:\n");
         
