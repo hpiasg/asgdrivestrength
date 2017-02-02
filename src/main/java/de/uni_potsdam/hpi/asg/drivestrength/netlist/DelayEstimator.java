@@ -1,5 +1,7 @@
 package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 
+import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
+
 public class DelayEstimator {
     private Netlist netlist;
     
@@ -12,7 +14,7 @@ public class DelayEstimator {
             double loadCapacitance = c.getLoadCapacitance();
             for (String pinName : c.getInputPinNames()) {
                 double estimatedDelay = estimateDelay(c, pinName, loadCapacitance);
-                System.out.println(c.getDefinitionName() + "__" + pinName + "__" + c.getName() + ", " + 1000 * estimatedDelay + " ");
+                System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + 1000 * estimatedDelay + " ");
             }
         }
     }

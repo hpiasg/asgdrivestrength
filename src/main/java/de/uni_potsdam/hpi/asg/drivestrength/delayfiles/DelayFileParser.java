@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.uni_potsdam.hpi.asg.common.iohelper.FileHelper;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 
 public class DelayFileParser {
     
@@ -62,7 +63,7 @@ public class DelayFileParser {
         
         for (String instanceName : avgDelays.keySet()) {
             for (String pinName : avgDelays.get(instanceName).keySet()) {
-                String cellType = cellTypes.get(instanceName);
+                String cellType = Cell.sortableName(cellTypes.get(instanceName));
                 System.out.println(cellType + "__" + pinName + "__" + instanceName + ", " + avgDelays.get(instanceName).get(pinName));
             }
         }

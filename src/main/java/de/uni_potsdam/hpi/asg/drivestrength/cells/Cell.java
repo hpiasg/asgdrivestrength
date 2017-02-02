@@ -90,7 +90,11 @@ public class Cell {
     private static final Pattern cellNamePattern = Pattern.compile("([A-Z]+)_([A-Z0-9]+)([_A-Z]*)_([A-Z0-9]+)");
     
     public String sortableName() {
-        Matcher m = cellNamePattern.matcher(this.name);
+        return Cell.sortableName(this.name);
+    }
+    
+    public static String sortableName(String cellName) {
+        Matcher m = cellNamePattern.matcher(cellName);
         if (m.matches()) {
             String size = m.group(4);
             if (size.contains("P") || size.length() == 1) {
@@ -98,6 +102,6 @@ public class Cell {
             }
             return m.group(1) + "_" + m.group(2) + m.group(3) + "_" + size;
         }
-        return name;
+        return cellName;
     }
 }

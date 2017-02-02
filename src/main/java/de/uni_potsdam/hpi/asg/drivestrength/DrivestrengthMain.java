@@ -1,6 +1,5 @@
 package de.uni_potsdam.hpi.asg.drivestrength;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,8 +15,6 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCou
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsParser;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
-import de.uni_potsdam.hpi.asg.drivestrength.delayfiles.DelayFileParser;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.LoadGraphExporter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.assigncleaner.NetlistAssignCleaner;
@@ -107,13 +104,10 @@ public class DrivestrengthMain {
 
         logger.info(new LoadGraphExporter(inlinedNetlist).run());
 
-        logger.info("estimated:\n");
-        
-        new DelayEstimator(inlinedNetlist).run();
-        
-        logger.info("from delayfile:\n");
-        
-        new DelayFileParser(new File("delayfiles/count10-optimizedESE-clamped_newmux.sdf")).run();
+//        logger.info("estimated:\n");
+//        new DelayEstimator(inlinedNetlist).run();
+//        logger.info("from delayfile:\n");
+//        new DelayFileParser(new File("delayfiles/count10-optimizedESE-clamped_newmux.sdf")).run();
         
         return 0;
     }
