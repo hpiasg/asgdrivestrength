@@ -2,6 +2,8 @@ package de.uni_potsdam.hpi.asg.drivestrength.cells;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin.Direction;
 
@@ -83,5 +85,23 @@ public class Cell {
             }
         }
         throw new Error("Could not find capacitance for pin " + pinName + " in rawCell " + this.getName());
+    }
+    
+    private static final Pattern cellNamePattern = Pattern.compile("([A-Z]+)_([A-Z0-9]+)([_A-Z]*)_([A-Z0-9]+)");
+    
+    public String sortableName() {
+        return Cell.sortableName(this.name);
+    }
+    
+    public static String sortableName(String cellName) {
+        Matcher m = cellNamePattern.matcher(cellName);
+        if (m.matches()) {
+            String size = m.group(4);
+            if (size.contains("P") || size.length() == 1) {
+                size = "0" + size;
+            }
+            return m.group(1) + "_" + m.group(2) + m.group(3) + "_" + size;
+        }
+        return cellName;
     }
 }

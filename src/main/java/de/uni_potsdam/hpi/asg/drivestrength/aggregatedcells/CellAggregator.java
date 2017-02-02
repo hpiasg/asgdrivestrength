@@ -147,14 +147,18 @@ public class CellAggregator {
     }
     
     private DelayLine extractDelayLineFor(String pinName, Cell rawSize, double inputCapacitance) {
+        List<DelayLine> delayLines = new ArrayList<>();
         for (Timing t : rawSize.getOutputPin().getTimings()) {
             if (!t.getRelatedPinName().equals(pinName)) continue;
             if (t.getRiseDelays() == null || t.getFallDelays() == null) continue;
             DelayLine lineRise = this.extractDelayLine(t.getRiseDelays(), inputCapacitance);
             DelayLine lineFall = this.extractDelayLine(t.getFallDelays(), inputCapacitance);
-            return DelayLine.averageFrom(lineRise, lineFall);
+            delayLines.add(DelayLine.averageFrom(lineRise, lineFall));
         }
-        throw new Error("Could not find delay slope for pin " + pinName + " on raw cell " + rawSize.getName());
+        if (delayLines.size() == 0) {
+            throw new Error("Could not find delay slope for pin " + pinName + " on raw cell " + rawSize.getName());
+        }
+        return DelayLine.averageFrom(delayLines);
     }
     
     private DelayLine extractDelayLine(DelayMatrix delayMatrix, double inputCapacitance) {

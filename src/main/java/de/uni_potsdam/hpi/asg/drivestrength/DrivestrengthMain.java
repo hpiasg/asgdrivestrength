@@ -15,7 +15,6 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCou
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsParser;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.LoadGraphExporter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.assigncleaner.NetlistAssignCleaner;
@@ -44,7 +43,7 @@ public class DrivestrengthMain {
             options = new DrivestrengthCommandlineOptions();
             if (options.parseCmdLine(args)) {
                 logger = LoggerHelper.initLogger(options.getOutputlevel(),
-                        options.getLogfile(), options.isDebug());
+                        options.getLogfile(), options.isDebug(), "/log4j2.xml");
                 logger.debug("Args: " + Arrays.asList(args).toString());
                 WorkingdirGenerator.getInstance().create(
                         options.getWorkingdir(), "", "drivestrengthwork", null);
@@ -67,6 +66,7 @@ public class DrivestrengthMain {
         
         List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
         
+        
         logger.info("Library contains " + cells.size() + " cells");
         
         StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
@@ -77,6 +77,8 @@ public class DrivestrengthMain {
         logger.info("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
         
 //        aggregatedCellLibrary.printDelayParameterTable();
+        
+        
         
         
         Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary).createNetlist();
@@ -101,10 +103,15 @@ public class DrivestrengthMain {
         logger.info("\n\n\n\n\n");
 
         logger.info(new LoadGraphExporter(inlinedNetlist).run());
-        
-        new DelayEstimator(inlinedNetlist).run();
+
+//        logger.info("estimated:\n");
+//        new DelayEstimator(inlinedNetlist).run();
+//        logger.info("from delayfile:\n");
+//        new DelayFileParser(new File("delayfiles/count10-optimizedESE-clamped_newmux.sdf")).run();
         
         return 0;
     }
+
+        
     
 }
