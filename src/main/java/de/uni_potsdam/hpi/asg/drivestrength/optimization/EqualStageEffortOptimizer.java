@@ -26,7 +26,9 @@ public class EqualStageEffortOptimizer {
         for (int i = 0; i < this.roundCount; i++) {
             optimizeOneRound();
         }
-        selectSizes();
+        for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
+            c.selectSizeFromTheoreticalCapacitances();
+        }
     }
     
     private void optimizeOneRound() {
@@ -74,11 +76,5 @@ public class EqualStageEffortOptimizer {
         double stageEffort = Math.pow(electricalEffort * logicalEffort, 1.0 / stageCount);
         
         return stageEffort;
-    }
-    
-    private void selectSizes() {
-        for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
-            c.selectSizeFromTheoreticalCapacitances();
-        }
     }
 }

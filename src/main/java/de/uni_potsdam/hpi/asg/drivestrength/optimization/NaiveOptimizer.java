@@ -23,6 +23,9 @@ public class NaiveOptimizer {
         for (int i = 0; i < this.roundCount; i++) {
             optimizeOneRound();
         }
+        for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
+            c.selectSizeFromTheoreticalCapacitances();
+        }
     }
     
     private void optimizeOneRound() {
