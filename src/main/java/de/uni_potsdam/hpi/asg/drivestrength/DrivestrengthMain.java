@@ -69,6 +69,7 @@ public class DrivestrengthMain {
         
         List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
         
+        
         logger.info("Library contains " + cells.size() + " cells");
         
         StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
@@ -79,6 +80,8 @@ public class DrivestrengthMain {
         logger.info("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
         
 //        aggregatedCellLibrary.printDelayParameterTable();
+        
+        
         
         
         Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary).createNetlist();
@@ -114,5 +117,7 @@ public class DrivestrengthMain {
         
         return 0;
     }
+
+        
     
 }

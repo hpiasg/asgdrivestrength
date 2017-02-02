@@ -158,9 +158,6 @@ public class CellAggregator {
         if (delayLines.size() == 0) {
             throw new Error("Could not find delay slope for pin " + pinName + " on raw cell " + rawSize.getName());
         }
-        if (delayLines.size() > 1) {
-            System.out.println(delayLines.size()  + " delay lines for " + rawSize.getName() + " pin " + pinName);
-        }
         return DelayLine.averageFrom(delayLines);
     }
     
