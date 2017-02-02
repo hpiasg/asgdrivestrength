@@ -12,6 +12,7 @@ public class AggregatedCell {
     private String name;
     private Map<String, Map<String, Double>> sizeCapacitances; //pin->size->value
     private Map<String, DelayParameterTriple> delayParameterTriples; //pin->triple
+    private Map<String, Map<String, DelayLine>> sizeDelayLines; //pin->size->value
     private List<String> orderedPinNames;
     private List<String> inputPinNames;
     private String outputPinName;
@@ -79,6 +80,10 @@ public class AggregatedCell {
 		this.sizeCapacitances = sizeCapacitances;
 	}
 	
+	public double getSizeCapacitance(String sizeName, String pinName) {
+	    return this.sizeCapacitances.get(pinName).get(sizeName);
+	}
+	
 	public void setDelayParameterTriples(Map<String, DelayParameterTriple> delayParameterTriples) {
 	    this.delayParameterTriples = delayParameterTriples;
 	}
@@ -86,6 +91,14 @@ public class AggregatedCell {
 	public Map<String, DelayParameterTriple> getDelayParameterTriples() {
 	    return this.delayParameterTriples;
 	}
+	
+	public void setSizeDelayLines(Map<String, Map<String, DelayLine>> sizeDelayLines) {
+        this.sizeDelayLines = sizeDelayLines;
+    }
+
+    public Map<String, Map<String, DelayLine>> getSizeDelayLines() {
+        return sizeDelayLines;
+    }
 
     public double getParasiticDelayForPin(String pinName) {
         return this.delayParameterTriples.get(pinName).getParasiticDelay();
@@ -107,21 +120,40 @@ public class AggregatedCell {
     	return this.delayParameterTriples.get(pinName).getStageCount();
     }
     
-    public String getSizeNameFor(Map<String, Double> desiredInputPinCapacitances) {
+    public Cell getSizeForInputCapacitances(Map<String, Double> desiredInputPinCapacitances) {
         double lowestDeviation = Double.POSITIVE_INFINITY;
-        String bestSizeName = null;
+        Cell bestSize = this.getDefaultSize();
         
-        for (String sizeName : this.sizeNames) {
-            double deviation = computeDeviationToDesiredCapacitances(sizeName, desiredInputPinCapacitances);
+        for (Cell size : this.sizesRaw) {
+            double deviation = computeDeviationToDesiredCapacitances(size.getName(), desiredInputPinCapacitances);
             if (deviation < lowestDeviation) {
                 lowestDeviation = deviation;
-                bestSizeName = sizeName;
+                bestSize = size;
             }
         }
-        if (bestSizeName == null) {
-            throw(new Error("Could not find " + this.getName() + " cell size for desired input pin capacitances"));
+        return bestSize;
+    }
+    
+    public Cell getFastestSizeForLoad(double loadCapacitance) {
+        Cell fastestSize = this.getDefaultSize();
+        double lowestAvgDelay = Double.POSITIVE_INFINITY;
+        for (Cell c : this.sizesRaw) {
+            double delaySum = 0.0;
+            int delayCount = 0;
+            for (String pinName : this.inputPinNames) {
+                double inputCapacitance = this.sizeCapacitances.get(pinName).get(c.getName());
+                double electricalEffort = loadCapacitance / inputCapacitance;
+                double delay = this.sizeDelayLines.get(pinName).get(c.getName()).valueAtX(electricalEffort);
+                delaySum += delay;
+                delayCount++;
+            }
+            double avgDelay = delaySum / delayCount;
+            if (avgDelay < lowestAvgDelay) {
+                lowestAvgDelay = avgDelay;
+                fastestSize = c;
+            }
         }
-        return bestSizeName;
+        return fastestSize;
     }
     
     private double computeDeviationToDesiredCapacitances(String sizeName, Map<String, Double> desiredCapacitances) {
@@ -167,7 +199,7 @@ public class AggregatedCell {
         return rawCell.getCapacitanceForPin(pinName);
     }
     
-    private Cell getDefaultSize() {
+    public Cell getDefaultSize() {
         for (Cell rawCell : this.sizesRaw) {
             if (rawCell.getName().equals(this.defaultSizeName)) {
                 return rawCell;

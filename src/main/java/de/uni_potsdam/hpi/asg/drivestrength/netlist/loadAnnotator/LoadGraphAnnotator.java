@@ -8,11 +8,11 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal.Direction;
 
-public class LoadAnnotator {
+public class LoadGraphAnnotator {
     private Module module;
     private double outputPinCapacitance;
     
-    public LoadAnnotator(Netlist netlist, double outputPinCapacitance) {
+    public LoadGraphAnnotator(Netlist netlist, double outputPinCapacitance) {
         this.module = netlist.getRootModule();
         this.outputPinCapacitance = outputPinCapacitance;
     }

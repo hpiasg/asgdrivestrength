@@ -6,22 +6,26 @@ import java.util.List;
 import java.util.Map;
 
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 
 public class CellInstance extends AbstractInstance {
     
     private AggregatedCell definition;
     private String definitionName;
-    private Map<String, Double> inputPinCapacitances;
+    private Map<String, Double> inputPinTheoreticalCapacitances;
     private CellInstance avatar; //the CellInstance this one was copied from (if copy was called accordingly). Capacitance setter also modifies avatar
     private List<Load> loads;
+    private Cell selectedSize;
 
     public CellInstance(String name, AggregatedCell definition, List<PinAssignment> pinAssignments) {
         super(name, pinAssignments);
         this.definition = definition;
-        initializeInputPinCapacitances();
+        initializeInputPinTheoreticalCapacitances();
         this.nameAllPinAssignments();
         this.loads = new ArrayList<>();
+        this.selectedSize = definition.getDefaultSize();
     }
+    
     public CellInstance(String name, String definitionName, List<PinAssignment> pinAssignments) {
         super(name, pinAssignments);
         this.definitionName = definitionName;
@@ -46,18 +50,26 @@ public class CellInstance extends AbstractInstance {
         return this.loads;
     }
     
-    public double getLoadCapacitance() {
+    public double getLoadCapacitanceTheoretical() {
         double totalCapacitance = 0.0;
         for (Load l : this.loads) {
-            totalCapacitance += l.getCapacitance();
+            totalCapacitance += l.getCapacitanceTheoretical();
         }
         return totalCapacitance;
     }
     
-    private void initializeInputPinCapacitances() {
-        this.inputPinCapacitances = new HashMap<>();
+    public double getLoadCapacitanceSelected() {
+        double totalCapacitance = 0.0;
+        for (Load l : this.loads) {
+            totalCapacitance += l.getCapacitanceSelected();
+        }
+        return totalCapacitance;
+    }
+    
+    private void initializeInputPinTheoreticalCapacitances() {
+        this.inputPinTheoreticalCapacitances = new HashMap<>();
         for (String pinName : this.getInputPinNames()) {
-            this.inputPinCapacitances.put(pinName, this.definition.getDefaultCapacitanceForPin(pinName));
+            this.inputPinTheoreticalCapacitances.put(pinName, this.definition.getDefaultCapacitanceForPin(pinName));
         }
     }
 
@@ -66,34 +78,56 @@ public class CellInstance extends AbstractInstance {
         if (definitionName != null) {
             return definitionName;
         }
-        return definition.getSizeNameFor(this.inputPinCapacitances);
+        return selectedSize.getName();
+    }
+    
+    public void selectSizeFromTheoreticalCapacitances() {
+        this.selectedSize = definition.getSizeForInputCapacitances(this.inputPinTheoreticalCapacitances);
+    }
+    
+    public void selectSizeForLoad(double loadCapacitance) {
+        this.selectedSize = definition.getFastestSizeForLoad(loadCapacitance);
     }
     
     public AggregatedCell getDefinition() {
         return definition;
     }
     
-    public void setInputPinCapacitance(String inputPin, double newInputPinCapacitance, boolean clampToPossible) {
+    public void setInputPinTheoreticalCapacitance(String inputPin, double newInputPinCapacitance, boolean clampToPossible) {
         if (clampToPossible) {
             newInputPinCapacitance = Math.min(newInputPinCapacitance, this.definition.getLargestPossibleCapacitance(inputPin));
             newInputPinCapacitance = Math.max(newInputPinCapacitance, this.definition.getSmallestPossibleCapacitance(inputPin));
         }
-        this.inputPinCapacitances.put(inputPin, newInputPinCapacitance);
+        this.inputPinTheoreticalCapacitances.put(inputPin, newInputPinCapacitance);
         if (this.avatar != null) {
-            this.avatar.setInputPinCapacitance(inputPin, newInputPinCapacitance, false);
+            this.avatar.setInputPinTheoreticalCapacitance(inputPin, newInputPinCapacitance, false);
         }
     }
     
-    public double getInputPinCapacitance(String inputPinName) {
-        return this.inputPinCapacitances.get(inputPinName);
+    public double getInputPinTheoreticalCapacitance(String inputPinName) {
+        return this.inputPinTheoreticalCapacitances.get(inputPinName);
     }
     
-    public double getAverageInputPinCapacitance() {
+    public double getInputPinSelectedCapacitance(String inputPinName) {
+        return this.definition.getSizeCapacitance(this.selectedSize.getName(), inputPinName);
+    }
+    
+    public double getAverageInputPinTheoreticalCapacitance() {
         double sum = 0.0;
-        for (double c : this.inputPinCapacitances.values()) {
+        for (double c : this.inputPinTheoreticalCapacitances.values()) {
             sum += c;
         }
-        return sum / this.inputPinCapacitances.size();
+        return sum / this.inputPinTheoreticalCapacitances.size();
+    }
+    
+    public double getAverageInputPinSelectedCapacitance() {
+        double sum = 0.0;
+        int count = 0;
+        for (String inputPinName : this.getInputPinNames()) {
+            sum += this.getInputPinSelectedCapacitance(inputPinName);
+            count++;
+        }
+        return sum / count;
     }
     
     private void nameAllPinAssignments() {

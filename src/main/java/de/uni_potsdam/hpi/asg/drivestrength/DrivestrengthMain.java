@@ -21,9 +21,9 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.assigncleaner.NetlistAssignC
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.bundlesplitter.NetlistBundleSplitter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.inliner.NetlistInliner;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.loadAnnotator.LoadAnnotator;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.loadAnnotator.LoadGraphAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.SelectForLoadOptimizer;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -72,7 +72,7 @@ public class DrivestrengthMain {
         StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
         DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
         
-        AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts, defaultSizes).run();
+        AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts, defaultSizes, false).run();
 
         logger.info("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
         
@@ -95,14 +95,15 @@ public class DrivestrengthMain {
         
 
         double outputPinCapacitance = .003;
-        new LoadAnnotator(inlinedNetlist, outputPinCapacitance).run();
+        new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         
-        new EqualStageEffortOptimizer(inlinedNetlist, 100, true).run();
+        //new EqualStageEffortOptimizer(inlinedNetlist, 100, false).run();
+        new SelectForLoadOptimizer(inlinedNetlist, 100).run();
 
         logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
         logger.info("\n\n\n\n\n");
 
-        logger.info(new LoadGraphExporter(inlinedNetlist).run());
+        logger.info(new LoadGraphExporter(inlinedNetlist, false).run());
 
 //        logger.info("estimated:\n");
 //        new DelayEstimator(inlinedNetlist).run();

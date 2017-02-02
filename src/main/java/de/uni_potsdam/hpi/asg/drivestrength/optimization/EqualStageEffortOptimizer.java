@@ -26,21 +26,22 @@ public class EqualStageEffortOptimizer {
         for (int i = 0; i < this.roundCount; i++) {
             optimizeOneRound();
         }
+        selectSizes();
     }
     
     private void optimizeOneRound() {
         double targetEffort = avgStageEffort();
         
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
-            double loadCapacitance = c.getLoadCapacitance();
+            double loadCapacitance = c.getLoadCapacitanceTheoretical();
             for (String pinName : c.getInputPinNames()) {
                 double stageEffort = stageEffort(c, pinName, loadCapacitance);
                 double error = stageEffort / targetEffort;
                 if (error > 1) { //too much stage effort, make stronger
-                    c.setInputPinCapacitance(pinName, c.getInputPinCapacitance(pinName) * Math.min(error, 1.2), clampToImplementableCapacitances);
+                    c.setInputPinTheoreticalCapacitance(pinName, c.getInputPinTheoreticalCapacitance(pinName) * Math.min(error, 1.2), clampToImplementableCapacitances);
                 }
                 if (error < 1) { //too little stage effort, make weaker
-                    c.setInputPinCapacitance(pinName, c.getInputPinCapacitance(pinName) * Math.max(error,  0.8), clampToImplementableCapacitances);
+                    c.setInputPinTheoreticalCapacitance(pinName, c.getInputPinTheoreticalCapacitance(pinName) * Math.max(error,  0.8), clampToImplementableCapacitances);
                 }
             }
         }
@@ -50,7 +51,7 @@ public class EqualStageEffortOptimizer {
         double sum = 0.0;
         int count = 0;
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
-            double loadCapacitance = c.getLoadCapacitance();
+            double loadCapacitance = c.getLoadCapacitanceTheoretical();
             for (String pinName : c.getInputPinNames()) {
                 double stageEffort = stageEffort(c, pinName, loadCapacitance);
                 sum += stageEffort;
@@ -61,7 +62,7 @@ public class EqualStageEffortOptimizer {
     }
     
     private double stageEffort(CellInstance cellInstance, String pinName, double loadCapacitance) {
-        double inputCapacitance = cellInstance.getInputPinCapacitance(pinName);
+        double inputCapacitance = cellInstance.getInputPinTheoreticalCapacitance(pinName);
         double electricalEffort = loadCapacitance / inputCapacitance;
         int stageCount = cellInstance.getDefinition().getStageCountForPin(pinName);
         double logicalEffort = cellInstance.getDefinition().getLogicalEffortForPin(pinName);
@@ -73,5 +74,11 @@ public class EqualStageEffortOptimizer {
         double stageEffort = Math.pow(electricalEffort * logicalEffort, 1.0 / stageCount);
         
         return stageEffort;
+    }
+    
+    private void selectSizes() {
+        for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
+            c.selectSizeFromTheoreticalCapacitances();
+        }
     }
 }

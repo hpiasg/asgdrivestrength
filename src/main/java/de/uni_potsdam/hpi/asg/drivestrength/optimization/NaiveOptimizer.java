@@ -27,12 +27,12 @@ public class NaiveOptimizer {
     
     private void optimizeOneRound() {
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
-            double loadCapacitance = c.getLoadCapacitance();
+            double loadCapacitance = c.getLoadCapacitanceTheoretical();
             for (String pinName : c.getInputPinNames()) {
-                double inputCapacitance = c.getInputPinCapacitance(pinName);
+                double inputCapacitance = c.getInputPinTheoreticalCapacitance(pinName);
                 double electricalEffort = loadCapacitance / inputCapacitance;
                 if (electricalEffort > 1.5) {
-                    c.setInputPinCapacitance(pinName, inputCapacitance * 1.5, false);
+                    c.setInputPinTheoreticalCapacitance(pinName, inputCapacitance * 1.5, false);
                 }
             }
         }

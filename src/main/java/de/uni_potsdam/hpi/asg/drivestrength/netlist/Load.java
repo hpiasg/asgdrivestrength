@@ -14,11 +14,18 @@ public class Load {
         this.staticCapacitance = staticCapacitance;
     }
     
-    public double getCapacitance() {
+    public double getCapacitanceTheoretical() {
         if (this.isStaticLoad()) {
             return this.staticCapacitance;
         }
-        return this.cellInstance.getInputPinCapacitance(pinName);
+        return this.cellInstance.getInputPinTheoreticalCapacitance(pinName);
+    }
+    
+    public double getCapacitanceSelected() {
+        if (this.isStaticLoad()) {
+            return this.staticCapacitance;
+        }
+        return this.cellInstance.getInputPinSelectedCapacitance(pinName);
     }
     
     public boolean isStaticLoad() {

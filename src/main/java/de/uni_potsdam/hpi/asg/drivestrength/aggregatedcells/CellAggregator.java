@@ -22,14 +22,17 @@ public class CellAggregator {
     private Map<String, AggregatedCell> aggregatedCells;
     private StageCountsContainer stageCounts;
     private DefaultSizesContainer defaultSizes;
+    private boolean skipDeviatingSizes;
     
     // We use values for input slew = 0.0161238 ns, as it is closest to the 0.0181584ns used in cell pdfs
     private final int inputSlewIndex = 0; 
     
-    public CellAggregator(List<Cell> rawCells, StageCountsContainer stageCounts, DefaultSizesContainer defaultSizes) {
+    public CellAggregator(List<Cell> rawCells, StageCountsContainer stageCounts, 
+            DefaultSizesContainer defaultSizes, boolean skipDeviatingSizes) {
         this.rawCells = rawCells;
         this.stageCounts = stageCounts;
         this.defaultSizes = defaultSizes;
+        this.skipDeviatingSizes = skipDeviatingSizes;
     }
     
     public AggregatedCellLibrary run() {
@@ -55,11 +58,11 @@ public class CellAggregator {
             aggregatedCell.setSizeCapacitances(this.extractSizeCapacitances(rawSizes));
             aggregatedCell.setDefaultSizeName(this.defaultSizes.get(aggregatedCell.getName()));
             
-            Map<String, Map<String, DelayLine>> delayLines = 
-                    this.extractDelayLinesFor(rawSizes, aggregatedCell.getInputPinNames(), aggregatedCell.getSizeCapacitances());
+            aggregatedCell.setSizeDelayLines(this.extractDelayLinesFor(rawSizes, aggregatedCell.getInputPinNames(),
+                                                                       aggregatedCell.getSizeCapacitances()));
             
             Map<String, Integer> stageCountsPerPin = this.stageCounts.getFootprintDefaults().get(aggregatedCell.getName());
-            aggregatedCell.setDelayParameterTriples(this.extractDelayParameters(delayLines, stageCountsPerPin));;
+            aggregatedCell.setDelayParameterTriples(this.extractDelayParameters(aggregatedCell.getSizeDelayLines(), stageCountsPerPin));;
         }
    
         return new AggregatedCellLibrary(aggregatedCells);
@@ -79,7 +82,7 @@ public class CellAggregator {
             logger.debug(logPrefix + "(no stage count information)");
             return false;
         }
-        if (this.stageCounts.getDeviatingSizes().containsKey(rawCell.getName())) {
+        if (this.skipDeviatingSizes && this.stageCounts.getDeviatingSizes().containsKey(rawCell.getName())) {
             logger.debug(logPrefix + "(size with deviating cell count)");
             return false;
         }

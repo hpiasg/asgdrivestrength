@@ -11,7 +11,7 @@ public class DelayEstimator {
     
     public void run() {
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
-            double loadCapacitance = c.getLoadCapacitance();
+            double loadCapacitance = c.getLoadCapacitanceTheoretical();
             for (String pinName : c.getInputPinNames()) {
                 double estimatedDelay = estimateDelay(c, pinName, loadCapacitance);
                 System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + 1000 * estimatedDelay + " ");
@@ -21,7 +21,7 @@ public class DelayEstimator {
     
 
     private double estimateDelay(CellInstance cellInstance, String pinName, double loadCapacitance) {
-        double inputCapacitance = cellInstance.getInputPinCapacitance(pinName);
+        double inputCapacitance = cellInstance.getInputPinTheoreticalCapacitance(pinName);
         double electricalEffort = loadCapacitance / inputCapacitance;
         int stageCount = cellInstance.getDefinition().getStageCountForPin(pinName);
         double logicalEffort = cellInstance.getDefinition().getLogicalEffortForPin(pinName);
