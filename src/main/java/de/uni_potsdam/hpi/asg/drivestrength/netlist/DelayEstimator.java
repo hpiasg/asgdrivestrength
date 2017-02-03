@@ -4,14 +4,16 @@ import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 
 public class DelayEstimator {
     private Netlist netlist;
+    private boolean useTheoreticalLoad;
     
-    public DelayEstimator(Netlist netlist) {
+    public DelayEstimator(Netlist netlist, boolean useTheoreticalLoad) {
         this.netlist = netlist;
+        this.useTheoreticalLoad = useTheoreticalLoad;
     }
     
     public void run() {
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
-            double loadCapacitance = c.getLoadCapacitanceTheoretical();
+            double loadCapacitance = this.findLoadCapacitance(c);
             for (String pinName : c.getInputPinNames()) {
                 double estimatedDelay = estimateDelay(c, pinName, loadCapacitance);
                 System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + 1000 * estimatedDelay + " ");
@@ -19,6 +21,12 @@ public class DelayEstimator {
         }
     }
     
+    private double findLoadCapacitance(CellInstance c) {
+        if (this.useTheoreticalLoad) {
+            return c.getLoadCapacitanceTheoretical();
+        }
+        return c.getLoadCapacitanceSelected();
+    }
 
     private double estimateDelay(CellInstance cellInstance, String pinName, double loadCapacitance) {
         double inputCapacitance = cellInstance.getInputPinTheoreticalCapacitance(pinName);

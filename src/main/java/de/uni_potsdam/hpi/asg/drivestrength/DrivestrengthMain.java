@@ -23,7 +23,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.inliner.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.loadAnnotator.LoadGraphAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.SelectForLoadOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -72,7 +72,7 @@ public class DrivestrengthMain {
         StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
         DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
         
-        AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts, defaultSizes, false).run();
+        AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts, defaultSizes, true).run();
 
         logger.info("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
         
@@ -97,8 +97,8 @@ public class DrivestrengthMain {
         double outputPinCapacitance = .003;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         
-        //new EqualStageEffortOptimizer(inlinedNetlist, 100, false).run();
-        new SelectForLoadOptimizer(inlinedNetlist, 100).run();
+        new EqualStageEffortOptimizer(inlinedNetlist, 100, false).run();
+        //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
 
         logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
         logger.info("\n\n\n\n\n");
@@ -106,10 +106,10 @@ public class DrivestrengthMain {
         logger.info(new LoadGraphExporter(inlinedNetlist, false).run());
 
 //        logger.info("estimated:\n");
-//        new DelayEstimator(inlinedNetlist).run();
+//        new DelayEstimator(inlinedNetlist, false).run();
 //        logger.info("from delayfile:\n");
-//        new DelayFileParser(new File("delayfiles/count10-optimizedESE-clamped_newmux.sdf")).run();
-        
+//        new DelayFileParser(new File("delayfiles/count10-ESE-slew.sdf")).run();
+//        
         return 0;
     }
 
