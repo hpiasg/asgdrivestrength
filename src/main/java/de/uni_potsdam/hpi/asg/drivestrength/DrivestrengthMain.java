@@ -24,6 +24,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.inliner.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.loadAnnotator.LoadGraphAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -110,6 +111,9 @@ public class DrivestrengthMain {
 //        logger.info("from delayfile:\n");
 //        new DelayFileParser(new File("delayfiles/count10-ESE-slew.sdf")).run();
 //        
+        if (options.getRemoteConfigFile() != null) {
+            new RemoteSimulation("count10", inlinedNetlist.toVerilog(), options.getRemoteConfigFile()).run();
+        }
         return 0;
     }
 

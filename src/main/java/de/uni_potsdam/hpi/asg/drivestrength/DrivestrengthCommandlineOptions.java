@@ -30,10 +30,13 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     
     @Option(name = "-stage", metaVar = "<stageCountsFile>", usage ="Cell Stage Counts JSON File", required = true)
     private File stageCountsFile;
-    
+
     @Option(name = "-defaultSizes", metaVar = "<defaultSizesFile>", usage ="Cell Default Sizes JSON File", required = true)
     private File defaultSizesFile;
 
+    @Option(name = "-remoteConfig", metaVar = "<remoteConfigFile>", usage ="Remote Config JSON File containing username, host, ...", required = false)
+    private File remoteConfigFile;
+    
     @Argument(metaVar = "Verilog Netlist File", required = true)
     private File netlistFile;
 
@@ -70,6 +73,10 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
 
     public File getWorkingdir() {
         return workingdir;
+    }
+    
+    public File getRemoteConfigFile() {
+        return remoteConfigFile;
     }
 
 }
