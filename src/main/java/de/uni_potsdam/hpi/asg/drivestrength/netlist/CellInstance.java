@@ -191,5 +191,9 @@ public class CellInstance extends AbstractInstance {
         }
         throw new Error("Signal " + aSignal.getName() + " is not connected to CellInstance " + this.getName());
     }
+    
+    public boolean isDummyCellInstance() {
+        return (this.definition == null);
+    }
 
 }
