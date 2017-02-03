@@ -25,19 +25,19 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     @Option(name = "-debug")
     private boolean debug = false;
 
-    @Option(name = "-lib", metaVar = "<libertyfile>", usage ="Liberty Cell Library File", required = true)
+    @Option(name = "-lib", metaVar = "<libertyfile>", usage ="Liberty Cell Library File", required = false)
     private File libertyFile;
     
-    @Option(name = "-stage", metaVar = "<stageCountsFile>", usage ="Cell Stage Counts JSON File", required = true)
+    @Option(name = "-stage", metaVar = "<stageCountsFile>", usage ="Cell Stage Counts JSON File", required = false)
     private File stageCountsFile;
 
-    @Option(name = "-defaultSizes", metaVar = "<defaultSizesFile>", usage ="Cell Default Sizes JSON File", required = true)
+    @Option(name = "-defaultSizes", metaVar = "<defaultSizesFile>", usage ="Cell Default Sizes JSON File", required = false)
     private File defaultSizesFile;
 
     @Option(name = "-remoteConfig", metaVar = "<remoteConfigFile>", usage ="Remote Config JSON File containing username, host, ...", required = false)
     private File remoteConfigFile;
     
-    @Argument(metaVar = "Verilog Netlist File", required = true)
+    @Argument(metaVar = "Verilog Netlist File", required = false)
     private File netlistFile;
 
 
