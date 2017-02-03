@@ -11,8 +11,7 @@ public class SimulationRemoteOperationWorkflow extends SimpleRemoteOperationWork
 
     @Override
     protected boolean executeCallBack(String script, int code) {
-        System.out.println("executeCallBack");
-        return false;
+        return true;
     }
 
 }

@@ -15,7 +15,7 @@ public class DefaultSizesParser {
     }
     
     public DefaultSizesContainer run() {
-        String json = FileHelper.readTextFile(defaultSizesFile);
+        String json = FileHelper.readTextFileToString(defaultSizesFile);
         DefaultSizesContainer c = new Gson().fromJson(json, DefaultSizesContainer.class);
         return c;
     }
