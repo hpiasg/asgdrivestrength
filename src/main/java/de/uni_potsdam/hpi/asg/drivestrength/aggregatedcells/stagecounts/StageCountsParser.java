@@ -12,7 +12,7 @@ public class StageCountsParser {
 	}
 	
 	public StageCountsContainer run() {
-		String json = FileHelper.readTextFile(stageCountsFile);
+		String json = FileHelper.readTextFileToString(stageCountsFile);
 		StageCountsContainer c = new Gson().fromJson(json, StageCountsContainer.class);
 		return c;
 	}
