@@ -110,12 +110,9 @@ public class DrivestrengthMain {
 //        new DelayEstimator(inlinedNetlist, false).run();
 //        logger.info("from delayfile:\n");
 //        new DelayFileParser(new File("delayfiles/count10-ESE-slew.sdf")).run();
-
-        if (options.getRemoteConfigFile() != null) {
-            logger.info("Starting remote simulation...");
-            int testbenchRuntimePicoseconds = new RemoteSimulation("count10", inlinedNetlist.toVerilog(), options.getRemoteConfigFile()).run();
-            logger.info("Testbench Runtime: " + testbenchRuntimePicoseconds + " ps");
-        }
+        
+        new RemoteSimulation(options.getNetlistFile().getName(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile()).run();
+        
         return 0;
     }
 

@@ -11,36 +11,52 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.gson.Gson;
 
 import de.uni_potsdam.hpi.asg.common.remote.RemoteInformation;
 import de.uni_potsdam.hpi.asg.drivestrength.util.FileHelper;
 
 public class RemoteSimulation {
+    protected static final Logger logger = LogManager.getLogger();
+    private static final Pattern simulationResultSuccessPattern = Pattern.compile("[0-9]* TB_SUCCESS:\\s*([0-9]*)");
+    
     private String name;
     private String netlist;
-    private File remoteConfigFile;    
+    private File remoteConfigFile;
+    private String tempDir;
     
-    public RemoteSimulation(String name, String netlist, File remoteConfigFile) {
-        this.name = name;
+    public RemoteSimulation(String filename, String netlist, File remoteConfigFile) {
+        this.name = basename(filename);
         this.netlist = netlist;
         this.remoteConfigFile = remoteConfigFile;
     }
     
-    public int run() {
+    private String basename(String filename) {
+        return filename.split("\\.(?=[^\\.]+$)")[0];
+    }
+    
+    public void run() {
+        if (remoteConfigFile == null) {
+            logger.info("Skipping Remote Simulation (no remoteConfig file specified)");
+            return;
+        }
+
+        logger.info("Starting remote simulation, with testbench " + this.name + "...");
+        
+        
+        String date = date();
+        tempDir = "tmp/" + date + "/";
+        new File(tempDir).mkdir();
+
         String json = FileHelper.readTextFileToString(remoteConfigFile);
-        RemoteInformation rinfo = new Gson().fromJson(json, RemoteConfig.class).asRemoteInformation();         
+        RemoteInformation remoteInfo = new Gson().fromJson(json, RemoteConfig.class).asRemoteInformation();         
         
-        DateFormat dfmt = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");                 
-        String date = dfmt.format(new Date());
-        
-        SimulationRemoteOperationWorkflow wf = new SimulationRemoteOperationWorkflow(rinfo, name + "_" + date);
 
         Set<String> filesToMove = new HashSet<>();
         List<String> filesToExecute = new ArrayList<>();
-        
-        String tempDir = "tmp/" + date + "/";
-        new File(tempDir).mkdir();
         
         String netlistFilename = tempDir + name + ".v";
         FileHelper.writeStringToTextFile(netlist, netlistFilename);
@@ -50,18 +66,34 @@ public class RemoteSimulation {
         FileHelper.writeStringToTextFile("simulate " + name + ".v " + name + " | grep -E 'ERROR|SUCCESS' > output.txt", commandFilename);
         filesToMove.add(commandFilename);
         filesToExecute.add(name + ".sh");
-        
-        wf.run(filesToMove, filesToExecute, tempDir, false);
-        
-        String output = FileHelper.readTextFileToString(new File(tempDir + "output.txt")).trim();
-        FileHelper.deleteFileRecursive(new File(tempDir));
 
-        Pattern simulationResultPattern = Pattern.compile("[0-9]* TB_SUCCESS:\\s*([0-9]*)");
-        Matcher m = simulationResultPattern.matcher(output);
+        SimulationRemoteOperationWorkflow workFlow = new SimulationRemoteOperationWorkflow(remoteInfo, name + "_" + date);
+        boolean success = workFlow.run(filesToMove, filesToExecute, tempDir, true);
+        if (!success) {
+            FileHelper.deleteDirectory(tempDir);
+            throw new Error("Remote Simulation failed");
+        }
+        
+        parseResult();
+
+        FileHelper.deleteDirectory(tempDir);
+    }
+    
+    private String date() {
+        DateFormat dfmt = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        return dfmt.format(new Date());
+    }
+    
+    private void parseResult() {
+        File resultFile = new File(tempDir + "output.txt");
+        String result = FileHelper.readTextFileToString(resultFile).trim();
+        Matcher m = simulationResultSuccessPattern.matcher(result);
         
         if (m.matches()) {
-            return Integer.parseInt(m.group(1));
+            int runtime = Integer.parseInt(m.group(1));
+            logger.info("Testbench Success after " + runtime + " ps");
+        } else {
+            logger.info("Simulation unsuccessful: " + result);
         }
-        throw new Error("Simulation unsuccessful: " + output);
     }
 }

@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
+
 public class FileHelper {
     public static String readTextFileToString(File textFile) {
         try {
@@ -26,19 +28,11 @@ public class FileHelper {
         }
     }
     
-    public static void deleteFileRecursive(File file) {
-        if (file.exists()) {
-            if (file.isFile()) {
-                file.delete();
-                return;
-            }
-            if (file.isDirectory()) {
-                String files[] = file.list();
-                for (String str : files) {
-                    deleteFileRecursive(new File(file, str));
-                }
-                file.delete();
-            }
+    public static void deleteDirectory(String path) {
+        try {
+            FileUtils.deleteDirectory(new File(path));
+        } catch (IOException e) {
+            throw new Error("Could not delete directory " + path);
         }
     }
 }
