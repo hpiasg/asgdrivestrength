@@ -23,7 +23,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.inliner.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.loadAnnotator.LoadGraphAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.SelectForLoadOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
 
 public class DrivestrengthMain {
@@ -98,20 +98,16 @@ public class DrivestrengthMain {
         double outputPinCapacitance = .003;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         
-        new EqualStageEffortOptimizer(inlinedNetlist, 100, false).run();
-        //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
+        //new EqualStageEffortOptimizer(inlinedNetlist, 100, false).run();
+        new SelectForLoadOptimizer(inlinedNetlist, 100).run();
 
         logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
-        logger.info("\n\n\n\n\n");
 
         logger.info(new LoadGraphExporter(inlinedNetlist, false).run());
 
-//        logger.info("estimated:\n");
 //        new DelayEstimator(inlinedNetlist, false).run();
-//        logger.info("from delayfile:\n");
-//        new DelayFileParser(new File("delayfiles/count10-ESE-slew.sdf")).run();
-        
-        new RemoteSimulation(options.getNetlistFile().getName(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile()).run();
+
+        new RemoteSimulation(options.getNetlistFile().getName(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(), true).run();
         
         return 0;
     }

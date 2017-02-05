@@ -50,7 +50,7 @@ public class DelayFileParser {
         }
     }
     
-    public void run() {
+    public void parse() {
         delays = new HashMap<>();
         cellTypes = new HashMap<>();
         for (String line : lines) {
@@ -60,13 +60,25 @@ public class DelayFileParser {
         }
         
         computeAvgDelays();
-        
+    }
+    
+    public void printAll() {        
         for (String instanceName : avgDelays.keySet()) {
             for (String pinName : avgDelays.get(instanceName).keySet()) {
                 String cellType = Cell.sortableName(cellTypes.get(instanceName));
                 System.out.println(cellType + "__" + pinName + "__" + instanceName + ", " + avgDelays.get(instanceName).get(pinName));
             }
         }
+    }
+    
+    public int getDelaySum() {
+        double sum = 0;
+        for (String instanceName : avgDelays.keySet()) {
+            for (String pinName : avgDelays.get(instanceName).keySet()) {
+                sum += avgDelays.get(instanceName).get(pinName);
+            }
+        }
+        return (int) Math.round(sum);
     }
     
     private boolean parseCellTypeStatement(String line) {

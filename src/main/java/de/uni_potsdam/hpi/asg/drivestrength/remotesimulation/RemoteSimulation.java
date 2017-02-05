@@ -17,7 +17,9 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 
 import de.uni_potsdam.hpi.asg.common.remote.RemoteInformation;
+import de.uni_potsdam.hpi.asg.drivestrength.delayfiles.DelayFileParser;
 import de.uni_potsdam.hpi.asg.drivestrength.util.FileHelper;
+import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 
 public class RemoteSimulation {
     protected static final Logger logger = LogManager.getLogger();
@@ -26,12 +28,14 @@ public class RemoteSimulation {
     private String name;
     private String netlist;
     private File remoteConfigFile;
+    private boolean includeSdf;
     private String tempDir;
     
-    public RemoteSimulation(String filename, String netlist, File remoteConfigFile) {
+    public RemoteSimulation(String filename, String netlist, File remoteConfigFile, boolean includeSdf) {
         this.name = basename(filename);
         this.netlist = netlist;
         this.remoteConfigFile = remoteConfigFile;
+        this.includeSdf = includeSdf;
     }
     
     private String basename(String filename) {
@@ -63,7 +67,11 @@ public class RemoteSimulation {
         filesToMove.add(netlistFilename);
         
         String commandFilename = tempDir + name + ".sh";
-        FileHelper.writeStringToTextFile("simulate " + name + ".v " + name + " | grep -E 'ERROR|SUCCESS' > output.txt", commandFilename);
+        String command = "simulate " + name + ".v " + name + " | grep -E 'ERROR|SUCCESS' > output.txt;";
+        if (includeSdf) {
+            command += "cp simulation_" + name + "/" + name + ".sdf .";
+        }
+        FileHelper.writeStringToTextFile(command, commandFilename);
         filesToMove.add(commandFilename);
         filesToExecute.add(name + ".sh");
 
@@ -75,6 +83,7 @@ public class RemoteSimulation {
         }
         
         parseResult();
+        parseSdf();
 
         FileHelper.deleteDirectory(tempDir);
     }
@@ -91,9 +100,15 @@ public class RemoteSimulation {
         
         if (m.matches()) {
             int runtime = Integer.parseInt(m.group(1));
-            logger.info("Testbench Success after " + runtime + " ps");
+            logger.info("Testbench Success after " + NumberFormatter.spaced(runtime) + " ps");
         } else {
             logger.info("Simulation unsuccessful: " + result);
         }
+    }
+    
+    private void parseSdf() {
+        DelayFileParser sdfParser = new DelayFileParser(new File(tempDir + name + ".sdf"));
+        sdfParser.parse();
+        logger.info("SDF cell delay sum: " + NumberFormatter.spaced(sdfParser.getDelaySum()) + " ps");
     }
 }
