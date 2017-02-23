@@ -83,10 +83,16 @@ public class CellInstance extends AbstractInstance {
     
     public void selectSizeFromTheoreticalCapacitances() {
         this.selectedSize = definition.getSizeForInputCapacitances(this.inputPinTheoreticalCapacitances);
+        if (this.avatar != null) {
+            this.avatar.selectSizeFromTheoreticalCapacitances();
+        }
     }
     
     public void selectSizeForLoad(double loadCapacitance) {
         this.selectedSize = definition.getFastestSizeForLoad(loadCapacitance);
+        if (this.avatar != null) {
+            this.avatar.selectSizeForLoad(loadCapacitance);
+        }
     }
     
     public AggregatedCell getDefinition() {
