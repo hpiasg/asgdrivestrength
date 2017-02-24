@@ -24,6 +24,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.inliner.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.loadAnnotator.LoadGraphAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -63,7 +64,6 @@ public class DrivestrengthMain {
     }
 
     private static int execute() {
-        
         List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
         
         
@@ -72,7 +72,8 @@ public class DrivestrengthMain {
         StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
         DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
         
-        AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts, defaultSizes, true).run();
+        boolean skipDeviatingSizes = true;
+        AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts, defaultSizes, skipDeviatingSizes).run();
 
         logger.info("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
         
@@ -97,16 +98,18 @@ public class DrivestrengthMain {
         double outputPinCapacitance = .003;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         
-        new EqualStageEffortOptimizer(inlinedNetlist, 100, false).run();
+        boolean clampToImplementableCapacitances = false;
+        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
 
-        logger.info("with adjusted strengths:\n" + netlist.toVerilog());
+        logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
 
-        logger.info(new LoadGraphExporter(inlinedNetlist, false).run());
+        boolean exportTheoreticalLoad = true;
+        logger.info(new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run());
 
 //        new DelayEstimator(inlinedNetlist, false).run();
 
-        //new RemoteSimulation(options.getNetlistFile().getName(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(), true).run();
+        new RemoteSimulation(options.getNetlistFile().getName(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(), true).run();
         
         return 0;
     }

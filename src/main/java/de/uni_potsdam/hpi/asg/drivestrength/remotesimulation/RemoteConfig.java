@@ -7,13 +7,13 @@ public class RemoteConfig {
     private String host;
     private String username;
     private String password;
-    private String remoteFolder;
+    private String remoteDirectory;
     
     public RemoteConfig() {
     }
     
     public RemoteInformation asRemoteInformation() {
-        return new RemoteInformation(host, username, password, remoteFolder);
+        return new RemoteInformation(host, username, password, remoteDirectory);
     }
 
 }

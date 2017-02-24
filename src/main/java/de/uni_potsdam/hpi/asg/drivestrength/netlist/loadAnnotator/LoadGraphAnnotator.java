@@ -1,5 +1,8 @@
 package de.uni_potsdam.hpi.asg.drivestrength.netlist.loadAnnotator;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.AssignConnection;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.CellInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Load;
@@ -19,6 +22,7 @@ public class LoadGraphAnnotator {
     
     public void run() {
         this.addLoadsToCellInstances();
+        this.markInputDrivenInstances();
     }
     
     private void addLoadsToCellInstances() {
@@ -37,6 +41,31 @@ public class LoadGraphAnnotator {
             for (Signal ioSignal : module.getIOSignals()) {
                 if (ioSignal == signal) {
                     cellInstance.addLoad(new Load(this.outputPinCapacitance));
+                }
+            }
+        }
+    }
+    
+    private void markInputDrivenInstances() {
+        Set<Signal> inputDrivenSignals = new HashSet<>();
+        
+        for (Signal ioSignal : module.getIOSignals()) {
+            if (ioSignal.getDirection() == Direction.input) {
+                inputDrivenSignals.add(ioSignal);
+            }
+        }
+        
+        for (AssignConnection a : module.getAssignConnections()) {
+            if (inputDrivenSignals.contains(a.getSourceSignal())) {
+                inputDrivenSignals.add(a.getDestinationSignal());
+            }
+        }
+
+        for (CellInstance cellInstance : module.getCellInstances()) {
+            for (String cellInputPinName : cellInstance.getInputPinNames()) {
+                Signal cellInputSignal = cellInstance.getInputSignal(cellInputPinName);
+                if (inputDrivenSignals.contains(cellInputSignal)) {
+                    cellInstance.markAsInputDriven();
                 }
             }
         }

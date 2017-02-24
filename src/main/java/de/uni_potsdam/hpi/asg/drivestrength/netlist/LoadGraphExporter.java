@@ -16,10 +16,10 @@ public class LoadGraphExporter {
     public String run() {
         int staticLoadId = 0;
         for (CellInstance c : module.getCellInstances()) {
-            this.nodesJson +=  makeNodeJson(id(c), this.findAppropriateCapacitance(c));
+            this.nodesJson +=  makeNodeJson(id(c), this.findAppropriateCapacitance(c), c.isInputDriven());
             for (Load l : c.getLoads()) {
                 if (l.isStaticLoad()) {
-                    this.nodesJson += makeNodeJson("staticLoad"+staticLoadId, l.getCapacitanceTheoretical());
+                    this.nodesJson += makeNodeJson("staticLoad"+staticLoadId, l.getCapacitanceTheoretical(), false);
                     this.linksJson += makeLinkJson(id(c), "staticLoad"+staticLoadId, "static", true);
                     staticLoadId++;
                 } else {
@@ -41,8 +41,8 @@ public class LoadGraphExporter {
         return c.getAverageInputPinSelectedCapacitance();
     }
 
-    private String makeNodeJson(String id, double capacitance) {
-        return "{\"id\":\"" + id + "\", \"avgCapacitance\": " + capacitance + "},";
+    private String makeNodeJson(String id, double capacitance, boolean isInputDriven) {
+        return "{\"id\":\"" + id + "\", \"avgCapacitance\": " + capacitance + ", \"isInputDriven\":" + isInputDriven + "},";
     }
     
     private String makeLinkJson(String sourceId, String targetId, String targetPinName, boolean isStatic) {

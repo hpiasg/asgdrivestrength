@@ -16,6 +16,7 @@ public class CellInstance extends AbstractInstance {
     private CellInstance avatar; //the CellInstance this one was copied from (if copy was called accordingly). Capacitance setter also modifies avatar
     private List<Load> loads;
     private Cell selectedSize;
+    private boolean isInputDriven;
 
     public CellInstance(String name, AggregatedCell definition, List<PinAssignment> pinAssignments) {
         super(name, pinAssignments);
@@ -24,6 +25,7 @@ public class CellInstance extends AbstractInstance {
         this.nameAllPinAssignments();
         this.loads = new ArrayList<>();
         this.selectedSize = definition.getDefaultSize();
+        this.isInputDriven = false;
     }
     
     public CellInstance(String name, String definitionName, List<PinAssignment> pinAssignments) {
@@ -40,6 +42,14 @@ public class CellInstance extends AbstractInstance {
             return this;
         else
             return this.avatar;
+    }
+    
+    public void markAsInputDriven() {
+        this.isInputDriven = true;
+    }
+    
+    public boolean isInputDriven() {
+        return this.isInputDriven;
     }
     
     public void addLoad(Load aLoad) {
@@ -89,6 +99,7 @@ public class CellInstance extends AbstractInstance {
     }
     
     public void selectFastestSizeForLoad(double loadCapacitance) {
+        if (this.isInputDriven) return;
         this.selectedSize = definition.getFastestSizeForLoad(loadCapacitance);
         if (this.avatar != null) {
             this.avatar.selectFastestSizeForLoad(loadCapacitance);
@@ -100,6 +111,7 @@ public class CellInstance extends AbstractInstance {
     }
     
     public void setInputPinTheoreticalCapacitance(String inputPin, double newInputPinCapacitance, boolean clampToPossible) {
+        if (this.isInputDriven) return;
         if (clampToPossible) {
             newInputPinCapacitance = Math.min(newInputPinCapacitance, this.definition.getLargestPossibleCapacitance(inputPin));
             newInputPinCapacitance = Math.max(newInputPinCapacitance, this.definition.getSmallestPossibleCapacitance(inputPin));
