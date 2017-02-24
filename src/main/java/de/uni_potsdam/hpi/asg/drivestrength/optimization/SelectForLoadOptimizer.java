@@ -22,7 +22,7 @@ public class SelectForLoadOptimizer {
     private void optimizeOneRound() {
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
             double load = c.getLoadCapacitanceSelected();
-            c.selectSizeForLoad(load);
+            c.selectFastestSizeForLoad(load);
         }
     }
 }

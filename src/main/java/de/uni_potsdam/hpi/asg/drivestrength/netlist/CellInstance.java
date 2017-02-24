@@ -85,7 +85,7 @@ public class CellInstance extends AbstractInstance {
         this.selectedSize = definition.getSizeForInputCapacitances(this.inputPinTheoreticalCapacitances);
     }
     
-    public void selectSizeForLoad(double loadCapacitance) {
+    public void selectFastestSizeForLoad(double loadCapacitance) {
         this.selectedSize = definition.getFastestSizeForLoad(loadCapacitance);
     }
     
