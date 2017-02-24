@@ -91,7 +91,7 @@ public class CellInstance extends AbstractInstance {
     public void selectFastestSizeForLoad(double loadCapacitance) {
         this.selectedSize = definition.getFastestSizeForLoad(loadCapacitance);
         if (this.avatar != null) {
-            this.avatar.selectSizeForLoad(loadCapacitance);
+            this.avatar.selectFastestSizeForLoad(loadCapacitance);
         }
     }
     
