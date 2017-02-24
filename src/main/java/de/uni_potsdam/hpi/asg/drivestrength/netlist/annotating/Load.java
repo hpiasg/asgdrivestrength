@@ -1,4 +1,6 @@
-package de.uni_potsdam.hpi.asg.drivestrength.netlist;
+package de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating;
+
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 
 public class Load {
     private CellInstance cellInstance;

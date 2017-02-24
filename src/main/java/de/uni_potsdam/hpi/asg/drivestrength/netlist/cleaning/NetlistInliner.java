@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.netlist.inliner;
+package de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

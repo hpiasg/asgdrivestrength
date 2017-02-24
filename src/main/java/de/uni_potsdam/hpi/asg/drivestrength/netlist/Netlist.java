@@ -3,6 +3,9 @@ package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Module;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.ModuleInstance;
+
 public class Netlist {
     private List<Module> modules;
     private Module rootModule;

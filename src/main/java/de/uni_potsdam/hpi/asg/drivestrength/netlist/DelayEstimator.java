@@ -1,6 +1,7 @@
 package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 
 public class DelayEstimator {
     private Netlist netlist;

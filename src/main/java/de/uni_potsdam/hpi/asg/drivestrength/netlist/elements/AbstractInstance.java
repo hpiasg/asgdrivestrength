@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.netlist;
+package de.uni_potsdam.hpi.asg.drivestrength.netlist.elements;
 
 import java.util.ArrayList;
 import java.util.List;

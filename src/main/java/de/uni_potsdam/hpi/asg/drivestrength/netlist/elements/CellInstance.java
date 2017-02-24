@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.netlist;
+package de.uni_potsdam.hpi.asg.drivestrength.netlist.elements;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.Map;
 
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.Load;
 
 public class CellInstance extends AbstractInstance {
     
@@ -84,7 +85,7 @@ public class CellInstance extends AbstractInstance {
     }
 
     @Override
-    String getDefinitionName() {
+    public String getDefinitionName() {
         if (definitionName != null) {
             return definitionName;
         }

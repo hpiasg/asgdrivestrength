@@ -1,7 +1,7 @@
 package de.uni_potsdam.hpi.asg.drivestrength.optimization;
 
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.CellInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 
 public class NaiveOptimizer {
     private Netlist netlist;

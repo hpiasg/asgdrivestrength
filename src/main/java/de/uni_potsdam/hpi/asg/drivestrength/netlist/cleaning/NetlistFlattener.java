@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener;
+package de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,9 +6,9 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.ModuleInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Module;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.ModuleInstance;
 
 public class NetlistFlattener {
     protected static final Logger logger = LogManager.getLogger();

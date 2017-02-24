@@ -6,9 +6,9 @@ import java.io.File;
 
 import org.junit.Test;
 
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.flattener.NetlistFlattener;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.testhelper.TestHelper;
 
 public class VerilogParserTest {

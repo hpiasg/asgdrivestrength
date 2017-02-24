@@ -1,9 +1,9 @@
-package de.uni_potsdam.hpi.asg.drivestrength.netlist;
+package de.uni_potsdam.hpi.asg.drivestrength.netlist.elements;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal.Direction;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Signal.Direction;
 
 public class Module {
 

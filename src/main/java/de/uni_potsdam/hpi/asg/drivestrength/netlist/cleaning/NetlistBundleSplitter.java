@@ -1,15 +1,15 @@
-package de.uni_potsdam.hpi.asg.drivestrength.netlist.bundlesplitter;
+package de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.AssignConnection;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.CellInstance;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.PinAssignment;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.Signal.Direction;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.AssignConnection;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Module;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.PinAssignment;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Signal;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Signal.Direction;
 
 public class NetlistBundleSplitter {
     private Module netlistModule;
