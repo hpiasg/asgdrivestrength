@@ -1,5 +1,6 @@
 package de.uni_potsdam.hpi.asg.drivestrength;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCou
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsParser;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
+import de.uni_potsdam.hpi.asg.drivestrength.delayfiles.DelayFileParser;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.LoadGraphExporter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.InputDrivenAnnotator;
@@ -24,8 +26,10 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistBundleSplitt
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.AllLargestOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
+import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -102,6 +106,7 @@ public class DrivestrengthMain {
         boolean clampToImplementableCapacitances = false;
         new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
+        //new AllLargestOptimizer(inlinedNetlist).run();
 
         logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
 

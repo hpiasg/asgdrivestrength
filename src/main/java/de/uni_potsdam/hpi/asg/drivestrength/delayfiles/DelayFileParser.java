@@ -12,25 +12,26 @@ import de.uni_potsdam.hpi.asg.common.iohelper.FileHelper;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 
 public class DelayFileParser {
-    
+
     private static final Pattern cellTypePattern = Pattern.compile("CELLTYPE \"(.*)\"");
     private static final Pattern instanceNamePattern = Pattern.compile("INSTANCE (.*)");
     private static final Pattern delayPattern = Pattern.compile("(.*)IOPATH (.*) (.*) \\((.*)\\) \\((.*)\\)(.*)");
-    
+    private static final Pattern delayPatternOneTriple = Pattern.compile("(.*)IOPATH (.*) (.*) \\((.*)\\)(.*)");
+
     private List<String> lines;
-    
+
     private String currentCellType;
     private String currentInstanceName;
-    
+
     private Map<String, Map<String, List<Double>>> delays;
     private Map<String, Map<String, Double>> avgDelays;
     private Map<String, String> cellTypes;
-    
-    
+
+
     public DelayFileParser(File delayFile) {
         this.readLinesFromFile(delayFile);
     }
-    
+
     private void readLinesFromFile(File delayFile) {
         this.lines = new ArrayList<>();
         List<String> linesRaw = FileHelper.getInstance().readFile(delayFile);
@@ -45,11 +46,11 @@ public class DelayFileParser {
                 line = line.substring(0, line.length() - 1);
             }
             if (line.length() > 0) {
-                lines.add(line);                    
+                lines.add(line);
             }
         }
     }
-    
+
     public void parse() {
         delays = new HashMap<>();
         cellTypes = new HashMap<>();
@@ -57,12 +58,13 @@ public class DelayFileParser {
             if (parseCellTypeStatement(line)) continue;
             if (parseInstanceNameStatement(line)) continue;
             if (parseDelayStatement(line)) continue;
+            if (parseDelayStatementSingleTriple(line)) continue;
         }
-        
+
         computeAvgDelays();
     }
-    
-    public void printAll() {        
+
+    public void printAll() {
         for (String instanceName : avgDelays.keySet()) {
             for (String pinName : avgDelays.get(instanceName).keySet()) {
                 String cellType = Cell.sortableName(cellTypes.get(instanceName));
@@ -70,7 +72,7 @@ public class DelayFileParser {
             }
         }
     }
-    
+
     public int getDelaySum() {
         double sum = 0;
         for (String instanceName : avgDelays.keySet()) {
@@ -80,7 +82,7 @@ public class DelayFileParser {
         }
         return (int) Math.round(sum);
     }
-    
+
     private boolean parseCellTypeStatement(String line) {
         Matcher m = cellTypePattern.matcher(line);
         if (m.matches()) {
@@ -99,7 +101,7 @@ public class DelayFileParser {
         }
         return false;
     }
-    
+
     private boolean parseDelayStatement(String line) {
         Matcher m = delayPattern.matcher(line);
         if (m.matches()) {
@@ -109,26 +111,41 @@ public class DelayFileParser {
             String fallDelays = m.group(5).replace(")", "");
             double riseDelay = parseDelayTriple(riseDelays);
             double fallDelay = parseDelayTriple(fallDelays);
-            double avgDelay = (riseDelay + fallDelay) / 2 * 1000;
-            
-            if (!delays.containsKey(currentInstanceName)) {
-                delays.put(currentInstanceName, new HashMap<>());
-            }
-            if (!(delays.get(currentInstanceName)).containsKey(pinName)) {
-                delays.get(currentInstanceName).put(pinName, new ArrayList<>());
-            }
-            delays.get(currentInstanceName).get(pinName).add(avgDelay);
-            
+            double avgDelay = (riseDelay + fallDelay) / 2;
+            registerDelay(avgDelay, pinName);
             return true;
         }
         return false;
     }
-    
+
+    private boolean parseDelayStatementSingleTriple(String line) {
+        Matcher m = delayPatternOneTriple.matcher(line);
+        if (m.matches()) {
+            String pinName = m.group(2);
+            pinName = pinName.replace(")", "").replaceAll("\\(", "");
+            String delays = m.group(4);
+            double delay = parseDelayTriple(delays);
+            this.registerDelay(delay, pinName);
+            return true;
+        }
+        return false;
+    }
+
+    private void registerDelay(double delay, String pinName) {
+        if (!delays.containsKey(currentInstanceName)) {
+            delays.put(currentInstanceName, new HashMap<>());
+        }
+        if (!(delays.get(currentInstanceName)).containsKey(pinName)) {
+            delays.get(currentInstanceName).put(pinName, new ArrayList<>());
+        }
+        delays.get(currentInstanceName).get(pinName).add(delay * 1000);
+    }
+
     private double parseDelayTriple(String triple) {
         String oneValue = triple.split(":")[0];
         return Double.parseDouble(oneValue);
     }
-    
+
     private void computeAvgDelays() {
         avgDelays = new HashMap<>();
         for (String instanceName : this.delays.keySet()) {
