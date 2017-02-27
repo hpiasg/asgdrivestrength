@@ -17,23 +17,25 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Module;
 
 public class VerilogParser {
     protected static final Logger logger = LogManager.getLogger();
-    
+
     private static final Pattern endmodulePattern = Pattern.compile("^\\s*endmodule\\s*$");
     private static final Pattern statementPattern = Pattern.compile("^.*;$");
     private static final Pattern escapeLiteralPattern = Pattern.compile("\\\\([^ ]*) ");
-    
+
     private List<String> statements;
     private AggregatedCellLibrary aggregatedCellLibrary;
+    private boolean replaceCellsBySingleStageGates;
 
-    public VerilogParser(File verilogFile, AggregatedCellLibrary aggregatedCellLibrary) {
+    public VerilogParser(File verilogFile, AggregatedCellLibrary aggregatedCellLibrary, boolean replaceCellsBySingleStageGates) {
         this.statements = readVerilogStatementsFromFile(verilogFile);
         this.aggregatedCellLibrary = aggregatedCellLibrary;
+        this.replaceCellsBySingleStageGates = replaceCellsBySingleStageGates;
     }
-    
+
     public VerilogParser(File verilogFile) {
         this.statements = readVerilogStatementsFromFile(verilogFile);
     }
-    
+
     private List<String> readVerilogStatementsFromFile(File verilogFile) {
         List<String> lines = FileHelper.getInstance().readFile(verilogFile);
         assert(lines != null);
@@ -41,16 +43,16 @@ public class VerilogParser {
         replaceEscapeLiterals(statements);
         return statements;
     }
-    
+
     private List<String> mergeMultilineStatements(List<String> lines) {
         List<String> statements = new ArrayList<String>();
-        
+
         String statement = "";
         String comment = "";
         for (String line: lines) {
             line = line.trim();
             if(line.contains("//")) {
-                comment += line.substring(line.indexOf("//")); 
+                comment += line.substring(line.indexOf("//"));
                 line = line.substring(0, line.indexOf("//"));
             }
             if(line.equals("")) {
@@ -68,10 +70,10 @@ public class VerilogParser {
                 statement += " ";
             }
         }
-        
+
         return statements;
     }
-    
+
     private void replaceEscapeLiterals(List<String> statements) {
         for (ListIterator<String> i = statements.listIterator(); i.hasNext();) {
             String statement = i.next();
@@ -83,36 +85,35 @@ public class VerilogParser {
             i.set(statement);
         }
     }
-    
+
     private String cleanLiteral(String aLiteral) {
         return aLiteral.replaceAll("[^A-Za-z0-9 ]", "_");
     }
-    
+
     private boolean matches(String aString, Pattern aPattern) {
         Matcher m = aPattern.matcher(aString);
         return m.matches();
     }
-    
 
-    
     public Netlist createNetlist() {
         logger.info("Parsing Verilog netlist...");
-        
+
         Netlist netlist = new Netlist();
-        
+
         List<String> currentModuleStatements = new ArrayList<String>();
-        
+
         for (String statement: statements) {
             currentModuleStatements.add(statement);
             if (matches(statement, endmodulePattern)) {
-                Module module = new VerilogModuleParser(currentModuleStatements, netlist, aggregatedCellLibrary).run();
+                Module module = new VerilogModuleParser(currentModuleStatements, netlist,
+                        aggregatedCellLibrary, replaceCellsBySingleStageGates).run();
                 netlist.addModule(module);
                 currentModuleStatements = new ArrayList<String>();
             }
         }
-        
+
         logger.info("Parsing Verilog netlist complete");
-        
+
         return netlist;
     }
 }

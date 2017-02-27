@@ -10,7 +10,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.Load;
 
 public class CellInstance extends AbstractInstance {
-    
+
     private AggregatedCell definition;
     private String definitionName;
     private Map<String, Double> inputPinTheoreticalCapacitances;
@@ -28,39 +28,39 @@ public class CellInstance extends AbstractInstance {
         this.selectedSize = definition.getDefaultSize();
         this.isInputDriven = false;
     }
-    
+
     public CellInstance(String name, String definitionName, List<PinAssignment> pinAssignments) {
         super(name, pinAssignments);
         this.definitionName = definitionName;
     }
-    
+
     public void setAvatar(CellInstance avatar) {
         this.avatar = avatar;
     }
-    
+
     public CellInstance getAvatarOrSelf() {
         if (this.avatar == null)
             return this;
         else
             return this.avatar;
     }
-    
+
     public void markAsInputDriven() {
         this.isInputDriven = true;
     }
-    
+
     public boolean isInputDriven() {
         return this.isInputDriven;
     }
-    
+
     public void addLoad(Load aLoad) {
         this.loads.add(aLoad);
     }
-    
+
     public List<Load> getLoads() {
         return this.loads;
     }
-    
+
     public double getLoadCapacitanceTheoretical() {
         double totalCapacitance = 0.0;
         for (Load l : this.loads) {
@@ -68,7 +68,7 @@ public class CellInstance extends AbstractInstance {
         }
         return totalCapacitance;
     }
-    
+
     public double getLoadCapacitanceSelected() {
         double totalCapacitance = 0.0;
         for (Load l : this.loads) {
@@ -76,7 +76,7 @@ public class CellInstance extends AbstractInstance {
         }
         return totalCapacitance;
     }
-    
+
     private void initializeInputPinTheoreticalCapacitances() {
         this.inputPinTheoreticalCapacitances = new HashMap<>();
         for (String pinName : this.getInputPinNames()) {
@@ -91,14 +91,14 @@ public class CellInstance extends AbstractInstance {
         }
         return selectedSize.getName();
     }
-    
+
     public void selectSizeFromTheoreticalCapacitances() {
         this.selectedSize = definition.getSizeForInputCapacitances(this.inputPinTheoreticalCapacitances);
         if (this.avatar != null) {
             this.avatar.selectSizeFromTheoreticalCapacitances();
         }
     }
-    
+
     public void selectFastestSizeForLoad(double loadCapacitance) {
         if (this.isInputDriven) return;
         this.selectedSize = definition.getFastestSizeForLoad(loadCapacitance);
@@ -106,11 +106,11 @@ public class CellInstance extends AbstractInstance {
             this.avatar.selectFastestSizeForLoad(loadCapacitance);
         }
     }
-    
+
     public AggregatedCell getDefinition() {
         return definition;
     }
-    
+
     public void setInputPinTheoreticalCapacitance(String inputPin, double newInputPinCapacitance, boolean clampToPossible) {
         if (this.isInputDriven) return;
         if (clampToPossible) {
@@ -122,15 +122,15 @@ public class CellInstance extends AbstractInstance {
             this.avatar.setInputPinTheoreticalCapacitance(inputPin, newInputPinCapacitance, false);
         }
     }
-    
+
     public double getInputPinTheoreticalCapacitance(String inputPinName) {
         return this.inputPinTheoreticalCapacitances.get(inputPinName);
     }
-    
+
     public double getInputPinSelectedCapacitance(String inputPinName) {
         return this.definition.getSizeCapacitance(this.selectedSize.getName(), inputPinName);
     }
-    
+
     public double getAverageInputPinTheoreticalCapacitance() {
         double sum = 0.0;
         for (double c : this.inputPinTheoreticalCapacitances.values()) {
@@ -138,7 +138,7 @@ public class CellInstance extends AbstractInstance {
         }
         return sum / this.inputPinTheoreticalCapacitances.size();
     }
-    
+
     public double getAverageInputPinSelectedCapacitance() {
         double sum = 0.0;
         int count = 0;
@@ -148,7 +148,7 @@ public class CellInstance extends AbstractInstance {
         }
         return sum / count;
     }
-    
+
     private void nameAllPinAssignments() {
         if (this.definition == null) {
             throw new Error("Cannot name positional pin assignments for dummy cell instance " + this.getName());
@@ -160,7 +160,7 @@ public class CellInstance extends AbstractInstance {
             }
         }
     }
-    
+
     public Signal getOutputSignal() {
         if (this.definition == null) {
             throw new Error("Cannot find output Signal for dummy cell instance " + this.getName());
@@ -168,40 +168,40 @@ public class CellInstance extends AbstractInstance {
         String outputPinName = this.definition.getOutputPinName();
         for (PinAssignment p : this.getPinAssignments()) {
             if (p.getPinName().equals(outputPinName)) {
-                return p.getSignal();                    
+                return p.getSignal();
             }
         }
         throw new Error("Cannot find output Signal for cell instance " + this.getName());
     }
-    
+
     public List<String> getInputPinNames() {
         if (this.definition == null) {
             throw new Error("Cannot find input pin names for dummy cell instance " + this.getName());
         }
         return this.definition.getInputPinNames();
     }
-    
+
     public Signal getInputSignal(String inputPinName) {
         if (this.definition == null) {
             throw new Error("Cannot find input Signal for dummy cell instance " + this.getName());
         }
         for (PinAssignment p : this.getPinAssignments()) {
             if (p.getPinName().equals(inputPinName)) {
-                return p.getSignal();                    
+                return p.getSignal();
             }
         }
         throw new Error("Cannot find input Signal for cell instance " + this.getName());
     }
-    
+
     public boolean isInputSignal(Signal aSignal) {
         for (PinAssignment p : this.getPinAssignments()) {
             if (p.getSignal() == aSignal && !p.getPinName().equals(this.definition.getOutputPinName())) {
-                return true;                    
+                return true;
             }
         }
         return false;
     }
-    
+
     public String pinNameForConnectedSignal(Signal aSignal) {
         for (PinAssignment p : this.getPinAssignments()) {
             if (p.getSignal() == aSignal) {
@@ -210,7 +210,7 @@ public class CellInstance extends AbstractInstance {
         }
         throw new Error("Signal " + aSignal.getName() + " is not connected to CellInstance " + this.getName());
     }
-    
+
     public boolean isDummyCellInstance() {
         return (this.definition == null);
     }

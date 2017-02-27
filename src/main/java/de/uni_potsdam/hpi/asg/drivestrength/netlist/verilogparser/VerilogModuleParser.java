@@ -22,7 +22,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Signal.Direction;
 
 public class VerilogModuleParser {
     protected static final Logger logger = LogManager.getLogger();
-    
+
     private static final Pattern startmodulePattern = Pattern.compile("module (.*) \\((.*)\\);\\s*$");
 
     private static final Pattern signalBundlePattern = Pattern.compile("(input|output|wire|supply0|supply1)\\s*\\[\\s*(\\d+):(\\d+)\\]\\s*(.*);");
@@ -33,45 +33,48 @@ public class VerilogModuleParser {
 
     private static final Pattern instancePattern       = Pattern.compile("\\s*(.*)\\s+([_A-Za-z0-9]+)\\s+\\((.*)\\);\\s*");
     private static final Pattern mappedPositionPattern = Pattern.compile("\\.(.*)\\((.*)\\)");
-    
+
     private List<String>statements;
-    
+
     private Module module;
     private Netlist netlist;
     private AggregatedCellLibrary aggregatedCellLibrary;
+    private boolean replaceCellsBySingleStageGates;
 
-    public VerilogModuleParser(List<String> statements, Netlist netlist, AggregatedCellLibrary aggregatedCellLibrary) {
+    public VerilogModuleParser(List<String> statements, Netlist netlist,
+            AggregatedCellLibrary aggregatedCellLibrary, boolean replaceCellsBySingleStageGates) {
         this.statements = statements;
         this.netlist = netlist;
         this.aggregatedCellLibrary = aggregatedCellLibrary;
+        this.replaceCellsBySingleStageGates = replaceCellsBySingleStageGates;
     }
-    
+
     public Module run() {
         this.module = new Module();
-        
+
         for (String statement : this.statements) {
             if (parseStartmoduleStatement(statement)) continue;
             if (parseSignalStatement(statement)) continue;
             if (parseAssignStatement(statement)) continue;
             if (parseInstanceStatement(statement)) continue;
         }
-        
+
         return this.module;
     }
-    
+
     private boolean parseStartmoduleStatement(String statement) {
         Matcher m = startmodulePattern.matcher(statement);
         if(!m.matches()) {
             return false;
         }
         this.module.setName(m.group(1));
-        
+
         for(String signal : m.group(2).split(",")) {
             this.module.addInterfaceSignal(signal.trim());
         }
         return true;
     }
-    
+
     private boolean parseSignalStatement(String statement) {
         Matcher matcherSingle = signalSinglePattern.matcher(statement);
         Matcher matcherBundle = signalBundlePattern.matcher(statement);
@@ -88,15 +91,15 @@ public class VerilogModuleParser {
         }
         return true;
     }
-    
+
     private void registerSignals(String namesString, String directionString, int width) {
         Direction direction = parseSignalDirection(directionString);
         List<String> names = Arrays.asList(namesString.split(","));
         for (String name : names) {
-            this.module.addSignal(new Signal(name.trim(), direction, width));                
+            this.module.addSignal(new Signal(name.trim(), direction, width));
         }
     }
-    
+
     private Direction parseSignalDirection(String directionString) {
         switch(directionString) {
             case "input":
@@ -112,11 +115,11 @@ public class VerilogModuleParser {
         }
         throw new Error("parseSignalDirection failed: " + directionString);
     }
-    
+
     private boolean parseAssignStatement(String statement) {
         Matcher assignMatcher = assignPattern.matcher(statement);
         if(!assignMatcher.matches()) return false;
-        
+
         String sourceLiteral = assignMatcher.group(2).trim();
         String destinationLiteral = assignMatcher.group(1).trim();
         Signal sourceSignal = this.module.getSignalByName(extractSignalName(sourceLiteral));
@@ -132,29 +135,29 @@ public class VerilogModuleParser {
     private String extractSignalName(String signalLiteral) {
         Matcher m = signalBitIndexPattern.matcher(signalLiteral);
         if (m.matches()) {
-            return m.group(1);            
+            return m.group(1);
         }
         return signalLiteral;
     }
-    
+
     private int extractBitIndex(String signalLiteral) {
         Matcher m = signalBitIndexPattern.matcher(signalLiteral);
         if (m.matches()) {
-            return Integer.parseInt(m.group(2));            
+            return Integer.parseInt(m.group(2));
         }
         return -1;
     }
-    
-    
+
+
     private boolean parseInstanceStatement(String statement) {
         Matcher m = instancePattern.matcher(statement);
         if (!m.matches()) return false;
-        
+
         String definitionName = m.group(1).trim();
         String instanceName = m.group(2).trim();
-        
+
         List<PinAssignment> pinAssignments = parsePinAssignments(m.group(3));
-        
+
         try {
             Module definition = this.netlist.getModuleByName(definitionName);
             ModuleInstance instance = new ModuleInstance(instanceName, definition, pinAssignments);
@@ -172,28 +175,33 @@ public class VerilogModuleParser {
                 this.handleTie1(pinAssignments);
                 return true;
             }
+            if (this.replaceCellsBySingleStageGates) {
+                AggregatedCell definition = this.aggregatedCellLibrary.getSingleStageCellByCellName(definitionName);
+                this.replacePinNamesForSingleStageGate(pinAssignments, definition);
+                this.module.addInstance(new CellInstance(instanceName, definition, pinAssignments));
+                return true;
+            }
             AggregatedCell definition = this.aggregatedCellLibrary.getByCellName(definitionName);
             this.module.addInstance(new CellInstance(instanceName, definition, pinAssignments));
         }
-        
         return true;
     }
-    
+
     private void handleTie0(List<PinAssignment> pinAssignments) {
         AssignConnection a = new AssignConnection(Signal.getZeroInstance(), pinAssignments.get(0).getSignal(), 0, 0);
         this.module.addAssignConnection(a);
     }
-    
+
     private void handleTie1(List<PinAssignment> pinAssignments) {
         AssignConnection a = new AssignConnection(Signal.getOneInstance(), pinAssignments.get(0).getSignal(), 0, 0);
         this.module.addAssignConnection(a);
     }
-    
+
     private List<PinAssignment> parsePinAssignments(String pinAssignmentsLiteral) {
         List<PinAssignment> pinAssignments = new ArrayList<>();
-        
+
         List<String> pinAssignmentLiterals = Arrays.asList(pinAssignmentsLiteral.trim().split("\\s*\\,\\s*"));
-        
+
         int pinPosition = 0;
         for (String pinAssignmentLiteral : pinAssignmentLiterals) {
             Matcher mappedMatcher = mappedPositionPattern.matcher(pinAssignmentLiteral);
@@ -207,7 +215,7 @@ public class VerilogModuleParser {
                 Signal connectedSignal = this.module.getSignalByName(signalName);
                 pinAssignments.add(new PinAssignment(connectedSignal, bitIndex, pinName));
             } else {
-                //positional                
+                //positional
                 String signalName = extractSignalName(pinAssignmentLiteral);
                 int bitIndex = extractBitIndex(pinAssignmentLiteral);
                 Signal connectedSignal = this.module.getSignalByName(signalName);
@@ -216,5 +224,18 @@ public class VerilogModuleParser {
             }
         }
         return pinAssignments;
+    }
+
+    private void replacePinNamesForSingleStageGate(List<PinAssignment> pinAssignments, AggregatedCell cellDefinition) {
+        int replacedIndex = 0;
+        List<String> newInputPinNames = cellDefinition.getInputPinNames();
+        System.out.println("old pin assignment: " + pinAssignments);
+        System.out.println("new input pin names: " + newInputPinNames);
+        for (PinAssignment pinAssignment : pinAssignments) {
+            if (pinAssignment.isPositional()) continue;
+            if (pinAssignment.getPinName().equals(cellDefinition.getOutputPinName())) continue;
+            pinAssignment.setPinName(newInputPinNames.get(replacedIndex));
+            replacedIndex++;
+        }
     }
 }

@@ -66,40 +66,39 @@ public class DrivestrengthMain {
 
     private static int execute() {
         List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
-        
-        
+
+
         logger.info("Library contains " + cells.size() + " cells");
-        
+
         StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
         DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
-        
+
         boolean skipDeviatingSizes = true;
         AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts, defaultSizes, skipDeviatingSizes).run();
 
         logger.info("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
-        
+
 //        aggregatedCellLibrary.printDelayParameterTable();
-        
-        
-        
-        
-        Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary).createNetlist();
+
+
+
+        boolean replaceBySingleStageCells = false; //Will lead to non-functional netlist, exists just to analyze our algorithm behavior
+        Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary, replaceBySingleStageCells).createNetlist();
 
         logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
 
-        
         new NetlistFlattener(netlist).run();
-        
+
         Netlist inlinedNetlist = new NetlistInliner(netlist).run();
-        
+
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
-        
+
 
         double outputPinCapacitance = .003;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         new InputDrivenAnnotator(inlinedNetlist).run();
-        
+
         boolean clampToImplementableCapacitances = false;
         new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
@@ -112,10 +111,10 @@ public class DrivestrengthMain {
 //        new DelayEstimator(inlinedNetlist, false).run();
 
         new RemoteSimulation(options.getNetlistFile().getName(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(), true).run();
-        
+
         return 0;
     }
 
-        
-    
+
+
 }

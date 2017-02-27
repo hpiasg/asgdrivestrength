@@ -1,15 +1,28 @@
 package de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class AggregatedCellLibrary {
 
     private Map<String, AggregatedCell> aggregatedCells;
-    
+    private Map<Integer, AggregatedCell> singleStageAggregatedCells; //input pin count -> aggregatedCell
+
     public AggregatedCellLibrary(Map<String, AggregatedCell> aggregatedCells) {
         this.aggregatedCells = aggregatedCells;
+        registerSingleStageCells();
+    }
+
+    private void registerSingleStageCells() {
+        singleStageAggregatedCells = new HashMap<>();
+        for (AggregatedCell c : this.aggregatedCells.values()) {
+            if (c.isSingleStageCell()) {
+                int inputPinCount = c.getInputPinNames().size();
+                this.singleStageAggregatedCells.put(inputPinCount, c);
+            }
+        }
     }
 
     public AggregatedCell get(String aggregatedCellName) {
@@ -19,11 +32,11 @@ public class AggregatedCellLibrary {
         }
         return cell;
     }
-    
+
     public List<AggregatedCell> getAll() {
         return new ArrayList<AggregatedCell>(this.aggregatedCells.values());
     }
-    
+
     public AggregatedCell getByCellName(String cellName) {
         for (AggregatedCell aggregatedCell: this.aggregatedCells.values()) {
             if (aggregatedCell.containsSizeName(cellName)) {
@@ -32,22 +45,33 @@ public class AggregatedCellLibrary {
         }
         throw(new Error("No aggregated cell for cell size name " + cellName));
     }
+
+    public AggregatedCell getSingleStageCellByCellName(String cellName) {
+        AggregatedCell actualCell = this.getByCellName(cellName);
+        int inputPinCount = actualCell.getInputPinNames().size();
+        AggregatedCell matchingSingleStageCell = this.singleStageAggregatedCells.get(inputPinCount);
+        if (matchingSingleStageCell == null) {
+            throw new Error("Could not find matching single-stage cell for " + cellName);
+        }
+        return matchingSingleStageCell;
+    }
+
     public boolean isTieZero(String cellName) {
         return cellName.contains("TIE0");
     }
-    
+
     public boolean isTieOne(String cellName) {
         return cellName.contains("TIE1");
     }
-    
+
     public int size() {
         return this.aggregatedCells.size();
     }
-    
+
     public String toString() {
-        return "AggregatedCellLibrary (hashCode " + hashCode() +") with " + this.size() + " cells: " + this.aggregatedCells.toString();  
+        return "AggregatedCellLibrary (hashCode " + hashCode() +") with " + this.size() + " cells: " + this.aggregatedCells.toString();
     }
-    
+
     public void printDelayParameterTable() {
         System.out.println("Printing library delay paramters. Columns: ");
         System.out.println("CellFootprint, Pin, LogicalEffort, ParasiticDelay, StageCount");
@@ -58,5 +82,5 @@ public class AggregatedCellLibrary {
             }
         }
     }
-    
+
 }

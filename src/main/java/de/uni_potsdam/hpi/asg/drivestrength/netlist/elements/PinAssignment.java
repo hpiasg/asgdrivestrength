@@ -9,15 +9,15 @@ public class PinAssignment {
     public PinAssignment(Signal signal, int signalBitIndex, String pinName) {
         this.signal = signal;
         this.signalBitIndex = signalBitIndex;
-        this.pinName = pinName;        
+        this.pinName = pinName;
     }
 
     public PinAssignment(Signal signal, int signalBitIndex, int pinPosition) {
         this.signal = signal;
         this.signalBitIndex = signalBitIndex;
-        this.pinPosition = pinPosition;        
+        this.pinPosition = pinPosition;
     }
-    
+
     public int getPinPosition() {
         return pinPosition;
     }
@@ -33,23 +33,23 @@ public class PinAssignment {
     public boolean isPositional() {
         return pinName == null;
     }
-    
+
     public void setSignal(Signal newSignal) {
         this.signal = newSignal;
     }
-    
+
     public void setPinName(String pinName) {
         this.pinName = pinName;
     }
-    
+
     public void setSignalBitIndex(int newSignalBitIndex) {
         this.signalBitIndex = newSignalBitIndex;
     }
-    
+
     public boolean hasSelectedBit() {
         return signalBitIndex != -1;
     }
-    
+
     public String toVerilog() {
         String verilog = "";
         if (this.pinName == null) {
@@ -67,5 +67,9 @@ public class PinAssignment {
             verilog += ")";
         }
         return verilog;
+    }
+
+    public String toString() {
+        return toVerilog();
     }
 }
