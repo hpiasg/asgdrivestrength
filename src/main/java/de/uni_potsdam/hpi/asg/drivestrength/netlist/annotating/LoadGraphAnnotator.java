@@ -10,14 +10,15 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Signal.Direction;
 public class LoadGraphAnnotator {
     private Module module;
     private double outputPinCapacitance;
-    
+
     public LoadGraphAnnotator(Netlist netlist, double outputPinCapacitance) {
         this.module = netlist.getRootModule();
         this.outputPinCapacitance = outputPinCapacitance;
     }
-    
+
     public void run() {
         for (CellInstance cellInstance : module.getCellInstances()) {
+            cellInstance.clearLoads();
             Signal signal = cellInstance.getOutputSignal();
             for (CellInstance c : module.getCellInstances()) {
                 if (c.isInputSignal(signal)) {
@@ -36,6 +37,6 @@ public class LoadGraphAnnotator {
             }
         }
     }
-    
+
 }
 

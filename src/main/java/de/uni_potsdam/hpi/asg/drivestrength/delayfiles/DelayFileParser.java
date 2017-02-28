@@ -2,6 +2,7 @@ package de.uni_potsdam.hpi.asg.drivestrength.delayfiles;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,9 @@ public class DelayFileParser {
     }
 
     public void printAll() {
-        for (String instanceName : avgDelays.keySet()) {
+        List<String> instanceNames = new ArrayList<>(avgDelays.keySet());
+        Collections.sort(instanceNames);
+        for (String instanceName : instanceNames) {
             for (String pinName : avgDelays.get(instanceName).keySet()) {
                 String cellType = Cell.sortableName(cellTypes.get(instanceName));
                 System.out.println(cellType + "__" + pinName + "__" + instanceName + ", " + avgDelays.get(instanceName).get(pinName));

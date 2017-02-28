@@ -57,6 +57,10 @@ public class CellInstance extends AbstractInstance {
         this.loads.add(aLoad);
     }
 
+    public void clearLoads() {
+        this.loads = new ArrayList<>();
+    }
+
     public List<Load> getLoads() {
         return this.loads;
     }

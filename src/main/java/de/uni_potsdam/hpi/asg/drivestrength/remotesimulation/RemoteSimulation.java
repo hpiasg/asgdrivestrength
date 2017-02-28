@@ -28,14 +28,14 @@ public class RemoteSimulation {
     private String name;
     private String netlist;
     private File remoteConfigFile;
-    private boolean includeSdf;
+    private boolean keepTempDir;
     private String tempDir;
 
-    public RemoteSimulation(String filename, String netlist, File remoteConfigFile, boolean includeSdf) {
+    public RemoteSimulation(String filename, String netlist, File remoteConfigFile, boolean keepTempDir) {
         this.name = basename(filename);
         this.netlist = netlist;
         this.remoteConfigFile = remoteConfigFile;
-        this.includeSdf = includeSdf;
+        this.keepTempDir = keepTempDir;
     }
 
     private String basename(String filename) {
@@ -67,10 +67,9 @@ public class RemoteSimulation {
         filesToMove.add(netlistFilename);
 
         String commandFilename = tempDir + name + ".sh";
-        String command = "simulate " + name + ".v " + name + " | grep -E 'ERROR|SUCCESS' > output.txt;";
-        if (includeSdf) {
-            command += "cp simulation_" + name + "/" + name + ".sdf .";
-        }
+        String command = "simulate " + name + ".v " + name + " > output_full.txt; cat output_full.txt | grep -E 'ERROR|SUCCESS' > output.txt;";
+        command += "cp simulation_" + name + "/" + name + ".sdf .";
+
         FileHelper.writeStringToTextFile(command, commandFilename);
         filesToMove.add(commandFilename);
         filesToExecute.add(name + ".sh");
@@ -83,11 +82,11 @@ public class RemoteSimulation {
         }
 
         parseResult();
-        if (this.includeSdf) {
-            parseSdf();
-        }
+        parseSdf();
 
-        //FileHelper.deleteDirectory(tempDir);
+        if (!this.keepTempDir) {
+            FileHelper.deleteDirectory(tempDir);
+        }
     }
 
     private String date() {

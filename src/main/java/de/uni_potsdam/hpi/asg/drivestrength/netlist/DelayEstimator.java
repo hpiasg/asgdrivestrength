@@ -6,12 +6,12 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 public class DelayEstimator {
     private Netlist netlist;
     private boolean useTheoreticalLoad;
-    
+
     public DelayEstimator(Netlist netlist, boolean useTheoreticalLoad) {
         this.netlist = netlist;
         this.useTheoreticalLoad = useTheoreticalLoad;
     }
-    
+
     public void run() {
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
             double loadCapacitance = this.findLoadCapacitance(c);
@@ -21,7 +21,7 @@ public class DelayEstimator {
             }
         }
     }
-    
+
     private double findLoadCapacitance(CellInstance c) {
         if (this.useTheoreticalLoad) {
             return c.getLoadCapacitanceTheoretical();
@@ -29,18 +29,25 @@ public class DelayEstimator {
         return c.getLoadCapacitanceSelected();
     }
 
+    private double findOwnInputCapacitance(CellInstance cellInstance, String pinName) {
+        if (this.useTheoreticalLoad) {
+            return cellInstance.getInputPinTheoreticalCapacitance(pinName);
+        }
+        return cellInstance.getInputPinSelectedCapacitance(pinName);
+    }
+
     private double estimateDelay(CellInstance cellInstance, String pinName, double loadCapacitance) {
-        double inputCapacitance = cellInstance.getInputPinTheoreticalCapacitance(pinName);
+        double inputCapacitance = this.findOwnInputCapacitance(cellInstance, pinName);
         double electricalEffort = loadCapacitance / inputCapacitance;
         int stageCount = cellInstance.getDefinition().getStageCountForPin(pinName);
         double logicalEffort = cellInstance.getDefinition().getLogicalEffortForPin(pinName);
-        
+
         /* simplifying assumption: *within a cell*, the stage efforts are equal
-         * (pretend that someone chose the inner capacitances to do that for 
+         * (pretend that someone chose the inner capacitances to do that for
          * *our* electrical effort */
-        
+
         double parasiticDelay = cellInstance.getDefinition().getParasiticDelayForPin(pinName);
-        
+
         return stageCount * Math.pow(logicalEffort * electricalEffort, 1.0 / stageCount) + parasiticDelay;
     }
 }
