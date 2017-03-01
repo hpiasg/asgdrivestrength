@@ -2,8 +2,10 @@ package de.uni_potsdam.hpi.asg.drivestrength.netlist.elements;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
@@ -16,6 +18,7 @@ public class CellInstance extends AbstractInstance {
     private Map<String, Double> inputPinTheoreticalCapacitances;
     private CellInstance avatar; //the CellInstance this one was copied from (if copy was called accordingly). Capacitance setter also modifies avatar
     private List<Load> loads;
+    private Set<CellInstance> predecessors;
     private Cell selectedSize;
     private boolean isInputDriven;
 
@@ -27,6 +30,7 @@ public class CellInstance extends AbstractInstance {
         this.loads = new ArrayList<>();
         this.selectedSize = definition.getDefaultSize();
         this.isInputDriven = false;
+        this.predecessors = new HashSet<>();
     }
 
     public CellInstance(String name, String definitionName, List<PinAssignment> pinAssignments) {
@@ -49,6 +53,14 @@ public class CellInstance extends AbstractInstance {
         this.isInputDriven = true;
     }
 
+    public void addPredecessor(CellInstance newPredecessor) {
+        predecessors.add(newPredecessor);
+    }
+
+    public List<CellInstance> getPredecessors() {
+        return new ArrayList<CellInstance>(predecessors);
+    }
+
     public boolean isInputDriven() {
         return this.isInputDriven;
     }
@@ -63,6 +75,20 @@ public class CellInstance extends AbstractInstance {
 
     public List<Load> getLoads() {
         return this.loads;
+    }
+
+    public List<CellInstance> getSuccessors() {
+        List<CellInstance> successors = new ArrayList<>();
+        for (Load load : this.getLoads()) {
+            if (!load.isStaticLoad()) {
+                successors.add(load.getCellInstance());
+            }
+        }
+        return successors;
+    }
+
+    public boolean hasSuccessors() {
+        return this.getSuccessors().size() > 0;
     }
 
     public double getLoadCapacitanceTheoretical() {
@@ -217,6 +243,14 @@ public class CellInstance extends AbstractInstance {
 
     public boolean isDummyCellInstance() {
         return (this.definition == null);
+    }
+
+    public boolean hasPredecessors() {
+        return this.predecessors.size() > 0;
+    }
+
+    public String toString() {
+        return this.getName();
     }
 
 }
