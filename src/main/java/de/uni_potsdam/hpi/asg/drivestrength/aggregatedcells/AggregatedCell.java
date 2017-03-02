@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 
@@ -19,6 +20,7 @@ public class AggregatedCell {
     private List<String> sizeNames;
     private List<Cell> sizesRaw;
     private String defaultSizeName;
+    private Random randomGenerator;
 
     public String getName() {
         return name;
@@ -29,6 +31,7 @@ public class AggregatedCell {
         this.delayParameterTriples = new HashMap<>();
         this.sizeNames = new ArrayList<>();
         this.sizesRaw = new ArrayList<>();
+        this.randomGenerator = new Random();
     }
 
     public void setDefaultSizeName(String defaultSizeName) {
@@ -66,6 +69,10 @@ public class AggregatedCell {
 
     public List<Cell> getRawSizes() {
     	return this.sizesRaw;
+    }
+    
+    public Cell getRandomSize() {
+        return this.sizesRaw.get(randomGenerator.nextInt(this.sizesRaw.size())); 
     }
 
     public boolean containsSizeName(String cellName) {
@@ -209,7 +216,7 @@ public class AggregatedCell {
     }
 
     public String toString() {
-        return "AggregatedCell with " + this.getSizeCount() + " cell sizes";
+        return "AggregatedCell " + this.getName() + " with " + this.getSizeCount() + " cell sizes";
     }
 
     public boolean isSingleStageCell() {

@@ -128,6 +128,26 @@ public class CellInstance extends AbstractInstance {
             this.avatar.selectSizeFromTheoreticalCapacitances();
         }
     }
+    
+    public void selectRandomSize() {
+        if (this.isInputDriven) return;
+        this.selectedSize = definition.getRandomSize();
+        if (this.avatar != null) {
+            this.avatar.selectSize(this.selectedSize);
+        }
+    }
+    
+    public void selectSize(Cell sizeToSelect) {
+        if (this.isInputDriven) return;
+        this.selectedSize = sizeToSelect;
+        if (this.avatar != null) {
+            this.avatar.selectSize(this.selectedSize);
+        }
+    }
+    
+    public Cell getSelectedSize() {
+        return this.selectedSize;
+    }
 
     public void selectFastestSizeForLoad(double loadCapacitance) {
         if (this.isInputDriven) return;

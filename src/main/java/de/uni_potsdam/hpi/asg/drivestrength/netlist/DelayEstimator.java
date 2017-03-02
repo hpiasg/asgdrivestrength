@@ -23,9 +23,9 @@ public class DelayEstimator {
                 double estimatedDelay = estimateDelay(c, pinName, loadCapacitance) * 1000;
                 sum += estimatedDelay;
                 count++;
-                if (verbose) {
-                    System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + estimatedDelay + " ");
-                }
+//                if (verbose) {
+//                    System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + estimatedDelay + " ");
+//                }
             }
         }
         if (verbose) {
