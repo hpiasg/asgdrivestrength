@@ -20,6 +20,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.LoadGraphExporter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.InputDrivenAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.LoadGraphAnnotator;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.PredecessorAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistAssignCleaner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistBundleSplitter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
@@ -27,6 +28,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
+import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -96,24 +98,27 @@ public class DrivestrengthMain {
         new NetlistAssignCleaner(inlinedNetlist).run();
 
 
-        double outputPinCapacitance = .003;
+        double outputPinCapacitance = .00;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         new InputDrivenAnnotator(inlinedNetlist).run();
+        new PredecessorAnnotator(inlinedNetlist).run();
 
         boolean clampToImplementableCapacitances = false;
         new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
+        //new NeighborStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
+        //new SimulatedAnnealingOptimizer(inlinedNetlist, 500).run();
 
         logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
 
-        boolean exportTheoreticalLoad = true;
-        logger.info(new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run());
+        boolean exportTheoreticalLoad = false;
+        System.out.println(new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run());
 
-
-        double estimatorOutputPinCapacitance = 0.0;
-        new LoadGraphAnnotator(inlinedNetlist, estimatorOutputPinCapacitance).run();
-        new DelayEstimator(inlinedNetlist, false).run();
+        //double estimatorOutputPinCapacitance = 0.0;
+        //new LoadGraphAnnotator(inlinedNetlist, estimatorOutputPinCapacitance).run();
+        double delaySum = new DelayEstimator(inlinedNetlist, false, true).run();
+        logger.info("Estimated cell delay sum: " + NumberFormatter.spacedRounded(delaySum) + " ps");
 
         new RemoteSimulation(options.getNetlistFile().getName(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(), false).run();
 

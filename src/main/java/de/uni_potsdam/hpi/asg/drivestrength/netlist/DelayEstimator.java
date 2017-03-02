@@ -2,24 +2,37 @@ package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
+import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 
 public class DelayEstimator {
     private Netlist netlist;
     private boolean useTheoreticalLoad;
+    private boolean verbose;
 
-    public DelayEstimator(Netlist netlist, boolean useTheoreticalLoad) {
+    public DelayEstimator(Netlist netlist, boolean useTheoreticalLoad, boolean verbose) {
         this.netlist = netlist;
         this.useTheoreticalLoad = useTheoreticalLoad;
+        this.verbose = verbose;
     }
 
-    public void run() {
+    public double run() {
+        double sum = 0.0;
+        int count = 0;
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
             double loadCapacitance = this.findLoadCapacitance(c);
             for (String pinName : c.getInputPinNames()) {
-                double estimatedDelay = estimateDelay(c, pinName, loadCapacitance);
-                System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + 1000 * estimatedDelay + " ");
+                double estimatedDelay = estimateDelay(c, pinName, loadCapacitance) * 1000;
+                sum += estimatedDelay;
+                count++;
+                if (verbose) {
+                    System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + estimatedDelay + ", " + c.getLoadCapacitanceSelected() / c.getAverageInputPinSelectedCapacitance());
+                }
             }
         }
+        if (verbose) {
+            System.out.println("Estimated cell delay sum: " + NumberFormatter.spacedRounded(sum) + "   avg=" + sum/count);
+        }
+        return sum;
     }
 
     private double findLoadCapacitance(CellInstance c) {

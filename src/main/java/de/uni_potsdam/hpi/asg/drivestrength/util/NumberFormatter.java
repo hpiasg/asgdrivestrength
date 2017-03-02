@@ -6,7 +6,11 @@ public class NumberFormatter {
     public static String spaced(int aNumber) {
         return String.format(Locale.US, "%,d", aNumber).replace(',', ' ');
     }
-    
+
+    public static String spacedRounded(double aNumber) {
+        return NumberFormatter.spaced((int)Math.round(aNumber));
+    }
+
     public static String spaced(double aNumber) {
         return String.format(Locale.US, "%,f", aNumber).replace(',', ' ');
     }
