@@ -82,6 +82,7 @@ public class DrivestrengthMain {
         logger.info("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
 
 //        aggregatedCellLibrary.printDelayParameterTable();
+        //aggregatedCellLibrary.printSizes();
 
 
 

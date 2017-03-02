@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
+
 public class AggregatedCellLibrary {
 
     private Map<String, AggregatedCell> aggregatedCells;
@@ -44,6 +46,21 @@ public class AggregatedCellLibrary {
             }
         }
         throw(new Error("No aggregated cell for cell size name " + cellName));
+    }
+
+    public void printSizes() {
+        for (AggregatedCell aggregatedCell: this.aggregatedCells.values()) {
+            System.out.print("\"" + aggregatedCell.getName() + "\":    [");
+            boolean first = true;
+            for (Cell rawCell : aggregatedCell.getRawSizes()) {
+                if (!first) {
+                    System.out.print(", ");
+                }
+                first = false;
+                System.out.print("\"" + rawCell.getName() + "\"");
+            }
+            System.out.println("],");
+        }
     }
 
     public AggregatedCell getSingleStageCellByCellName(String cellName) {
