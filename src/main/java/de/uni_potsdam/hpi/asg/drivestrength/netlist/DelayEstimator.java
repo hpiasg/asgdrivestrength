@@ -2,6 +2,7 @@ package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
+import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 
 public class DelayEstimator {
     private Netlist netlist;
@@ -23,13 +24,13 @@ public class DelayEstimator {
                 double estimatedDelay = estimateDelay(c, pinName, loadCapacitance) * 1000;
                 sum += estimatedDelay;
                 count++;
-//                if (verbose) {
-//                    System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + estimatedDelay + " ");
-//                }
+                if (verbose) {
+                    System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + estimatedDelay + ", " + c.getLoadCapacitanceSelected() / c.getAverageInputPinSelectedCapacitance());
+                }
             }
         }
         if (verbose) {
-            System.out.println("Estimated cell delay sum: " + sum + " avg=" + sum/count);
+            System.out.println("Estimated cell delay sum: " + NumberFormatter.spacedRounded(sum) + "   avg=" + sum/count);
         }
         return sum;
     }

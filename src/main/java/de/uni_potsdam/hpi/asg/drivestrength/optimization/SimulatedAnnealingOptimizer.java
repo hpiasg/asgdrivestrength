@@ -28,7 +28,7 @@ public class SimulatedAnnealingOptimizer {
         this.randomGenerator = new Random();
         this.selectParameters();
     }
-    
+
     private void selectParameters() {
         int cellCount = netlist.getRootModule().getCellInstances().size();
         int expectedAvgDelta = 50; //from test with count10 and selectRandomSize
@@ -37,12 +37,15 @@ public class SimulatedAnnealingOptimizer {
         double initialAcceptanceP = 0.95;
         double greedyAcceptanceP = 0.05;
         this.initialTemperature = (-expectedAvgDelta) / Math.log(initialAcceptanceP);
-        this.alpha = Math.pow(-expectedAvgDelta / (initialTemperature * Math.log(greedyAcceptanceP)), 1 / becomeGreedyAfter);
+        this.alpha = Math.pow(-expectedAvgDelta / (initialTemperature * Math.log(greedyAcceptanceP)), 1.0 / becomeGreedyAfter);
+
+
+        System.out.println("alpha: " + alpha + ", T0: " + initialTemperature + ", G: " + becomeGreedyAfter);
     }
-    
+
     public void run() {
         long startTime = System.currentTimeMillis();
-        
+
         temperature = initialTemperature;
         for (int i = 0; i < iterationCount; i++) {
             double currentEnergy = delayEstimator.run();
@@ -51,7 +54,7 @@ public class SimulatedAnnealingOptimizer {
             if (newEnergy > currentEnergy) {
                 double delta = newEnergy - currentEnergy;
                 double condition = Math.exp(- delta / this.temperature);
-                System.out.println("rejecting if random > " + condition);
+                //System.out.println("rejecting if random > " + condition);
                 if (Math.random() > condition) {
                     this.undoRandomStep();
                 }
@@ -60,9 +63,10 @@ public class SimulatedAnnealingOptimizer {
             this.temperature *= alpha;
         }
         long stopTime = System.currentTimeMillis();
-        System.out.println("SA took " + (stopTime - startTime) + " ms");
+        System.out.println("SA took " + (stopTime - startTime) + " ms, result energy: " + delayEstimator.run());
+
     }
-    
+
     private void performRandomStep() {
         List<CellInstance> instances = this.netlist.getRootModule().getCellInstances();
         int index = randomGenerator.nextInt(instances.size());
@@ -71,7 +75,7 @@ public class SimulatedAnnealingOptimizer {
         undoPreviousSize = instance.getSelectedSize();
         instance.selectRandomSize();
     }
-    
+
     private void undoRandomStep() {
         List<CellInstance> instances = this.netlist.getRootModule().getCellInstances();
         instances.get(undoIndex).selectSize(undoPreviousSize);
