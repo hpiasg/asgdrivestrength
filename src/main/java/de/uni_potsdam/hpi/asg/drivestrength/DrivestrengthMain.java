@@ -28,7 +28,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistBundleSplitt
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.SimulatedAnnealingOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
 import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 
@@ -109,14 +109,14 @@ public class DrivestrengthMain {
 
 
 
-//        boolean clampToImplementableCapacitances = false;
-//        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
+        boolean clampToImplementableCapacitances = false;
+        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new NeighborStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
-        new SimulatedAnnealingOptimizer(inlinedNetlist, 500).run();
+        //new SimulatedAnnealingOptimizer(inlinedNetlist, 100).run();
 
-        logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
+        //logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
 
         boolean exportTheoreticalLoad = false;
         System.out.println(new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run());

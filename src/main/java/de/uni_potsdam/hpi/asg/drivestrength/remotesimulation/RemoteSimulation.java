@@ -110,7 +110,7 @@ public class RemoteSimulation {
     private void parseSdf() {
         DelayFileParser sdfParser = new DelayFileParser(new File(tempDir + name + ".sdf"));
         sdfParser.parse();
-        sdfParser.printAll();
+        //sdfParser.printAll();
         logger.info("SDF cell delay sum: " + NumberFormatter.spaced(sdfParser.getDelaySum()) + " ps");
     }
 }
