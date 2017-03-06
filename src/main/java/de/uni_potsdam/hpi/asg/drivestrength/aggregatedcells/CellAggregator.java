@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesContainer;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.OrderedSizesContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix;
@@ -17,24 +18,26 @@ import de.uni_potsdam.hpi.asg.drivestrength.cells.Timing;
 
 public class CellAggregator {
     protected static final Logger logger = LogManager.getLogger();
-    
+
     private final List<Cell> rawCells;
     private Map<String, AggregatedCell> aggregatedCells;
     private StageCountsContainer stageCounts;
     private DefaultSizesContainer defaultSizes;
+    private OrderedSizesContainer orderedSizes;
     private boolean skipDeviatingSizes;
-    
+
     // We use values for input slew = 0.0161238 ns, as it is closest to the 0.0181584ns used in cell pdfs
-    private final int inputSlewIndex = 0; 
-    
-    public CellAggregator(List<Cell> rawCells, StageCountsContainer stageCounts, 
-            DefaultSizesContainer defaultSizes, boolean skipDeviatingSizes) {
+    private final int inputSlewIndex = 0;
+
+    public CellAggregator(List<Cell> rawCells, StageCountsContainer stageCounts,
+            DefaultSizesContainer defaultSizes, OrderedSizesContainer orderedSizes, boolean skipDeviatingSizes) {
         this.rawCells = rawCells;
         this.stageCounts = stageCounts;
         this.defaultSizes = defaultSizes;
+        this.orderedSizes = orderedSizes;
         this.skipDeviatingSizes = skipDeviatingSizes;
     }
-    
+
     public AggregatedCellLibrary run() {
         this.aggregatedCells = new HashMap<>();
 
@@ -47,9 +50,9 @@ public class CellAggregator {
             AggregatedCell aggregatedCell = this.aggregatedCells.get(cellFootprint);
             aggregatedCell.addCellSize(rawCell);
         }
-        
+
         for (AggregatedCell aggregatedCell : aggregatedCells.values()) {
-            
+
             List<Cell> rawSizes = aggregatedCell.getRawSizes();
 
             aggregatedCell.setOrderedPinNames(this.getOrderedPinNames(rawSizes.get(0)));
@@ -57,14 +60,15 @@ public class CellAggregator {
             aggregatedCell.setOutputPinName(this.extractOutputPinName(rawSizes.get(0)));
             aggregatedCell.setSizeCapacitances(this.extractSizeCapacitances(rawSizes));
             aggregatedCell.setDefaultSizeName(this.defaultSizes.get(aggregatedCell.getName()));
-            
+            aggregatedCell.orderRawSizes(this.orderedSizes.get(aggregatedCell.getName()));
+
             aggregatedCell.setSizeDelayLines(this.extractDelayLinesFor(rawSizes, aggregatedCell.getInputPinNames(),
                                                                        aggregatedCell.getSizeCapacitances()));
-            
+
             Map<String, Integer> stageCountsPerPin = this.stageCounts.getFootprintDefaults().get(aggregatedCell.getName());
             aggregatedCell.setDelayParameterTriples(this.extractDelayParameters(aggregatedCell.getSizeDelayLines(), stageCountsPerPin));;
         }
-   
+
         return new AggregatedCellLibrary(aggregatedCells);
     }
 
@@ -88,7 +92,7 @@ public class CellAggregator {
         }
         return true;
     }
-    
+
     private List<String> getOrderedPinNames(Cell rawCell) {
         List<String> pinNames = new ArrayList<>();
         for (Pin p : rawCell.getPins()) {
@@ -136,19 +140,19 @@ public class CellAggregator {
     private Map<String, Map<String, DelayLine>> extractDelayLinesFor(List<Cell> rawSizes, List<String> pinNames,
                    Map<String, Map<String, Double>> sizeCapacitances) {
         Map<String, Map<String, DelayLine>> sizeDelayLines = new HashMap<>();
-        
+
         for (String pinName : pinNames) {
             sizeDelayLines.put(pinName, new HashMap<String, DelayLine>());
             for (Cell rawSize : rawSizes) {
                 String sizeName = rawSize.getName();
-                DelayLine delayLine = this.extractDelayLineFor(pinName, rawSize, sizeCapacitances.get(pinName).get(sizeName)); 
+                DelayLine delayLine = this.extractDelayLineFor(pinName, rawSize, sizeCapacitances.get(pinName).get(sizeName));
                 sizeDelayLines.get(pinName).put(sizeName, delayLine);
             }
         }
-        
+
         return sizeDelayLines;
     }
-    
+
     private DelayLine extractDelayLineFor(String pinName, Cell rawSize, double inputCapacitance) {
         List<DelayLine> delayLines = new ArrayList<>();
         for (Timing t : rawSize.getOutputPin().getTimings()) {
@@ -163,15 +167,15 @@ public class CellAggregator {
         }
         return DelayLine.averageFrom(delayLines);
     }
-    
+
     private DelayLine extractDelayLine(DelayMatrix delayMatrix, double inputCapacitance) {
         List<DelayPoint> delayPoints = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
             double loadCapacitance = delayMatrix.getLoadCapacitanceAt(i);
             double electricalEffort = loadCapacitance / inputCapacitance;
             double delay = delayMatrix.getDelayAt(this.inputSlewIndex, i);
-            
-            delayPoints.add(new DelayPoint(electricalEffort, delay));            
+
+            delayPoints.add(new DelayPoint(electricalEffort, delay));
         }
 
         LinearFunctionFitter f = new LinearFunctionFitter(delayPoints);
@@ -180,15 +184,15 @@ public class CellAggregator {
 
     private Map<String, DelayParameterTriple> extractDelayParameters(
                Map<String, Map<String, DelayLine>> delayLines, Map<String, Integer> stageCounts) {
-        
+
         Map<String, DelayParameterTriple> delayParameterTriplesPerPin = new HashMap<>();
-        
+
         for (String pinName : delayLines.keySet()) {
             Map<String, DelayLine> delayLinesForPin = delayLines.get(pinName);
             int stageCountForPin = stageCounts.get(pinName);
             delayParameterTriplesPerPin.put(pinName, new DelayParametersExtractor(delayLinesForPin, stageCountForPin).run());
         }
-        
+
         return delayParameterTriplesPerPin;
     }
 }

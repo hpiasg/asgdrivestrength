@@ -44,6 +44,7 @@ public class SimulatedAnnealingOptimizer {
     }
 
     public void run() {
+        double beforeEnergy = delayEstimator.run();
         long startTime = System.currentTimeMillis();
 
         temperature = initialTemperature;
@@ -59,11 +60,11 @@ public class SimulatedAnnealingOptimizer {
                     this.undoRandomStep();
                 }
             }
-            //System.out.println(currentEnergy);
+            //System.out.print(Math.round(currentEnergy));
             this.temperature *= alpha;
         }
         long stopTime = System.currentTimeMillis();
-        System.out.println("SA took " + (stopTime - startTime) + " ms, result energy: " + delayEstimator.run());
+        System.out.println("SA took " + (stopTime - startTime) + " ms, result energy: " + delayEstimator.run() + " vs before " + beforeEnergy);
 
     }
 
@@ -73,7 +74,12 @@ public class SimulatedAnnealingOptimizer {
         CellInstance instance = instances.get(index);
         undoIndex = index;
         undoPreviousSize = instance.getSelectedSize();
-        instance.selectRandomSize();
+        //instance.selectRandomSize();
+        if (randomGenerator.nextFloat() > 0.5) {
+            instance.selectNextBiggerSizeIfPossible();
+        } else {
+            instance.selectNextSmallerSizeIfPossible();
+        }
     }
 
     private void undoRandomStep() {

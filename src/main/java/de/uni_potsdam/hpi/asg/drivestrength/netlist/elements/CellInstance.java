@@ -128,15 +128,19 @@ public class CellInstance extends AbstractInstance {
             this.avatar.selectSizeFromTheoreticalCapacitances();
         }
     }
-    
+
     public void selectRandomSize() {
-        if (this.isInputDriven) return;
-        this.selectedSize = definition.getRandomSize();
-        if (this.avatar != null) {
-            this.avatar.selectSize(this.selectedSize);
-        }
+        this.selectSize(definition.getRandomSize());
     }
-    
+
+    public void selectNextBiggerSizeIfPossible() {
+        this.selectSize(this.definition.getNextBiggerSizeTo(this.selectedSize));
+    }
+
+    public void selectNextSmallerSizeIfPossible() {
+        this.selectSize(this.definition.getNextSmallerSizeTo(this.selectedSize));
+    }
+
     public void selectSize(Cell sizeToSelect) {
         if (this.isInputDriven) return;
         this.selectedSize = sizeToSelect;
@@ -144,7 +148,7 @@ public class CellInstance extends AbstractInstance {
             this.avatar.selectSize(this.selectedSize);
         }
     }
-    
+
     public Cell getSelectedSize() {
         return this.selectedSize;
     }

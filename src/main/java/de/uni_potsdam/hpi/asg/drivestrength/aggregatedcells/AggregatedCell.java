@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 
 public class AggregatedCell {
@@ -21,6 +24,8 @@ public class AggregatedCell {
     private List<Cell> sizesRaw;
     private String defaultSizeName;
     private Random randomGenerator;
+
+    protected static final Logger logger = LogManager.getLogger();
 
     public String getName() {
         return name;
@@ -67,12 +72,47 @@ public class AggregatedCell {
         this.sizeNames.add(cellSizeRaw.getName());
     }
 
+    public void orderRawSizes(List<String> orderedSizeNames) {
+        for (Cell rawCell : this.sizesRaw) {
+            if (!orderedSizeNames.contains(rawCell.getName())) {
+                logger.warn("Size " + rawCell.getName() + " missing in ordered size names. Skipping it in AggregatedCell.");
+            }
+        }
+
+        List<Cell> orderedSizesRaw = new ArrayList<>();
+        for (String name : orderedSizeNames) {
+            Cell rawCell = this.getSizeByName(name);
+            orderedSizesRaw.add(rawCell);
+        }
+        this.sizesRaw = orderedSizesRaw;
+    }
+
     public List<Cell> getRawSizes() {
     	return this.sizesRaw;
     }
-    
+
     public Cell getRandomSize() {
-        return this.sizesRaw.get(randomGenerator.nextInt(this.sizesRaw.size())); 
+        return this.sizesRaw.get(randomGenerator.nextInt(this.sizesRaw.size()));
+    }
+
+    public Cell getNextBiggerSizeTo(Cell previousSize) {
+        //assumes that sizesRaw has previously been ordered
+        for (int i = 0; i < this.sizesRaw.size() - 1; i++) {
+            if (this.sizesRaw.get(i) == previousSize) {
+                return this.sizesRaw.get(i + 1);
+            }
+        }
+        return previousSize;
+    }
+
+    public Cell getNextSmallerSizeTo(Cell previousSize) {
+        //assumes that sizesRaw has previously been ordered
+        for (int i = 1; i < this.sizesRaw.size(); i++) {
+            if (this.sizesRaw.get(i) == previousSize) {
+                return this.sizesRaw.get(i - 1);
+            }
+        }
+        return previousSize;
     }
 
     public boolean containsSizeName(String cellName) {
@@ -227,5 +267,14 @@ public class AggregatedCell {
             }
         }
         return true;
+    }
+
+    private Cell getSizeByName(String name) {
+        for (Cell c : this.sizesRaw) {
+            if (c.getName().equals(name)) {
+                return c;
+            }
+        }
+        throw new Error("AggregatedCell " + this.getName() + " has no raw size of name " + name);
     }
 }

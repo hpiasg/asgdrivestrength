@@ -11,17 +11,17 @@ public class Cell {
 
     private String name;
     private String footprint;
-    
+
     private final List<Pin> pins;
-    
+
     public Cell() {
         this.pins = new ArrayList<Pin>();
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public String getName() {
         return this.name;
     }
@@ -50,7 +50,7 @@ public class Cell {
         }
         throw(new Error("Could not find output pin for cell " + this.name));
     }
-    
+
     public boolean hasSingleOutputPin() {
         int outputPinCount = 0;
         for (Pin pin : this.pins) {
@@ -60,7 +60,7 @@ public class Cell {
         }
         return outputPinCount == 1;
     }
-    
+
     public List<Pin> getInputPins() {
     	List<Pin> inputPins = new ArrayList<Pin>();
         for (Pin pin : this.pins) {
@@ -70,14 +70,14 @@ public class Cell {
         }
         return inputPins;
     }
-    
+
     public boolean hasClockPin() {
 		for (Pin pin: this.pins) {
 			if (pin.isClockPin()) return true;
 		}
 	    return false;
 	}
-    
+
     public double getCapacitanceForPin(String pinName) {
         for (Pin pin : this.pins) {
             if (pin.getName().equals(pinName)) {
@@ -86,13 +86,13 @@ public class Cell {
         }
         throw new Error("Could not find capacitance for pin " + pinName + " in rawCell " + this.getName());
     }
-    
+
     private static final Pattern cellNamePattern = Pattern.compile("([A-Z]+)_([A-Z0-9]+)([_A-Z]*)_([A-Z0-9]+)");
-    
+
     public String sortableName() {
         return Cell.sortableName(this.name);
     }
-    
+
     public static String sortableName(String cellName) {
         Matcher m = cellNamePattern.matcher(cellName);
         if (m.matches()) {
@@ -103,5 +103,9 @@ public class Cell {
             return m.group(1) + "_" + m.group(2) + m.group(3) + "_" + size;
         }
         return cellName;
+    }
+
+    public String toString() {
+        return "<raw cell " + this.getName() + ">";
     }
 }

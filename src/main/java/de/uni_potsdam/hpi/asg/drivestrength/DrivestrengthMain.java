@@ -11,6 +11,8 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrar
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.CellAggregator;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesParser;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.OrderedSizesContainer;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.OrderedSizesParser;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsParser;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
@@ -26,7 +28,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistBundleSplitt
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.SimulatedAnnealingOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
 import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 
@@ -70,14 +72,15 @@ public class DrivestrengthMain {
     private static int execute() {
         List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
 
-
         logger.info("Library contains " + cells.size() + " cells");
 
         StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
         DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
+        OrderedSizesContainer orderedSizes = new OrderedSizesParser(options.getOrderedSizesFile()).run();
 
         boolean skipDeviatingSizes = true;
-        AggregatedCellLibrary aggregatedCellLibrary = new CellAggregator(cells, stageCounts, defaultSizes, skipDeviatingSizes).run();
+        CellAggregator ca = new CellAggregator(cells, stageCounts, defaultSizes, orderedSizes, skipDeviatingSizes);
+        AggregatedCellLibrary aggregatedCellLibrary = ca.run();
 
         logger.info("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
 
@@ -99,17 +102,19 @@ public class DrivestrengthMain {
         new NetlistAssignCleaner(inlinedNetlist).run();
 
 
-        double outputPinCapacitance = .00;
+        double outputPinCapacitance = .003;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         new InputDrivenAnnotator(inlinedNetlist).run();
         new PredecessorAnnotator(inlinedNetlist).run();
 
-        boolean clampToImplementableCapacitances = false;
-        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
+
+
+//        boolean clampToImplementableCapacitances = false;
+//        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new NeighborStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
-        //new SimulatedAnnealingOptimizer(inlinedNetlist, 500).run();
+        new SimulatedAnnealingOptimizer(inlinedNetlist, 500).run();
 
         logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
 
@@ -118,7 +123,7 @@ public class DrivestrengthMain {
 
         //double estimatorOutputPinCapacitance = 0.0;
         //new LoadGraphAnnotator(inlinedNetlist, estimatorOutputPinCapacitance).run();
-        double delaySum = new DelayEstimator(inlinedNetlist, false, true).run();
+        double delaySum = new DelayEstimator(inlinedNetlist, false, false).run();
         logger.info("Estimated cell delay sum: " + NumberFormatter.spacedRounded(delaySum) + " ps");
 
         new RemoteSimulation(options.getNetlistFile().getName(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(), false).run();
