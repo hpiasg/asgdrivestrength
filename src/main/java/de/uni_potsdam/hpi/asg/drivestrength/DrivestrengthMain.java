@@ -28,8 +28,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistBundleSplitt
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
-import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.equaldelaymatrix.EqualDelayMatrixOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 
 public class DrivestrengthMain {
@@ -109,16 +108,17 @@ public class DrivestrengthMain {
 
 
 
-        boolean clampToImplementableCapacitances = false;
-        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
+//        boolean clampToImplementableCapacitances = false;
+//        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new NeighborStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
         //new SimulatedAnnealingOptimizer(inlinedNetlist, 100).run();
+        new EqualDelayMatrixOptimizer(inlinedNetlist).run();
 
         //logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
 
-        boolean exportTheoreticalLoad = false;
+        boolean exportTheoreticalLoad = true;
         System.out.println(new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run());
 
         //double estimatorOutputPinCapacitance = 0.0;
@@ -126,7 +126,7 @@ public class DrivestrengthMain {
         double delaySum = new DelayEstimator(inlinedNetlist, false, false).run();
         logger.info("Estimated cell delay sum: " + NumberFormatter.spacedRounded(delaySum) + " ps");
 
-        new RemoteSimulation(options.getNetlistFile().getName(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(), false).run();
+        //new RemoteSimulation(options.getNetlistFile().getName(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(), false).run();
 
         return 0;
     }
