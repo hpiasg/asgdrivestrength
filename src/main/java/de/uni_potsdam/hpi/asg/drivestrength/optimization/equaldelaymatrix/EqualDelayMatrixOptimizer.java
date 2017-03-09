@@ -15,6 +15,7 @@ public class EqualDelayMatrixOptimizer {
     private List<CellInstance> cellInstances;
     private RealMatrix effortMatrix_T;
     private RealMatrix staticLoadMatrix_b;
+    private double criticalDelay;
 
 
     public EqualDelayMatrixOptimizer(Netlist netlist) {
@@ -24,7 +25,8 @@ public class EqualDelayMatrixOptimizer {
 
     public void run() {
         this.fillMatrices();
-        double criticalDelay = this.computeCriticalDelay();
+        this.computeCriticalDelay();
+        this.solveLinearEquationSystem();
 
         System.out.println("Critical Delay: " + criticalDelay);
     }
@@ -61,7 +63,7 @@ public class EqualDelayMatrixOptimizer {
         throw new Error("Could not find load CellInstance in this module");
     }
 
-    private double computeCriticalDelay() {
+    private void computeCriticalDelay() {
         EigenDecomposition e = new EigenDecomposition(effortMatrix_T);
         double[] realParts = e.getRealEigenvalues();
         double[] imagParts = e.getImagEigenvalues();
@@ -72,6 +74,33 @@ public class EqualDelayMatrixOptimizer {
                 largestAbsoluteEigenvalue = realParts[i];
             }
         }
-        return largestAbsoluteEigenvalue;
+        this.criticalDelay = largestAbsoluteEigenvalue * 1.01;
     }
+
+    private void solveLinearEquationSystem() {
+        RealMatrix driveStrengthMatrix_x = MatrixUtils.createRealMatrix(this.cellInstances.size(), 1);
+        System.out.println(driveStrengthMatrix_x);
+
+        int iterations = 500;
+
+        for (int i = 0; i < iterations; i++) {
+            RealMatrix effortLoadMatrix = this.effortMatrix_T.multiply(driveStrengthMatrix_x);
+            driveStrengthMatrix_x = effortLoadMatrix.add(this.staticLoadMatrix_b).scalarMultiply(1 / this.criticalDelay);
+            printX(driveStrengthMatrix_x, iterations - 1);
+        }
+    }
+
+    private void printX(RealMatrix x, int iteration) {
+        for (int i = 0; i < x.getRowDimension(); i++) {
+            double value = x.getEntry(i, 0);
+            //System.out.print(Math.pow(value, 1.0 / iteration));
+            System.out.print(value);
+            if ( i < x.getRowDimension() - 1 ){
+                System.out.print(',');
+            }
+        }
+        System.out.print('\n');
+    }
+
+
 }

@@ -88,7 +88,7 @@ public class DrivestrengthMain {
 
 
 
-        boolean replaceBySingleStageCells = false; //Will lead to non-functional netlist, exists just to analyze our algorithm behavior
+        boolean replaceBySingleStageCells = true; //Will lead to non-functional netlist, exists just to analyze our algorithm behavior
         Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary, replaceBySingleStageCells).createNetlist();
 
         logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
