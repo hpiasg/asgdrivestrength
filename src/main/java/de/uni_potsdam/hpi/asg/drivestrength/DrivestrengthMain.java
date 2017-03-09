@@ -123,7 +123,7 @@ public class DrivestrengthMain {
 
         //double estimatorOutputPinCapacitance = 0.0;
         //new LoadGraphAnnotator(inlinedNetlist, estimatorOutputPinCapacitance).run();
-        double delaySum = new DelayEstimator(inlinedNetlist, false, false).run();
+        double delaySum = new DelayEstimator(inlinedNetlist, true, false).run();
         logger.info("Estimated cell delay sum: " + NumberFormatter.spacedRounded(delaySum) + " ps");
 
         //new RemoteSimulation(options.getNetlistFile().getName(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(), false).run();

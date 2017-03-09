@@ -21,13 +21,28 @@ public class EqualDelayMatrixOptimizer {
 
     public EqualDelayMatrixOptimizer(Netlist netlist) {
         this.cellInstances = netlist.getRootModule().getCellInstances();
-        //TODO: assert that all gates are single-stage
+        for (CellInstance i: this.cellInstances) {
+            if (!(i.getDefinition().isSingleStageCell())) {
+                throw new Error("Equal Delay Matrix Optimizer works only on all-single-stage netlists");
+            }
+        }
     }
 
     public void run() {
+        int iterations = 1000;
         this.fillMatrices();
         this.computeCriticalDelay();
-        this.solveLinearEquationSystem(this.criticalDelay *  1.001, 500);
+        System.out.println("Critical delay: " + this.criticalDelay);
+
+        double delayFactor = 1.001;
+        double deviation = 5;
+        do {
+            System.out.println("running with delayFactor " + delayFactor);
+            this.solveLinearEquationSystem(this.criticalDelay * delayFactor, iterations);
+            deviation = this.calculateInputDrivenDeviation();
+            System.out.println("deviation: " + deviation);
+            delayFactor *= 1.001;
+        } while (deviation > 1.0);
         this.setCapactiances();
         this.selectSizes();
     }
@@ -46,7 +61,7 @@ public class EqualDelayMatrixOptimizer {
                 } else {
                     CellInstance loadInstance = l.getCellInstance();
                     int loadIndex = this.findGateIndex(loadInstance);
-                    effortMatrix_T.setEntry(i, loadIndex, loadInstance.getDefinition().getAvgLogicalEffort());
+                    effortMatrix_T.setEntry(i, loadIndex, loadInstance.getDefinition().getLogicalEffortForPin(l.getPinName()));
                 }
             }
             double oldValue = effortMatrix_T.getEntry(i, i);
@@ -55,7 +70,6 @@ public class EqualDelayMatrixOptimizer {
     }
 
     private int findGateIndex(CellInstance aGateInstance) {
-        //TODO: precalculate gate->index map if this turns out to be slow
         for (int i = 0; i < this.cellInstances.size(); i++) {
             if (cellInstances.get(i) == aGateInstance) {
                 return i;
@@ -80,15 +94,14 @@ public class EqualDelayMatrixOptimizer {
 
     private void solveLinearEquationSystem(double targetDelay, int iterations) {
         driveStrengthMatrix_x = MatrixUtils.createRealMatrix(this.cellInstances.size(), 1);
-        System.out.println(driveStrengthMatrix_x);
 
         for (int i = 0; i < iterations; i++) {
             RealMatrix effortLoadMatrix = this.effortMatrix_T.multiply(driveStrengthMatrix_x);
             driveStrengthMatrix_x = effortLoadMatrix.add(this.staticLoadMatrix_b).scalarMultiply(1 / targetDelay);
-            printX(driveStrengthMatrix_x, iterations - 1);
         }
     }
 
+    @SuppressWarnings("unused")
     private void printX(RealMatrix x, int iteration) {
         for (int i = 0; i < x.getRowDimension(); i++) {
             double value = x.getEntry(i, 0);
@@ -100,12 +113,40 @@ public class EqualDelayMatrixOptimizer {
         System.out.print('\n');
     }
 
+    private double calculateInputDrivenDeviation() {
+        double errorSum = 0.0;
+        int inputDrivenCount = 0;
+        for (int i = 0; i < this.cellInstances.size(); i++) {
+            CellInstance cellInstance = this.cellInstances.get(i);
+            if (cellInstance.isInputDriven()) {
+                double pinSum = 0.0;
+                for (String inputPinName : cellInstance.getInputPinNames()) {
+                    double logicalEffort = cellInstance.getDefinition().getLogicalEffortForPin(inputPinName);
+                    double newCapacitance = logicalEffort * this.driveStrengthMatrix_x.getEntry(i, 0);
+                    double originalCapacitance = cellInstance.getInputPinTheoreticalCapacitance(inputPinName);
+                    double error = newCapacitance / originalCapacitance;
+                    pinSum += error;
+                }
+                double cellError = pinSum / cellInstance.getInputPinNames().size();
+                if (cellError > 1.0) {
+                    errorSum += cellError;
+                    inputDrivenCount++;
+                }
+            }
+        }
+        if (inputDrivenCount == 0) {
+            return 0;
+        }
+        return errorSum / inputDrivenCount;
+    }
+
     private void setCapactiances() {
         for (int i = 0; i < this.cellInstances.size(); i++) {
             CellInstance cellInstance = this.cellInstances.get(i);
             for (String inputPinName : cellInstance.getInputPinNames()) {
                 double logicalEffort = cellInstance.getDefinition().getLogicalEffortForPin(inputPinName);
                 double capacitance = logicalEffort * this.driveStrengthMatrix_x.getEntry(i, 0);
+                capacitance = Math.max(capacitance, 0.00000001);
                 cellInstance.setInputPinTheoreticalCapacitance(inputPinName, capacitance, false);
             }
         }

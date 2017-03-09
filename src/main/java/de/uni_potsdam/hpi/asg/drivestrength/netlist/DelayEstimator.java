@@ -25,7 +25,7 @@ public class DelayEstimator {
                 sum += estimatedDelay;
                 count++;
                 if (verbose) {
-                    System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + estimatedDelay + ", " + c.getLoadCapacitanceSelected() / c.getAverageInputPinSelectedCapacitance());
+                    System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + estimatedDelay);
                 }
             }
         }

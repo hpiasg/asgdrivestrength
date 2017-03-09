@@ -229,8 +229,6 @@ public class VerilogModuleParser {
     private void replacePinNamesForSingleStageGate(List<PinAssignment> pinAssignments, AggregatedCell cellDefinition) {
         int replacedIndex = 0;
         List<String> newInputPinNames = cellDefinition.getInputPinNames();
-        System.out.println("old pin assignment: " + pinAssignments);
-        System.out.println("new input pin names: " + newInputPinNames);
         for (PinAssignment pinAssignment : pinAssignments) {
             if (pinAssignment.isPositional()) continue;
             if (pinAssignment.getPinName().equals(cellDefinition.getOutputPinName())) continue;
