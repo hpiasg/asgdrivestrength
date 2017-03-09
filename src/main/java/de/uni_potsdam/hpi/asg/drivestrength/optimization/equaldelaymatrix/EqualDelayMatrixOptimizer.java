@@ -15,6 +15,7 @@ public class EqualDelayMatrixOptimizer {
     private List<CellInstance> cellInstances;
     private RealMatrix effortMatrix_T;
     private RealMatrix staticLoadMatrix_b;
+    private RealMatrix driveStrengthMatrix_x;
     private double criticalDelay;
 
 
@@ -26,9 +27,9 @@ public class EqualDelayMatrixOptimizer {
     public void run() {
         this.fillMatrices();
         this.computeCriticalDelay();
-        this.solveLinearEquationSystem();
-
-        System.out.println("Critical Delay: " + criticalDelay);
+        this.solveLinearEquationSystem(this.criticalDelay *  1.001, 500);
+        this.setCapactiances();
+        this.selectSizes();
     }
 
     private void fillMatrices() {
@@ -74,18 +75,16 @@ public class EqualDelayMatrixOptimizer {
                 largestAbsoluteEigenvalue = realParts[i];
             }
         }
-        this.criticalDelay = largestAbsoluteEigenvalue * 1.01;
+        this.criticalDelay = largestAbsoluteEigenvalue;
     }
 
-    private void solveLinearEquationSystem() {
-        RealMatrix driveStrengthMatrix_x = MatrixUtils.createRealMatrix(this.cellInstances.size(), 1);
+    private void solveLinearEquationSystem(double targetDelay, int iterations) {
+        driveStrengthMatrix_x = MatrixUtils.createRealMatrix(this.cellInstances.size(), 1);
         System.out.println(driveStrengthMatrix_x);
-
-        int iterations = 500;
 
         for (int i = 0; i < iterations; i++) {
             RealMatrix effortLoadMatrix = this.effortMatrix_T.multiply(driveStrengthMatrix_x);
-            driveStrengthMatrix_x = effortLoadMatrix.add(this.staticLoadMatrix_b).scalarMultiply(1 / this.criticalDelay);
+            driveStrengthMatrix_x = effortLoadMatrix.add(this.staticLoadMatrix_b).scalarMultiply(1 / targetDelay);
             printX(driveStrengthMatrix_x, iterations - 1);
         }
     }
@@ -93,7 +92,6 @@ public class EqualDelayMatrixOptimizer {
     private void printX(RealMatrix x, int iteration) {
         for (int i = 0; i < x.getRowDimension(); i++) {
             double value = x.getEntry(i, 0);
-            //System.out.print(Math.pow(value, 1.0 / iteration));
             System.out.print(value);
             if ( i < x.getRowDimension() - 1 ){
                 System.out.print(',');
@@ -102,5 +100,21 @@ public class EqualDelayMatrixOptimizer {
         System.out.print('\n');
     }
 
+    private void setCapactiances() {
+        for (int i = 0; i < this.cellInstances.size(); i++) {
+            CellInstance cellInstance = this.cellInstances.get(i);
+            for (String inputPinName : cellInstance.getInputPinNames()) {
+                double logicalEffort = cellInstance.getDefinition().getLogicalEffortForPin(inputPinName);
+                double capacitance = logicalEffort * this.driveStrengthMatrix_x.getEntry(i, 0);
+                cellInstance.setInputPinTheoreticalCapacitance(inputPinName, capacitance, false);
+            }
+        }
+    }
+
+    private void selectSizes() {
+        for (CellInstance i : this.cellInstances) {
+            i.selectSizeFromTheoreticalCapacitances();
+        }
+    }
 
 }
