@@ -119,7 +119,7 @@ public class DrivestrengthMain {
         //logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
 
         boolean exportTheoreticalLoad = true;
-        System.out.println(new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run());
+        new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run();
 
         //double estimatorOutputPinCapacitance = 0.0;
         //new LoadGraphAnnotator(inlinedNetlist, estimatorOutputPinCapacitance).run();
