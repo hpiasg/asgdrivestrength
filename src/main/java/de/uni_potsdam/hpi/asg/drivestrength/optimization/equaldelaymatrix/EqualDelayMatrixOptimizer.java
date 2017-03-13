@@ -5,12 +5,16 @@ import java.util.List;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.Load;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 
 public class EqualDelayMatrixOptimizer {
+
+    protected static final Logger logger = LogManager.getLogger();
 
     private List<CellInstance> cellInstances;
     private RealMatrix effortMatrix_T;
@@ -35,17 +39,16 @@ public class EqualDelayMatrixOptimizer {
         int iterations = 1000;
         this.fillMatrices();
         this.computeCriticalDelay();
-        System.out.println("Critical delay: " + this.criticalDelay);
+        logger.info("Equal Delay Matrix Optimizer.");
+        logger.info("Critical delay: " + this.criticalDelay);
 
         double delayFactor = 1.001;
-        double deviation = 5;
         do {
-            System.out.println("running with delayFactor " + delayFactor);
             this.solveLinearEquationSystem(this.criticalDelay * delayFactor, iterations);
-            deviation = this.calculateInputDrivenDeviation();
-            System.out.println("deviation: " + deviation);
             delayFactor *= 1.001;
         } while (violatesInputDrivenSizeRequirement());
+
+        logger.info("Chosen delay to match input driven: " + delayFactor * this.criticalDelay + " (" + delayFactor + " * critical)");
         this.setCapactiances();
         this.selectSizes();
     }

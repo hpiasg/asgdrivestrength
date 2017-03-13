@@ -118,13 +118,14 @@ public class DrivestrengthMain {
 
         //logger.info("with adjusted strengths:\n" + inlinedNetlist.toVerilog());
 
-        boolean exportTheoreticalLoad = true;
+        boolean exportTheoreticalLoad = false;
         new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run();
 
         //double estimatorOutputPinCapacitance = 0.0;
         //new LoadGraphAnnotator(inlinedNetlist, estimatorOutputPinCapacitance).run();
-        double delaySum = new DelayEstimator(inlinedNetlist, true, false).run();
-        logger.info("Estimated cell delay sum: " + NumberFormatter.spacedRounded(delaySum) + " ps");
+        boolean estimateWithTheoreticalLoad = false;
+        new DelayEstimator(inlinedNetlist, estimateWithTheoreticalLoad, false).print();
+
 
         //new RemoteSimulation(options.getNetlistFile().getName(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(), false).run();
 

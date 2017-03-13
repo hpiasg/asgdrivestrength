@@ -1,10 +1,15 @@
 package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 
 public class DelayEstimator {
+    protected static final Logger logger = LogManager.getLogger();
+
     private Netlist netlist;
     private boolean useTheoreticalLoad;
     private boolean verbose;
@@ -13,6 +18,15 @@ public class DelayEstimator {
         this.netlist = netlist;
         this.useTheoreticalLoad = useTheoreticalLoad;
         this.verbose = verbose;
+    }
+
+    public void print() {
+        double delaySum = this.run();
+        String theoreticalNote = "(from chosen sizes)";
+        if (this.useTheoreticalLoad) {
+            theoreticalNote = "(from theoretical sizes)";
+        }
+        logger.info("Estimated cell delay sum " + theoreticalNote + ": " + NumberFormatter.spacedRounded(delaySum) + " ps");
     }
 
     public double run() {

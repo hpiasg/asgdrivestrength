@@ -1,10 +1,16 @@
 package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.Load;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Module;
 
 public class LoadGraphExporter {
+
+    protected static final Logger logger = LogManager.getLogger();
+
     private Module module;
     private String nodesJson;
     private String linksJson;
@@ -35,6 +41,11 @@ public class LoadGraphExporter {
         nodesJson = nodesJson.substring(0, nodesJson.length()-1);
         linksJson = linksJson.substring(0, linksJson.length()-1);
 
+        if (this.useTheoreticalLoad) {
+            logger.info("Load graph with theoretical loads: ");
+        } else {
+            logger.info("Load graph with selected sizes as loads: ");
+        }
         System.out.println("{\"nodes\": [" + this.nodesJson + "], \n\"links\": [" + this.linksJson + "]}");
     }
 
