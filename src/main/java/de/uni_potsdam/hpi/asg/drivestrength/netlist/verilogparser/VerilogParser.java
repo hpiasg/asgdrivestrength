@@ -30,6 +30,9 @@ public class VerilogParser {
         this.statements = readVerilogStatementsFromFile(verilogFile);
         this.aggregatedCellLibrary = aggregatedCellLibrary;
         this.replaceCellsBySingleStageGates = replaceCellsBySingleStageGates;
+        if (this.replaceCellsBySingleStageGates) {
+            logger.warn("Replacing multi-stage cells with single-stage cells of equal pin count. Remove in production!");
+        }
     }
 
     public VerilogParser(File verilogFile) {

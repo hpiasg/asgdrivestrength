@@ -163,6 +163,14 @@ public class AggregatedCell {
         return sum / this.delayParameterTriples.size();
     }
 
+    public double getAvgParasiticDelay() {
+        double sum = 0;
+        for (DelayParameterTriple t : this.delayParameterTriples.values()) {
+            sum += t.getParasiticDelay();
+        }
+        return sum / this.delayParameterTriples.size();
+    }
+
     public int getStageCountForPin(String pinName) {
     	return this.delayParameterTriples.get(pinName).getStageCount();
     }
