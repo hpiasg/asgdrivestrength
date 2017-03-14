@@ -37,12 +37,12 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
         this.initialTemperature = (-expectedAvgDelta) / Math.log(initialAcceptanceP);
         this.alpha = Math.pow(-expectedAvgDelta / (initialTemperature * Math.log(greedyAcceptanceP)), 1.0 / becomeGreedyAfter);
 
-        logger.info("Simulated Annealing. alpha: " + alpha + ", T0: " + initialTemperature + ", G: " + becomeGreedyAfter);
+        logger.info("SA: alpha: " + alpha + ", T0: " + initialTemperature + ", G: " + becomeGreedyAfter);
     }
 
-    public void run() {
+    @Override
+    protected void optimize() {
         double beforeEnergy = calculateEnergy();
-        long startTime = System.currentTimeMillis();
 
         temperature = initialTemperature;
         for (int i = 0; i < iterationCount; i++) {
@@ -58,8 +58,7 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
             }
             this.temperature *= alpha;
         }
-        long stopTime = System.currentTimeMillis();
-        logger.info("SA took " + (stopTime - startTime) + " ms, result energy: " + calculateEnergy() + " vs before " + beforeEnergy);
+        logger.info("SA: result energy: " + calculateEnergy() + " vs before " + beforeEnergy);
     }
 
     private void performRandomStep() {

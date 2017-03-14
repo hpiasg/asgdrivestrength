@@ -14,7 +14,8 @@ public class EqualStageEffortOptimizer extends AbstractDriveOptimizer {
         this.clampToImplementableCapacitances = clampToImplementableCapacitances;
     }
 
-    public void run() {
+    @Override
+    protected void optimize() {
         for (int i = 0; i < this.roundCount; i++) {
             optimizeOneRound();
         }

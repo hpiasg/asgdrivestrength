@@ -30,12 +30,12 @@ public class EqualDelayMatrixOptimizer extends AbstractDriveOptimizer {
         }
     }
 
-    public void run() {
+    @Override
+    protected void optimize() {
         int iterations = 1000;
         this.fillMatrices();
         this.computeCriticalDelay();
-        logger.info("Equal Delay Matrix Optimizer.");
-        logger.info("Critical delay: " + this.criticalDelay);
+        logger.info("EDM: Critical delay: " + this.criticalDelay);
 
         double delayFactor = 1.001;
         do {
@@ -43,7 +43,7 @@ public class EqualDelayMatrixOptimizer extends AbstractDriveOptimizer {
             delayFactor *= 1.001;
         } while (violatesInputDrivenSizeRequirement());
 
-        logger.info("Chosen delay to match input driven: " + delayFactor * this.criticalDelay + " (" + delayFactor + " * critical)");
+        logger.info("EDM: Chosen delay to match input driven: " + delayFactor * this.criticalDelay + " (" + delayFactor + " * critical)");
         this.setCapactiances();
         this.selectSizesFromTheoretical();
     }

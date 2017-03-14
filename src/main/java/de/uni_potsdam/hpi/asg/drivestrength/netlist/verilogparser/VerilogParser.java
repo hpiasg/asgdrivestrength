@@ -115,7 +115,7 @@ public class VerilogParser {
             }
         }
 
-        logger.info("Parsing Verilog netlist complete");
+        logger.info("Netlist root module: " + netlist.getRootModule().getName());
 
         return netlist;
     }

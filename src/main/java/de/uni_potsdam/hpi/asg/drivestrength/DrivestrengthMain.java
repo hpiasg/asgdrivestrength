@@ -36,16 +36,10 @@ public class DrivestrengthMain {
     private static DrivestrengthCommandlineOptions options;
 
     public static void main(String[] args) {
-        int status = main2(args);
-        System.exit(status);
-    }
-
-    public static int main2(String[] args) {
         System.out.println("Hello World from ASGdrivestrength");
 
         try {
             long start = System.currentTimeMillis();
-            int status = -1;
             options = new DrivestrengthCommandlineOptions();
             if (options.parseCmdLine(args)) {
                 logger = LoggerHelper.initLogger(options.getOutputlevel(),
@@ -54,24 +48,22 @@ public class DrivestrengthMain {
                 WorkingdirGenerator.getInstance().create(
                         options.getWorkingdir(), "", "drivestrengthwork", null);
 
-                status = execute();
+                execute();
             }
             long end = System.currentTimeMillis();
             if (logger != null) {
                 logger.info("Runtime: " + LoggerHelper.formatRuntime(end - start, false));
             }
-            return status;
-        } catch (Exception e) {
+            System.exit(0);
+        } catch (Error | Exception e) {
             System.out.println("An error occurred: " + e.getLocalizedMessage());
             e.printStackTrace();
-            return 1;
+            System.exit(1);
         }
     }
 
     private static int execute() {
         List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
-
-        logger.info("Library contains " + cells.size() + " cells");
 
         StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
         DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
@@ -81,16 +73,8 @@ public class DrivestrengthMain {
         CellAggregator ca = new CellAggregator(cells, stageCounts, defaultSizes, orderedSizes, skipDeviatingSizes);
         AggregatedCellLibrary aggregatedCellLibrary = ca.run();
 
-        logger.info("Aggregated to " + aggregatedCellLibrary.size() + " distinct (single-output) cells");
-
-//        aggregatedCellLibrary.printDelayParameterTable();
-        //aggregatedCellLibrary.printSizes();
-
-
         boolean replaceBySingleStageCells = false; //Will lead to non-functional netlist, exists just to analyze our algorithm behavior
         Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary, replaceBySingleStageCells).createNetlist();
-
-        logger.info("Netlist’s root module: " + netlist.getRootModule().getName());
 
         new NetlistFlattener(netlist).run();
 
@@ -99,11 +83,12 @@ public class DrivestrengthMain {
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
 
-
         double outputPinCapacitance = 0.003;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         new InputDrivenAnnotator(inlinedNetlist).run();
         new PredecessorAnnotator(inlinedNetlist).run();
+
+        new DelayEstimator(inlinedNetlist, false, false).print();
 
         boolean clampToImplementableCapacitances = true;
         new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
@@ -113,8 +98,6 @@ public class DrivestrengthMain {
         //new SimulatedAnnealingOptimizer(inlinedNetlist, 100).run();
         //new EqualDelayMatrixOptimizer(inlinedNetlist).run();
 
-        //logger.info("Netlist with adjusted strengths:\n" + inlinedNetlist.toVerilog());
-
         boolean exportTheoreticalLoad = false;
         new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run();
 
@@ -123,9 +106,8 @@ public class DrivestrengthMain {
 
         boolean remoteVerbose = false;
         boolean keepFiles = false;
-        new RemoteSimulation(options.getNetlistFile(), netlist.toVerilog(),
-                             options.getRemoteConfigFile(), outputPinCapacitance,
-                             keepFiles, remoteVerbose).run();
+        new RemoteSimulation(options.getNetlistFile(), netlist.toVerilog(), options.getRemoteConfigFile(),
+                              outputPinCapacitance, keepFiles, remoteVerbose).run();
 
         return 0;
     }

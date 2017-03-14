@@ -21,10 +21,19 @@ public abstract class AbstractDriveOptimizer {
         this.cellInstances = netlist.getRootModule().getCellInstances();
     }
 
+    public void run() {
+        logger.info("Optimizing with " + this.getClass().getSimpleName() + "...");
+        long startTime = System.currentTimeMillis();
+        this.optimize();
+        long stopTime = System.currentTimeMillis();
+        logger.info("Optimization runtime: " + (stopTime - startTime) + " ms");
+    }
 
     protected void selectSizesFromTheoretical() {
         for (CellInstance i : this.cellInstances) {
             i.selectSizeFromTheoreticalCapacitances();
         }
     }
+
+    protected abstract void optimize();
 }

@@ -12,7 +12,8 @@ public class SelectForLoadOptimizer extends AbstractDriveOptimizer {
         this.roundCount = roundCount;
     }
 
-    public void run() {
+    @Override
+    protected void optimize() {
         for (int i = 0; i < roundCount; i++) {
             optimizeOneRound();
         }

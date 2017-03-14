@@ -15,43 +15,40 @@ public class LibertyParser {
     protected static final Logger logger = LogManager.getLogger();
 
     private static final Pattern startCellPattern = Pattern.compile("^(\\s*)cell\\s*\\((.*)\\)\\s*");
-    
+
     private List<String> statements;
 
     public LibertyParser(File libertyFile) {
+        logger.info("Loading Liberty cell library " + libertyFile.getName());
         this.statements = this.readLibertyStatementsFromFile(libertyFile);
     }
-    
+
     public List<Cell> run() {
         logger.info("Parsing Liberty cell library...");
 
-        /*for(String statement : statements) {
-            System.out.println(statement);
-        }*/
-        
         List<Cell> cells = new ArrayList<>();
-        
+
         List<List<String>> cellBlocks = new IndentBlockSeparator(statements, startCellPattern).run();
 
         for (List<String> cellBlock : cellBlocks) {
             cells.add(new LibertyCellParser(cellBlock).run());
         }
 
-        logger.info("Parsing Liberty cell library complete");
+        logger.info("Library contains " + cells.size() + " cells");
         return cells;
     }
-    
+
     private List<String> readLibertyStatementsFromFile(File libertyFile) {
         List<String> lines = FileHelper.getInstance().readFile(libertyFile);
         assert(lines != null);
         List<String> statements = mergeMultilineStatements(lines);
         return statements;
     }
-    
+
 
     private List<String> mergeMultilineStatements(List<String> lines) {
         List<String> statements = new ArrayList<String>();
-        
+
         String statement = "";
         boolean trimNext = false;
         for (String line: lines) {
@@ -72,7 +69,7 @@ public class LibertyParser {
                 statement = "";
             }
         }
-        
+
         return statements;
     }
 }

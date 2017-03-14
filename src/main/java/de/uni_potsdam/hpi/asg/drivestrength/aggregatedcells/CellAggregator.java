@@ -69,6 +69,8 @@ public class CellAggregator {
             aggregatedCell.setDelayParameterTriples(this.extractDelayParameters(aggregatedCell.getSizeDelayLines(), stageCountsPerPin));;
         }
 
+        logger.info("Aggregated to " + aggregatedCells.size() + " distinct (single-output) cells");
+
         return new AggregatedCellLibrary(aggregatedCells);
     }
 

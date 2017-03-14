@@ -11,7 +11,8 @@ public class NaiveOptimizer extends AbstractDriveOptimizer {
         this.roundCount = rounds;
     }
 
-    public void run() {
+    @Override
+    protected void optimize() {
         for (int i = 0; i < this.roundCount; i++) {
             optimizeOneRound();
         }

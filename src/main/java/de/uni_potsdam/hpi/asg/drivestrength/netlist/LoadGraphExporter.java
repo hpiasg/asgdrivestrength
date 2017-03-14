@@ -42,9 +42,9 @@ public class LoadGraphExporter {
         linksJson = linksJson.substring(0, linksJson.length()-1);
 
         if (this.useTheoreticalLoad) {
-            logger.info("Load graph with theoretical loads: ");
+            logger.info("Load graph (from theoretical sizes): ");
         } else {
-            logger.info("Load graph with selected sizes as loads: ");
+            logger.info("Load graph (from chosen sizes): ");
         }
         System.out.println("{\"nodes\": [" + this.nodesJson + "], \n\"links\": [" + this.linksJson + "]}");
     }

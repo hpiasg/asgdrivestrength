@@ -9,7 +9,8 @@ public class AllLargestOptimizer extends AbstractDriveOptimizer {
         super(netlist);
     }
 
-    public void run() {
+    @Override
+    protected void optimize() {
         for (CellInstance c : this.cellInstances) {
             for (String pinName : c.getInputPinNames()) {
                 c.setInputPinTheoreticalCapacitance(pinName, 1000, true);
