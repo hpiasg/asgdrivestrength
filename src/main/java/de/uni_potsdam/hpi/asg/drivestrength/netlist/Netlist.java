@@ -9,11 +9,11 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.ModuleInstance;
 public class Netlist {
     private List<Module> modules;
     private Module rootModule;
-    
+
     public Netlist() {
         modules = new ArrayList<Module>();
     }
-    
+
     public List<Module> getModules() {
         return modules;
     }
@@ -21,20 +21,20 @@ public class Netlist {
     public Module getRootModule() {
         return rootModule;
     }
-    
+
     public void setRootModule(Module newRootModule) {
         this.rootModule = newRootModule;
     }
-    
+
     public void addModule(Module newModule) {
         modules.add(newModule);
         this.rootModule = newModule;
     }
-    
+
     public void setModules(List<Module> newModules) {
         this.modules = newModules;
     }
-    
+
     public Module getModuleByName(String moduleName) {
 
         for (Module m : this.modules) {
@@ -44,7 +44,7 @@ public class Netlist {
         }
         throw new Error("Netlist does not have a Module named " + moduleName);
     }
-    
+
     public String toVerilog() {
         String verilog = "";
         for (Module module: modules) {
@@ -53,7 +53,7 @@ public class Netlist {
         }
         return verilog;
     }
-    
+
     public boolean isFlat() {
     	List<Module> instanciatedModuleDefinitions = new ArrayList<Module>();
     	for (Module module : this.getModules()) {
@@ -66,5 +66,9 @@ public class Netlist {
     		}
     	}
     	return true;
+    }
+
+    public boolean isInlined() {
+        return this.getModules().size() == 1;
     }
 }

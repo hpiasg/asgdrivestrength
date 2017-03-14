@@ -1,29 +1,24 @@
-package de.uni_potsdam.hpi.asg.drivestrength.optimization.equaldelaymatrix;
+package de.uni_potsdam.hpi.asg.drivestrength.optimization;
 
 import java.util.List;
 
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.Load;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 
-public class EqualDelayMatrixOptimizer {
+public class EqualDelayMatrixOptimizer extends AbstractDriveOptimizer {
 
-    protected static final Logger logger = LogManager.getLogger();
-
-    private List<CellInstance> cellInstances;
     private RealMatrix effortMatrix_T;
     private RealMatrix staticLoadMatrix_b;
     private RealMatrix driveStrengthMatrix_x;
     private double criticalDelay;
 
     public EqualDelayMatrixOptimizer(Netlist netlist) {
-        this.cellInstances = netlist.getRootModule().getCellInstances();
+        super(netlist);
         this.assertAllCellsAreSingleStage();
     }
 
@@ -50,7 +45,7 @@ public class EqualDelayMatrixOptimizer {
 
         logger.info("Chosen delay to match input driven: " + delayFactor * this.criticalDelay + " (" + delayFactor + " * critical)");
         this.setCapactiances();
-        this.selectSizes();
+        this.selectSizesFromTheoretical();
     }
 
     private void fillMatrices() {
@@ -150,12 +145,6 @@ public class EqualDelayMatrixOptimizer {
                 capacitance = Math.max(capacitance, 0.00000001);
                 cellInstance.setInputPinTheoreticalCapacitance(inputPinName, capacitance, false);
             }
-        }
-    }
-
-    private void selectSizes() {
-        for (CellInstance i : this.cellInstances) {
-            i.selectSizeFromTheoreticalCapacitances();
         }
     }
 

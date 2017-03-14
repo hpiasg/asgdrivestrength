@@ -1,21 +1,14 @@
 package de.uni_potsdam.hpi.asg.drivestrength.optimization;
 
-import java.util.List;
 import java.util.Random;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 
-public class SimulatedAnnealingOptimizer {
+public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
 
-    protected static final Logger logger = LogManager.getLogger();
-
-    private List<CellInstance> cellInstances;
     private int roundsPerCell;
     private int iterationCount;
     private double initialTemperature;
@@ -27,7 +20,7 @@ public class SimulatedAnnealingOptimizer {
     private Cell previousSizeForUndo;
 
     public SimulatedAnnealingOptimizer(Netlist netlist, int roundPerCell) {
-        this.cellInstances = netlist.getRootModule().getCellInstances();
+        super(netlist);
         this.roundsPerCell = roundPerCell;
         this.delayEstimator = new DelayEstimator(netlist, false, false);
         this.randomGenerator = new Random();
@@ -44,7 +37,7 @@ public class SimulatedAnnealingOptimizer {
         this.initialTemperature = (-expectedAvgDelta) / Math.log(initialAcceptanceP);
         this.alpha = Math.pow(-expectedAvgDelta / (initialTemperature * Math.log(greedyAcceptanceP)), 1.0 / becomeGreedyAfter);
 
-        logger.info("Simulated Annealing alpha: " + alpha + ", T0: " + initialTemperature + ", G: " + becomeGreedyAfter);
+        logger.info("Simulated Annealing. alpha: " + alpha + ", T0: " + initialTemperature + ", G: " + becomeGreedyAfter);
     }
 
     public void run() {

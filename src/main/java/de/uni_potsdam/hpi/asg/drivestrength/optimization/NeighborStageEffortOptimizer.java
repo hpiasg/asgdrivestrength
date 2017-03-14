@@ -6,14 +6,13 @@ import java.util.Map;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 
-public class NeighborStageEffortOptimizer {
+public class NeighborStageEffortOptimizer extends AbstractDriveOptimizer {
 
-    private Netlist netlist;
     private int roundCount;
     private boolean clampToImplementableCapacitances;
 
     public NeighborStageEffortOptimizer(Netlist netlist, int rounds, boolean clampToImplementableCapacitances) {
-        this.netlist = netlist;
+        super(netlist);
         this.roundCount = rounds;
         this.clampToImplementableCapacitances = clampToImplementableCapacitances;
     }
@@ -22,17 +21,34 @@ public class NeighborStageEffortOptimizer {
         for (int i = 0; i < this.roundCount; i++) {
             optimizeOneRound();
         }
-        for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
-            c.selectSizeFromTheoreticalCapacitances();
-        }
+        this.selectSizesFromTheoretical();
     }
 
     private void optimizeOneRound() {
+        Map<CellInstance, Double> targetEfforts = determineTargetEfforts();
 
+        for (CellInstance c : targetEfforts.keySet()) {
+            double targetEffort = targetEfforts.get(c);
+            double loadCapacitance = c.getLoadCapacitanceTheoretical();
+            for (String pinName : c.getInputPinNames()) {
+                double stageEffort = calculateStageEffort(c, pinName, loadCapacitance);
+                double error = stageEffort / targetEffort;
+                if (error > 1) { //too much stage effort, make stronger
+                    double newCapacitance = c.getInputPinTheoreticalCapacitance(pinName) * Math.min(error, 1.05);
+                    c.setInputPinTheoreticalCapacitance(pinName, newCapacitance, clampToImplementableCapacitances);
+                }
+                if (error < 1) { //too little stage effort, make weaker
+                    double newCapacitance = c.getInputPinTheoreticalCapacitance(pinName) * Math.max(error,  0.95);
+                    c.setInputPinTheoreticalCapacitance(pinName, newCapacitance, clampToImplementableCapacitances);
+                }
+            }
+        }
+    }
+
+    private Map<CellInstance, Double> determineTargetEfforts() {
         Map<CellInstance, Double> targetEfforts = new HashMap<>();
 
-        System.out.println("\n\nROUND");
-        for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
+        for (CellInstance c : this.cellInstances) {
             double targetEffort = 0;
             if (c.hasSuccessors() && c.hasPredecessors()) {
                 targetEffort = avgSuccessorStageEffort(c) + avgPredecessorStageEffort(c) / 2;
@@ -45,24 +61,7 @@ public class NeighborStageEffortOptimizer {
             }
             targetEfforts.put(c, targetEffort);
         }
-
-        for (CellInstance c : targetEfforts.keySet()) {
-            double targetEffort = targetEfforts.get(c);
-            double loadCapacitance = c.getLoadCapacitanceTheoretical();
-            for (String pinName : c.getInputPinNames()) {
-                double stageEffort = stageEffort(c, pinName, loadCapacitance);
-                System.out.println("own: " + stageEffort + ", target: " + targetEffort);
-                double error = stageEffort / targetEffort;
-                if (error > 1) { //too much stage effort, make stronger
-                    double newCapacitance = c.getInputPinTheoreticalCapacitance(pinName) * Math.min(error, 1.05);
-                    c.setInputPinTheoreticalCapacitance(pinName, newCapacitance, clampToImplementableCapacitances);
-                }
-                if (error < 1) { //too little stage effort, make weaker
-                    double newCapacitance = c.getInputPinTheoreticalCapacitance(pinName) * Math.max(error,  0.95);
-                    c.setInputPinTheoreticalCapacitance(pinName, newCapacitance, clampToImplementableCapacitances);
-                }
-            }
-        }
+        return targetEfforts;
     }
 
     @SuppressWarnings("unused")
@@ -99,14 +98,14 @@ public class NeighborStageEffortOptimizer {
         int count = 0;
         double loadCapacitance = c.getLoadCapacitanceTheoretical();
         for (String pinName : c.getInputPinNames()) {
-            double stageEffort = stageEffort(c, pinName, loadCapacitance);
+            double stageEffort = calculateStageEffort(c, pinName, loadCapacitance);
             sum += stageEffort;
             count++;
         }
         return sum / count;
     }
 
-    private double stageEffort(CellInstance cellInstance, String pinName, double loadCapacitance) {
+    private double calculateStageEffort(CellInstance cellInstance, String pinName, double loadCapacitance) {
         double inputCapacitance = cellInstance.getInputPinTheoreticalCapacitance(pinName);
         double electricalEffort = loadCapacitance / inputCapacitance;
         int stageCount = cellInstance.getDefinition().getStageCountForPin(pinName);

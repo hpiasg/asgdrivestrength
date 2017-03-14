@@ -3,33 +3,23 @@ package de.uni_potsdam.hpi.asg.drivestrength.optimization;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 
-public class NaiveOptimizer {
-    private Netlist netlist;
+public class NaiveOptimizer extends AbstractDriveOptimizer {
     private int roundCount;
-    
+
     public NaiveOptimizer(Netlist netlist, int rounds) {
-        this.netlist = netlist;
+        super(netlist);
         this.roundCount = rounds;
-        assertNetlistFitness();
     }
-    
-    private void assertNetlistFitness() {
-        if (this.netlist.getModules().size() != 1) {
-            throw new Error("Cannot optimize on non-inlined netlist");
-        }
-    }
-    
+
     public void run() {
         for (int i = 0; i < this.roundCount; i++) {
             optimizeOneRound();
         }
-        for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
-            c.selectSizeFromTheoreticalCapacitances();
-        }
+        this.selectSizesFromTheoretical();
     }
-    
+
     private void optimizeOneRound() {
-        for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
+        for (CellInstance c : this.cellInstances) {
             double loadCapacitance = c.getLoadCapacitanceTheoretical();
             for (String pinName : c.getInputPinNames()) {
                 double inputCapacitance = c.getInputPinTheoreticalCapacitance(pinName);
