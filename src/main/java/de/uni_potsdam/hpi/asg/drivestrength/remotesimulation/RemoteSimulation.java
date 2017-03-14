@@ -29,13 +29,18 @@ public class RemoteSimulation {
     private String netlist;
     private File remoteConfigFile;
     private boolean keepTempDir;
+    private boolean verbose;
+    private double outputPinCapacitance;
     private String tempDir;
 
-    public RemoteSimulation(String filename, String netlist, File remoteConfigFile, boolean keepTempDir) {
-        this.name = basename(filename);
+    public RemoteSimulation(File netlistfile, String netlist,
+            File remoteConfigFile, double outputPinCapacitance, boolean keepTempDir, boolean verbose) {
+        this.name = basename(netlistfile.getName());
         this.netlist = netlist;
         this.remoteConfigFile = remoteConfigFile;
+        this.outputPinCapacitance = outputPinCapacitance;
         this.keepTempDir = keepTempDir;
+        this.verbose = verbose;
     }
 
     private String basename(String filename) {
@@ -67,7 +72,8 @@ public class RemoteSimulation {
         filesToMove.add(netlistFilename);
 
         String commandFilename = tempDir + name + ".sh";
-        String command = "simulate " + name + ".v " + name + " > output_full.txt; cat output_full.txt | grep -E 'ERROR|SUCCESS' > output.txt;";
+        String command = "simulate " + name + ".v " + name + " " + outputPinCapacitance
+                + " > output_full.txt; cat output_full.txt | grep -E 'ERROR|SUCCESS' > output.txt;";
         command += "cp simulation_" + name + "/" + name + ".sdf .";
 
         FileHelper.writeStringToTextFile(command, commandFilename);
@@ -110,7 +116,9 @@ public class RemoteSimulation {
     private void parseSdf() {
         DelayFileParser sdfParser = new DelayFileParser(new File(tempDir + name + ".sdf"));
         sdfParser.parse();
-        //sdfParser.printAll();
+        if (this.verbose) {
+            sdfParser.printAll();
+        }
         logger.info("SDF cell delay sum: " + NumberFormatter.spaced(sdfParser.getDelaySum()) + " ps");
     }
 }
