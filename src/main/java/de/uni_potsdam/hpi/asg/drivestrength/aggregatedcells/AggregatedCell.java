@@ -15,6 +15,7 @@ public class AggregatedCell {
 
     private String name;
     private Map<String, Map<String, Double>> sizeCapacitances; //pin->size->value
+    private Map<String, Map<String, Double>> monotonizedSizeCapacitances; // pin->size->value
     private Map<String, DelayParameterTriple> delayParameterTriples; //pin->triple
     private Map<String, Map<String, DelayLine>> sizeDelayLines; //pin->size->value
     private List<String> orderedPinNames;
@@ -85,6 +86,10 @@ public class AggregatedCell {
             orderedSizesRaw.add(rawCell);
         }
         this.sizesRaw = orderedSizesRaw;
+    }
+
+    public void setMonotonizedSizeCapacitances(Map<String, Map<String, Double>> monotonizedSizeCapacitances) {
+        this.monotonizedSizeCapacitances = monotonizedSizeCapacitances;
     }
 
     public List<Cell> getRawSizes() {
@@ -214,11 +219,18 @@ public class AggregatedCell {
     private double computeDeviationToDesiredCapacitances(String sizeName, Map<String, Double> desiredCapacitances) {
         double deviation = 0.0;
         for (String pinName : desiredCapacitances.keySet()) {
-            double actual = this.sizeCapacitances.get(pinName).get(sizeName);
+            double actual = this.getMonotonizedOrRegularSizeCapacitance(pinName, sizeName);
             double desired = desiredCapacitances.get(pinName);
             deviation += Math.abs(actual - desired);
         }
         return deviation;
+    }
+
+    private double getMonotonizedOrRegularSizeCapacitance(String pinName, String sizeName) {
+        if (this.monotonizedSizeCapacitances == null) {
+            return this.sizeCapacitances.get(pinName).get(sizeName);
+        }
+        return this.monotonizedSizeCapacitances.get(pinName).get(sizeName);
     }
 
     public double getLargestPossibleCapacitance(String pinName) {

@@ -42,15 +42,15 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
 
     @Override
     protected void optimize() {
-        double beforeEnergy = calculateEnergy();
+        double beforeCost = calculateCost();
 
         temperature = initialTemperature;
         for (int i = 0; i < iterationCount; i++) {
-            double currentEnergy = calculateEnergy();
+            double currentCost = calculateCost();
             this.performRandomStep();
-            double newEnergy = calculateEnergy();
-            if (newEnergy > currentEnergy) {
-                double delta = newEnergy - currentEnergy;
+            double newCost = calculateCost();
+            if (newCost > currentCost) {
+                double delta = newCost - currentCost;
                 double condition = Math.exp(- delta / this.temperature);
                 if (Math.random() > condition) {
                     this.undoRandomStep();
@@ -58,7 +58,7 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
             }
             this.temperature *= alpha;
         }
-        logger.info("SA: result energy: " + calculateEnergy() + " vs before " + beforeEnergy);
+        logger.info("SA: result cost: " + calculateCost() + " vs before " + beforeCost);
     }
 
     private void performRandomStep() {
@@ -78,7 +78,7 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
         this.cellInstances.get(indexForUndo).selectSize(previousSizeForUndo);
     }
 
-    private double calculateEnergy() {
+    private double calculateCost() {
         return delayEstimator.run();
     }
 }

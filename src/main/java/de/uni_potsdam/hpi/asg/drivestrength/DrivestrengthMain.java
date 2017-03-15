@@ -9,6 +9,7 @@ import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.CellAggregator;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.SizeCapacitanceMonotonizer;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesParser;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.OrderedSizesContainer;
@@ -72,6 +73,7 @@ public class DrivestrengthMain {
         boolean skipDeviatingSizes = true;
         CellAggregator ca = new CellAggregator(cells, stageCounts, defaultSizes, orderedSizes, skipDeviatingSizes);
         AggregatedCellLibrary aggregatedCellLibrary = ca.run();
+        new SizeCapacitanceMonotonizer(aggregatedCellLibrary, orderedSizes).run();
 
         boolean replaceBySingleStageCells = false; //Will lead to non-functional netlist, exists just to analyze our algorithm behavior
         Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary, replaceBySingleStageCells).createNetlist();
@@ -83,7 +85,7 @@ public class DrivestrengthMain {
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
 
-        double outputPinCapacitance = 0.003;
+        double outputPinCapacitance = 0.03;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         new InputDrivenAnnotator(inlinedNetlist).run();
         new PredecessorAnnotator(inlinedNetlist).run();
@@ -106,7 +108,7 @@ public class DrivestrengthMain {
 
         boolean remoteVerbose = false;
         boolean keepFiles = false;
-        new RemoteSimulation(options.getNetlistFile(), netlist.toVerilog(), options.getRemoteConfigFile(),
+        new RemoteSimulation(options.getNetlistFile(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(),
                               outputPinCapacitance, keepFiles, remoteVerbose).run();
 
         return 0;
