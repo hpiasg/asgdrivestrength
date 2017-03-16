@@ -109,6 +109,7 @@ public class DrivestrengthMain {
         boolean remoteVerbose = false;
         boolean keepFiles = false;
         new RemoteSimulation(options.getNetlistFile(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(),
+                             "_noslew_nowire",
                               outputPinCapacitance, keepFiles, remoteVerbose).run();
 
         return 0;

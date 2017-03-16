@@ -31,16 +31,18 @@ public class RemoteSimulation {
     private boolean keepTempDir;
     private boolean verbose;
     private double outputPinCapacitance;
+    private String librarySuffix;
     private String tempDir;
 
-    public RemoteSimulation(File netlistfile, String netlist,
-            File remoteConfigFile, double outputPinCapacitance, boolean keepTempDir, boolean verbose) {
+    public RemoteSimulation(File netlistfile, String netlist, File remoteConfigFile,
+            String librarySuffix, double outputPinCapacitance, boolean keepTempDir, boolean verbose) {
         this.name = basename(netlistfile.getName());
         this.netlist = netlist;
         this.remoteConfigFile = remoteConfigFile;
         this.outputPinCapacitance = outputPinCapacitance;
         this.keepTempDir = keepTempDir;
         this.verbose = verbose;
+        this.librarySuffix = librarySuffix;
     }
 
     private String basename(String filename) {
@@ -53,7 +55,7 @@ public class RemoteSimulation {
             return;
         }
 
-        logger.info("Starting remote simulation, with testbench " + this.name + "...");
+        logger.info("Starting remote simulation, with testbench " + this.name + " on library " + this.librarySuffix + "...");
 
 
         String date = date();
@@ -72,7 +74,8 @@ public class RemoteSimulation {
         filesToMove.add(netlistFilename);
 
         String commandFilename = tempDir + name + ".sh";
-        String command = "simulate " + name + ".v " + name + " " + outputPinCapacitance
+        String command = "selectLibrary " + librarySuffix + "\n";
+        command += "simulate " + name + ".v " + name + " " + outputPinCapacitance
                 + " > output_full.txt; cat output_full.txt | grep -E 'ERROR|SUCCESS' > output.txt;";
         command += "cp simulation_" + name + "/" + name + ".sdf .";
 
