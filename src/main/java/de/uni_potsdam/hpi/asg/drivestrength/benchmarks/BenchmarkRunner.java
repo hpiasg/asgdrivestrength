@@ -7,8 +7,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
@@ -50,8 +53,8 @@ public class BenchmarkRunner {
         System.out.println("Running Benchmarks...");
         this.count = 0;
 
-        String[] benchmarkNetlists = {"inc"};
-        //String[] benchmarkNetlists = {"inc", "mod10", "count10", "bufferx", "gcd", "mult"};
+        //String[] benchmarkNetlists = {"inc"};
+        String[] benchmarkNetlists = {"inc", "mod10", "count10", "bufferx", "gcd", "mult"};
         double[] benchmarkOutCs = {0.0, 0.003, 0.012, 0.1, 1.0};
         boolean[] benchmarkLimitInputs = {true, false};
 
@@ -127,7 +130,9 @@ public class BenchmarkRunner {
 
         PrintWriter fileOut = new PrintWriter(new BufferedWriter(new FileWriter(outFileName, true)));
 
-        for (String optimizerName : optimizers.keySet()) {
+        List<String> optimizerNamesSorted = new ArrayList<>(optimizers.keySet());
+        Collections.sort(optimizerNamesSorted);
+        for (String optimizerName : optimizerNamesSorted) {
             AbstractDriveOptimizer optimizer = optimizers.get(optimizerName);
             optimizer.run();
 
