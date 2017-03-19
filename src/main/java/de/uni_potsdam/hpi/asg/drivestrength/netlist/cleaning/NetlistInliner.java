@@ -9,21 +9,22 @@ public class NetlistInliner {
 
     protected static final Logger logger = LogManager.getLogger();
     private Netlist originalNetlist;
-    
+
     public NetlistInliner(Netlist originalNetlist) {
-    	this.originalNetlist = originalNetlist;
+        this.originalNetlist = originalNetlist;
     }
-    
+
     public Netlist run() {
-    	assertNetlistIsFlat();
-    	Netlist inlinedNetlist = new Netlist();
-    	inlinedNetlist.addModule(new ModuleInliner(originalNetlist.getRootModule()).run());
-    	return inlinedNetlist;
+        assertNetlistIsFlat();
+        Netlist inlinedNetlist = new Netlist();
+        inlinedNetlist.setName(originalNetlist.getName());
+        inlinedNetlist.addModule(new ModuleInliner(originalNetlist.getRootModule()).run());
+        return inlinedNetlist;
     }
-    
+
     private void assertNetlistIsFlat() {
-    	if (!this.originalNetlist.isFlat()) {
-        	logger.warn("NetlistInliner called on non-flat netlist (meaning it has submodule definition instanciated more than once)");    		
-    	}
+        if (!this.originalNetlist.isFlat()) {
+            logger.warn("NetlistInliner called on non-flat netlist (meaning it has submodule definition instanciated more than once)");
+        }
     }
 }

@@ -36,17 +36,13 @@ public class RemoteSimulation {
 
     public RemoteSimulation(File netlistfile, String netlist, File remoteConfigFile,
             String librarySuffix, double outputPinCapacitance, boolean keepTempDir, boolean verbose) {
-        this.name = basename(netlistfile.getName());
+        this.name = FileHelper.basename(netlistfile.getName());
         this.netlist = netlist;
         this.remoteConfigFile = remoteConfigFile;
         this.outputPinCapacitance = outputPinCapacitance;
         this.keepTempDir = keepTempDir;
         this.verbose = verbose;
         this.librarySuffix = librarySuffix;
-    }
-
-    private String basename(String filename) {
-        return filename.split("\\.(?=[^\\.]+$)")[0];
     }
 
     public void run() {

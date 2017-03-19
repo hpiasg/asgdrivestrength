@@ -17,7 +17,7 @@ public class FileHelper {
             throw new Error("Could not read file " +  textFile);
         }
     }
-    
+
     public static void writeStringToTextFile(String fileContent, String fileName) {
         try {
             PrintWriter out = new PrintWriter(fileName);
@@ -27,12 +27,16 @@ public class FileHelper {
             throw new Error("Could not write file " + fileName);
         }
     }
-    
+
     public static void deleteDirectory(String path) {
         try {
             FileUtils.deleteDirectory(new File(path));
         } catch (IOException e) {
             throw new Error("Could not delete directory " + path);
         }
+    }
+
+    public static String basename(String filename) {
+        return filename.split("\\.(?=[^\\.]+$)")[0];
     }
 }

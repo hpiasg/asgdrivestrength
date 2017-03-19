@@ -25,14 +25,20 @@ public class VerilogParser {
     private List<String> statements;
     private AggregatedCellLibrary aggregatedCellLibrary;
     private boolean replaceCellsBySingleStageGates;
+    private String netlistName;
 
     public VerilogParser(File verilogFile, AggregatedCellLibrary aggregatedCellLibrary, boolean replaceCellsBySingleStageGates) {
+        this.netlistName = basename(verilogFile.getName());
         this.statements = readVerilogStatementsFromFile(verilogFile);
         this.aggregatedCellLibrary = aggregatedCellLibrary;
         this.replaceCellsBySingleStageGates = replaceCellsBySingleStageGates;
         if (this.replaceCellsBySingleStageGates) {
             logger.warn("Replacing multi-stage cells with single-stage cells of equal pin count. Remove in production!");
         }
+    }
+
+    private String basename(String filename) {
+        return filename.split("\\.(?=[^\\.]+$)")[0];
     }
 
     public VerilogParser(File verilogFile) {
@@ -102,6 +108,8 @@ public class VerilogParser {
         logger.info("Parsing Verilog netlist...");
 
         Netlist netlist = new Netlist();
+
+        netlist.setName(this.netlistName);
 
         List<String> currentModuleStatements = new ArrayList<String>();
 

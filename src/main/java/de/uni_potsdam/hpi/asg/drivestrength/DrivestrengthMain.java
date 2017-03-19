@@ -16,6 +16,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.Ordered
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.OrderedSizesParser;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsParser;
+import de.uni_potsdam.hpi.asg.drivestrength.benchmarks.BenchmarkRunner;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
@@ -63,20 +64,17 @@ public class DrivestrengthMain {
         }
     }
 
+
     private static int execute() {
-        List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
+        AggregatedCellLibrary cellLibrary = loadCellInformation();
 
-        StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
-        DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
-        OrderedSizesContainer orderedSizes = new OrderedSizesParser(options.getOrderedSizesFile()).run();
-
-        boolean skipDeviatingSizes = true;
-        CellAggregator ca = new CellAggregator(cells, stageCounts, defaultSizes, orderedSizes, skipDeviatingSizes);
-        AggregatedCellLibrary aggregatedCellLibrary = ca.run();
-        new SizeCapacitanceMonotonizer(aggregatedCellLibrary, orderedSizes).run();
+        if (options.isBenchmarkRun()) {
+            new BenchmarkRunner(cellLibrary).run();
+            return 0;
+        }
 
         boolean replaceBySingleStageCells = false; //Will lead to non-functional netlist, exists just to analyze our algorithm behavior
-        Netlist netlist = new VerilogParser(options.getNetlistFile(), aggregatedCellLibrary, replaceBySingleStageCells).createNetlist();
+        Netlist netlist = new VerilogParser(options.getNetlistFile(), cellLibrary, replaceBySingleStageCells).createNetlist();
 
         new NetlistFlattener(netlist).run();
 
@@ -84,11 +82,11 @@ public class DrivestrengthMain {
 
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
+        new PredecessorAnnotator(inlinedNetlist).run();
 
         double outputPinCapacitance = 0.03;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         new InputDrivenAnnotator(inlinedNetlist).run();
-        new PredecessorAnnotator(inlinedNetlist).run();
 
         new DelayEstimator(inlinedNetlist, false, false).print();
 
@@ -115,6 +113,18 @@ public class DrivestrengthMain {
         return 0;
     }
 
+    private static AggregatedCellLibrary loadCellInformation() {
+        List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
 
+        StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
+        DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
+        OrderedSizesContainer orderedSizes = new OrderedSizesParser(options.getOrderedSizesFile()).run();
+
+        boolean skipDeviatingSizes = true;
+        CellAggregator ca = new CellAggregator(cells, stageCounts, defaultSizes, orderedSizes, skipDeviatingSizes);
+        AggregatedCellLibrary aggregatedCellLibrary = ca.run();
+        new SizeCapacitanceMonotonizer(aggregatedCellLibrary, orderedSizes).run();
+        return aggregatedCellLibrary;
+    }
 
 }

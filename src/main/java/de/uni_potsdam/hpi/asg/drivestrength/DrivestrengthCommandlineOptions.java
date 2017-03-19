@@ -25,6 +25,9 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     @Option(name = "-debug")
     private boolean debug = false;
 
+    @Option(name = "-runBenchmarks")
+    private boolean runBenchmarks = false;
+
     @Option(name = "-lib", metaVar = "<libertyfile>", usage ="Liberty Cell Library File", required = true)
     private File libertyFile;
 
@@ -56,6 +59,10 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
 
     public boolean isDebug() {
         return debug;
+    }
+
+    public boolean isBenchmarkRun() {
+        return runBenchmarks;
     }
 
     public File getNetlistFile() {

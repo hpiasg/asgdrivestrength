@@ -3,15 +3,30 @@ package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Module;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.ModuleInstance;
 
 public class Netlist {
     private List<Module> modules;
     private Module rootModule;
+    private String name;
 
     public Netlist() {
-        modules = new ArrayList<Module>();
+        modules = new ArrayList<>();
+    }
+
+    public Netlist(Netlist netlistToCopy) {
+        modules = new ArrayList<>();
+        Module oldRootModule = netlistToCopy.getRootModule();
+        for (Module m : netlistToCopy.getModules()) {
+            Module copiedModule = new Module(m, true);
+            modules.add(copiedModule);
+            if (m == oldRootModule) {
+                this.setRootModule(copiedModule);
+            }
+        }
+        this.name = netlistToCopy.name;
     }
 
     public List<Module> getModules() {
@@ -70,5 +85,24 @@ public class Netlist {
 
     public boolean isInlined() {
         return this.getModules().size() == 1;
+    }
+
+    public boolean isAllSingleStage() {
+        for (Module m : this.getModules()) {
+            for (CellInstance i: m.getCellInstances()) {
+                if (!(i.getDefinition().isSingleStageCell())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
