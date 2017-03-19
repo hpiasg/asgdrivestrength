@@ -29,7 +29,7 @@ public class DelayEstimator {
         logger.info("Estimated cell delay sum " + theoreticalNote + ": " + NumberFormatter.spacedRounded(delaySum) + " ps");
     }
 
-    public double run() {
+    public int run() {
         double sum = 0.0;
         int count = 0;
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
@@ -46,7 +46,7 @@ public class DelayEstimator {
         if (verbose) {
             System.out.println("Estimated cell delay sum: " + NumberFormatter.spacedRounded(sum) + "   avg=" + sum/count);
         }
-        return sum;
+        return (int)Math.round(sum);
     }
 
     private double findLoadCapacitance(CellInstance c) {
