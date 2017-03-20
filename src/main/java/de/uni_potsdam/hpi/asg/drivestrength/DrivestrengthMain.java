@@ -69,7 +69,7 @@ public class DrivestrengthMain {
         AggregatedCellLibrary cellLibrary = loadCellInformation();
 
         if (options.isBenchmarkRun()) {
-            new BenchmarkRunner(cellLibrary).run();
+            new BenchmarkRunner(cellLibrary, options.getRemoteConfigFile()).run();
             return 0;
         }
 
@@ -105,9 +105,8 @@ public class DrivestrengthMain {
         new DelayEstimator(inlinedNetlist, estimateWithTheoreticalLoad, false).print();
 
         boolean remoteVerbose = false;
-        boolean keepFiles = false;
+        boolean keepFiles = true;
         new RemoteSimulation(options.getNetlistFile(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(),
-                             "_noslew_nowire",
                               outputPinCapacitance, keepFiles, remoteVerbose).run();
 
         return 0;

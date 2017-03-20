@@ -33,15 +33,20 @@ import de.uni_potsdam.hpi.asg.drivestrength.optimization.NeighborStageEffortOpti
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.NopOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.SelectForLoadOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.SimulatedAnnealingOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
+import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulationResult;
 
 public class BenchmarkRunner {
     private AggregatedCellLibrary cellLibrary;
     private String outFileName;
     private int count;
+    private File remoteConfigFile;
+    private long startTime;
 
-    public BenchmarkRunner(AggregatedCellLibrary cellLibrary) {
+    public BenchmarkRunner(AggregatedCellLibrary cellLibrary, File remoteConfigFile) {
         this.cellLibrary = cellLibrary;
         this.outFileName = "benchmarks-output/" + date() + ".csv";
+        this.remoteConfigFile = remoteConfigFile;
     }
 
     private String date() {
@@ -52,6 +57,7 @@ public class BenchmarkRunner {
     public void run() {
         System.out.println("Running Benchmarks...");
         this.count = 0;
+        this.startTime = System.currentTimeMillis();
 
         //String[] benchmarkNetlists = {"inc"};
         String[] benchmarkNetlists = {"inc", "mod10", "count10", "bufferx", "gcd", "mult"};
@@ -127,8 +133,8 @@ public class BenchmarkRunner {
 
         Map<String, AbstractDriveOptimizer> optimizers = setupOptimizers(netlist, outputC, limitInput);
 
+        int totalcount = optimizers.size() * combinationCount;
 
-        PrintWriter fileOut = new PrintWriter(new BufferedWriter(new FileWriter(outFileName, true)));
 
         List<String> optimizerNamesSorted = new ArrayList<>(optimizers.keySet());
         Collections.sort(optimizerNamesSorted);
@@ -138,27 +144,45 @@ public class BenchmarkRunner {
 
             int estimatedDelay = new DelayEstimator(optimizer.getNetlist(), false, false).run();
 
+            RemoteSimulation rs = new RemoteSimulation(optimizer.getNetlist().getName(),
+                                           optimizer.getNetlist().toVerilog(), this.remoteConfigFile,
+                                           outputC, false, false);
+            rs.run();
+            RemoteSimulationResult rsResult = rs.getResult();
+
             String benchmarkOutput = "benchmark-entry,";
             benchmarkOutput += netlist.getName() + ",";
             benchmarkOutput += outputC + ",";
             benchmarkOutput += limitInput + ",";
             benchmarkOutput += optimizerName + ",";
-            benchmarkOutput += estimatedDelay;
+            benchmarkOutput += estimatedDelay + ",";
+            benchmarkOutput += rsResult.getSdfDelaySum("_orig") + ",";
+            benchmarkOutput += rsResult.getSdfDelaySum("_noslew") + ",";
+            benchmarkOutput += rsResult.getSdfDelaySum("_noslew_nowire") + ",";
+            benchmarkOutput += rsResult.getTestbenchSuccessTime("_orig") + ",";
+            benchmarkOutput += rsResult.getTestbenchSuccessTime("_noslew") + ",";
+            benchmarkOutput += rsResult.getTestbenchSuccessTime("_noslew_nowire");
+
+            PrintWriter fileOut = new PrintWriter(new BufferedWriter(new FileWriter(outFileName, true)));
             fileOut.println(benchmarkOutput);
+            fileOut.close();
 
-//              boolean remoteVerbose = false;
-//              boolean keepFiles = false;
-//              new RemoteSimulation(options.getNetlistFile(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(),
-//                                   "_noslew_nowire",
-//                                    outputPinCapacitance, keepFiles, remoteVerbose).run();
-
+            count++;
+            this.printProgress(totalcount);
         }
 
-        count += optimizers.size();
-        int totalcount = optimizers.size() * combinationCount;
-        System.out.println("Benchmark progress: " + count + " of " + totalcount + " (" + Math.round(100.0 * count / totalcount) + " %)" );
 
-        fileOut.close();
+    }
+
+    private void printProgress(int totalcount) {
+        long currentTime = System.currentTimeMillis();
+        long milliseconds = currentTime - startTime;
+        int seconds = (int) (milliseconds / 1000) % 60 ;
+        int minutes = (int) ((milliseconds / (1000*60)) % 60);
+        int hours   = (int) ((milliseconds / (1000*60*60)) % 24);
+        System.out.println("Benchmark progress: " + count + " of "
+                        + totalcount + " (" + Math.round(100.0 * count / totalcount) + " %)"
+                        + " after " + hours + "h " + minutes + "m " + seconds + "s");
 
     }
 
