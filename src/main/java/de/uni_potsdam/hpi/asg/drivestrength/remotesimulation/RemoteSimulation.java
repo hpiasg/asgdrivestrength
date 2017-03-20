@@ -23,7 +23,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 
 public class RemoteSimulation {
     protected static final Logger logger = LogManager.getLogger();
-    private static final Pattern simulationResultSuccessPattern = Pattern.compile("[0-9]* TB_SUCCESS:\\s*([0-9]*)");
+    private static final Pattern simulationResultSuccessPattern = Pattern.compile("[0-9]*\\s*TB_SUCCESS:\\s*([0-9]*)");
 
     private String name;
     private String netlist;
@@ -31,22 +31,22 @@ public class RemoteSimulation {
     private boolean keepTempDir;
     private boolean verbose;
     private double outputPinCapacitance;
-    private String librarySuffix;
     private String tempDir;
+    private RemoteSimulationResult remoteSimulationResult;
 
     public RemoteSimulation(File netlistfile, String netlist, File remoteConfigFile,
-            String librarySuffix, double outputPinCapacitance, boolean keepTempDir, boolean verbose) {
-        this.name = basename(netlistfile.getName());
+            double outputPinCapacitance, boolean keepTempDir, boolean verbose) {
+        this(FileHelper.basename(netlistfile.getName()), netlist, remoteConfigFile, outputPinCapacitance, keepTempDir, verbose);
+    }
+
+    public RemoteSimulation(String netlistName, String netlist, File remoteConfigFile,
+            double outputPinCapacitance, boolean keepTempDir, boolean verbose) {
+        this.name = netlistName;
         this.netlist = netlist;
         this.remoteConfigFile = remoteConfigFile;
         this.outputPinCapacitance = outputPinCapacitance;
         this.keepTempDir = keepTempDir;
         this.verbose = verbose;
-        this.librarySuffix = librarySuffix;
-    }
-
-    private String basename(String filename) {
-        return filename.split("\\.(?=[^\\.]+$)")[0];
     }
 
     public void run() {
@@ -55,8 +55,11 @@ public class RemoteSimulation {
             return;
         }
 
-        logger.info("Starting remote simulation, with testbench " + this.name + " on library " + this.librarySuffix + "...");
+        logger.info("Starting remote simulation, with testbench " + this.name + "...");
 
+        this.remoteSimulationResult = new RemoteSimulationResult();
+
+        String[] librarySuffixes = {"_orig", "_noslew", "_noslew_nowire"};
 
         String date = date();
         tempDir = "tmp/" + date + "/";
@@ -74,10 +77,13 @@ public class RemoteSimulation {
         filesToMove.add(netlistFilename);
 
         String commandFilename = tempDir + name + ".sh";
-        String command = "selectLibrary " + librarySuffix + "\n";
-        command += "simulate " + name + ".v " + name + " " + outputPinCapacitance
-                + " > output_full.txt; cat output_full.txt | grep -E 'ERROR|SUCCESS' > output.txt;";
-        command += "cp simulation_" + name + "/" + name + ".sdf .";
+        String command = "";
+        for (String librarySuffix : librarySuffixes) {
+            command += "selectLibrary " + librarySuffix + "\n";
+            command += "simulate " + name + ".v " + name + " " + outputPinCapacitance
+                    + " > output_full.txt; cat output_full.txt | grep -E 'ERROR|SUCCESS' > output" + librarySuffix + ".txt;";
+            command += "cp simulation_" + name + "/" + name + ".sdf ./" + name + librarySuffix + ".sdf\n";
+        }
 
         FileHelper.writeStringToTextFile(command, commandFilename);
         filesToMove.add(commandFilename);
@@ -90,12 +96,18 @@ public class RemoteSimulation {
             throw new Error("Remote Simulation failed");
         }
 
-        parseResult();
-        parseSdf();
+        for (String librarySuffix : librarySuffixes) {
+            parseTBSuccess(librarySuffix);
+            parseSdf(librarySuffix);
+        }
 
         if (!this.keepTempDir) {
             FileHelper.deleteDirectory(tempDir);
         }
+    }
+
+    public RemoteSimulationResult getResult() {
+        return this.remoteSimulationResult;
     }
 
     private String date() {
@@ -103,25 +115,28 @@ public class RemoteSimulation {
         return dfmt.format(new Date());
     }
 
-    private void parseResult() {
-        File resultFile = new File(tempDir + "output.txt");
-        String result = FileHelper.readTextFileToString(resultFile).trim();
+    private void parseTBSuccess(String librarySuffix) {
+        File resultFile = new File(tempDir + "output" + librarySuffix + ".txt");
+        String result = FileHelper.readTextFileToString(resultFile).split("\r\n|\r|\n")[0].trim();
         Matcher m = simulationResultSuccessPattern.matcher(result);
 
         if (m.matches()) {
             int runtime = Integer.parseInt(m.group(1));
-            logger.info("Testbench Success after " + NumberFormatter.spaced(runtime) + " ps");
+            logger.info("Testbench Success (" + librarySuffix + ") after " + NumberFormatter.spaced(runtime) + " ps");
+            remoteSimulationResult.addTestbenchSuccessTime(librarySuffix, runtime);
         } else {
-            logger.info("Simulation result: " + result);
+            logger.info("Simulation result (" + librarySuffix + "): " + result);
+            remoteSimulationResult.addTestbenchSuccessTime(librarySuffix, 0);
         }
     }
 
-    private void parseSdf() {
-        DelayFileParser sdfParser = new DelayFileParser(new File(tempDir + name + ".sdf"));
+    private void parseSdf(String librarySuffix) {
+        DelayFileParser sdfParser = new DelayFileParser(new File(tempDir + name + librarySuffix + ".sdf"));
         sdfParser.parse();
         if (this.verbose) {
             sdfParser.printAll();
         }
-        logger.info("SDF cell delay sum: " + NumberFormatter.spaced(sdfParser.getDelaySum()) + " ps");
+        remoteSimulationResult.addSdfDelaySum(librarySuffix, sdfParser.getDelaySum());
+        logger.info("SDF cell delay sum (" + librarySuffix + "): " + NumberFormatter.spaced(sdfParser.getDelaySum()) + " ps");
     }
 }

@@ -11,6 +11,7 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
 
     private int roundsPerCell;
     private int iterationCount;
+    private boolean jumpInMutation;
     private double initialTemperature;
     private double alpha;
     private double temperature;
@@ -19,9 +20,10 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
     private int indexForUndo;
     private Cell previousSizeForUndo;
 
-    public SimulatedAnnealingOptimizer(Netlist netlist, int roundPerCell) {
+    public SimulatedAnnealingOptimizer(Netlist netlist, boolean jumpNotStep, int roundPerCell) {
         super(netlist);
         this.roundsPerCell = roundPerCell;
+        this.jumpInMutation = jumpNotStep;
         this.delayEstimator = new DelayEstimator(netlist, false, false);
         this.randomGenerator = new Random();
         this.selectParameters();
@@ -66,11 +68,14 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
         CellInstance instance = this.cellInstances.get(index);
         indexForUndo = index;
         previousSizeForUndo = instance.getSelectedSize();
-        //instance.selectRandomSize();
-        if (randomGenerator.nextFloat() > 0.5) {
-            instance.selectNextBiggerSizeIfPossible();
+        if (jumpInMutation) {
+            instance.selectRandomSize();
         } else {
-            instance.selectNextSmallerSizeIfPossible();
+            if (randomGenerator.nextFloat() > 0.5) {
+                instance.selectNextBiggerSizeIfPossible();
+            } else {
+                instance.selectNextSmallerSizeIfPossible();
+            }
         }
     }
 

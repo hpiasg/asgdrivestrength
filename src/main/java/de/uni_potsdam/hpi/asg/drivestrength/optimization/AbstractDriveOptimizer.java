@@ -13,11 +13,13 @@ public abstract class AbstractDriveOptimizer {
     protected static final Logger logger = LogManager.getLogger();
 
     protected List<CellInstance> cellInstances;
+    private Netlist netlist;
 
     public AbstractDriveOptimizer(Netlist netlist) {
         if (!netlist.isInlined()) {
             throw new Error("Cannot optimize on non-inlined netlists.");
         }
+        this.netlist = netlist;
         this.cellInstances = netlist.getRootModule().getCellInstances();
     }
 
@@ -33,6 +35,10 @@ public abstract class AbstractDriveOptimizer {
         for (CellInstance i : this.cellInstances) {
             i.selectSizeFromTheoreticalCapacitances();
         }
+    }
+
+    public Netlist getNetlist() {
+        return this.netlist;
     }
 
     protected abstract void optimize();
