@@ -88,11 +88,15 @@ public class CellAggregator {
             logger.debug(logPrefix + "(no stage count information)");
             return false;
         }
-        if (this.skipDeviatingSizes && this.stageCounts.getDeviatingSizes().containsKey(rawCell.getName())) {
+        if (this.skipDeviatingSizes && this.isDeviatingSize(rawCell)) {
             logger.debug(logPrefix + "(size with deviating cell count)");
             return false;
         }
         return true;
+    }
+
+    private boolean isDeviatingSize(Cell rawCell) {
+        return this.stageCounts.getDeviatingSizes().containsKey(rawCell.getName());
     }
 
     private List<String> getOrderedPinNames(Cell rawCell) {
@@ -146,6 +150,7 @@ public class CellAggregator {
         for (String pinName : pinNames) {
             sizeDelayLines.put(pinName, new HashMap<String, DelayLine>());
             for (Cell rawSize : rawSizes) {
+                if (this.isDeviatingSize(rawSize)) continue;
                 String sizeName = rawSize.getName();
                 DelayLine delayLine = this.extractDelayLineFor(pinName, rawSize, sizeCapacitances.get(pinName).get(sizeName));
                 sizeDelayLines.get(pinName).put(sizeName, delayLine);

@@ -119,7 +119,7 @@ public class DrivestrengthMain {
         DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
         OrderedSizesContainer orderedSizes = new OrderedSizesParser(options.getOrderedSizesFile()).run();
 
-        boolean skipDeviatingSizes = true;
+        boolean skipDeviatingSizes = false;
         CellAggregator ca = new CellAggregator(cells, stageCounts, defaultSizes, orderedSizes, skipDeviatingSizes);
         AggregatedCellLibrary aggregatedCellLibrary = ca.run();
         new SizeCapacitanceMonotonizer(aggregatedCellLibrary, orderedSizes).run();
