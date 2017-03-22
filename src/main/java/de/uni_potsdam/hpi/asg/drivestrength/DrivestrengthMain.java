@@ -115,11 +115,13 @@ public class DrivestrengthMain {
     private static AggregatedCellLibrary loadCellInformation() {
         List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
 
+        boolean skipDeviatingSizes = true;
+
         StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
         DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
-        OrderedSizesContainer orderedSizes = new OrderedSizesParser(options.getOrderedSizesFile()).run();
+        OrderedSizesContainer orderedSizes = new OrderedSizesParser(options.getOrderedSizesFile(),
+                                                            skipDeviatingSizes, stageCounts.listDeviatingSizes()).run();
 
-        boolean skipDeviatingSizes = false;
         CellAggregator ca = new CellAggregator(cells, stageCounts, defaultSizes, orderedSizes, skipDeviatingSizes);
         AggregatedCellLibrary aggregatedCellLibrary = ca.run();
         new SizeCapacitanceMonotonizer(aggregatedCellLibrary, orderedSizes).run();

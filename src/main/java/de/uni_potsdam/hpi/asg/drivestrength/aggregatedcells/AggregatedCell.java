@@ -275,6 +275,7 @@ public class AggregatedCell {
         return this.sizesRaw.get(0);
     }
 
+    @Override
     public String toString() {
         return "AggregatedCell " + this.getName() + " with " + this.getSizeCount() + " cell sizes";
     }
