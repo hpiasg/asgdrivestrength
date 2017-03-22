@@ -88,15 +88,15 @@ public class CellAggregator {
             logger.debug(logPrefix + "(no stage count information)");
             return false;
         }
-        if (this.skipDeviatingSizes && this.isDeviatingSize(rawCell)) {
+        if (this.skipDeviatingSizes && this.isDeviatingSize(rawCell.getName())) {
             logger.debug(logPrefix + "(size with deviating cell count)");
             return false;
         }
         return true;
     }
 
-    private boolean isDeviatingSize(Cell rawCell) {
-        return this.stageCounts.getDeviatingSizes().containsKey(rawCell.getName());
+    private boolean isDeviatingSize(String rawCellName) {
+        return this.stageCounts.getDeviatingSizes().containsKey(rawCellName);
     }
 
     private List<String> getOrderedPinNames(Cell rawCell) {
@@ -150,7 +150,6 @@ public class CellAggregator {
         for (String pinName : pinNames) {
             sizeDelayLines.put(pinName, new HashMap<String, DelayLine>());
             for (Cell rawSize : rawSizes) {
-                if (this.isDeviatingSize(rawSize)) continue;
                 String sizeName = rawSize.getName();
                 DelayLine delayLine = this.extractDelayLineFor(pinName, rawSize, sizeCapacitances.get(pinName).get(sizeName));
                 sizeDelayLines.get(pinName).put(sizeName, delayLine);
@@ -195,11 +194,21 @@ public class CellAggregator {
         Map<String, DelayParameterTriple> delayParameterTriplesPerPin = new HashMap<>();
 
         for (String pinName : delayLines.keySet()) {
-            Map<String, DelayLine> delayLinesForPin = delayLines.get(pinName);
+            Map<String, DelayLine> delayLinesForPin = this.filterOutDeviatingSizeDelayLines(delayLines.get(pinName));
             int stageCountForPin = stageCounts.get(pinName);
             delayParameterTriplesPerPin.put(pinName, new DelayParametersExtractor(delayLinesForPin, stageCountForPin).run());
         }
 
         return delayParameterTriplesPerPin;
+    }
+
+    private Map<String, DelayLine> filterOutDeviatingSizeDelayLines(Map<String, DelayLine> delayLines) {
+        Map<String, DelayLine> filtered = new HashMap<>();
+        for (String sizeName : delayLines.keySet()) {
+            if (!this.isDeviatingSize(sizeName)) {
+                filtered.put(sizeName, delayLines.get(sizeName));
+            }
+        }
+        return filtered;
     }
 }
