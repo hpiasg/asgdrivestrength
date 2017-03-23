@@ -23,7 +23,6 @@ public class LibertyCellParser {
         Matcher m = cellNamePattern.matcher(statements.get(0));
         if(m.matches()) {
             cell.setName(m.group(2));
-            System.out.println("Cell " + cell.getName());
         }
 
         for (String statement : this.statements) {
