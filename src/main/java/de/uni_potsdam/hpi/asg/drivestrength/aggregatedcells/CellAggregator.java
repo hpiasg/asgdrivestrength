@@ -14,7 +14,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCou
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin;
-import de.uni_potsdam.hpi.asg.drivestrength.cells.Timing;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.TimingContainer;
 
 public class CellAggregator {
     protected static final Logger logger = LogManager.getLogger();
@@ -161,7 +161,7 @@ public class CellAggregator {
 
     private DelayLine extractDelayLineFor(String pinName, Cell rawSize, double inputCapacitance) {
         List<DelayLine> delayLines = new ArrayList<>();
-        for (Timing t : rawSize.getOutputPin().getTimings()) {
+        for (TimingContainer t : rawSize.getOutputPin().getTimings()) {
             if (!t.getRelatedPinName().equals(pinName)) continue;
             if (t.getRiseDelays() == null || t.getFallDelays() == null) continue;
             DelayLine lineRise = this.extractDelayLine(t.getRiseDelays(), inputCapacitance);

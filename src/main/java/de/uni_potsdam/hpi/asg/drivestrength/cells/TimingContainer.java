@@ -1,11 +1,11 @@
 package de.uni_potsdam.hpi.asg.drivestrength.cells;
 
-public class Timing {
+public class TimingContainer {
     private String relatedPinName;
     private DelayMatrix riseDelays;
     private DelayMatrix fallDelays;
     
-    public Timing() {
+    public TimingContainer() {
     }
     
     public DelayMatrix getRiseDelays() {
