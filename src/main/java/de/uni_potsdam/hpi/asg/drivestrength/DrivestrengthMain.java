@@ -32,7 +32,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistBundleSplitt
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -93,8 +93,8 @@ public class DrivestrengthMain {
         new PowerEstimator(inlinedNetlist, false).print();
         new EnergyEstimator(inlinedNetlist, false).print();
 
-        boolean clampToImplementableCapacitances = true;
-        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
+//        boolean clampToImplementableCapacitances = true;
+//        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new NeighborStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
@@ -109,10 +109,10 @@ public class DrivestrengthMain {
         new PowerEstimator(inlinedNetlist, false).print();
         new EnergyEstimator(inlinedNetlist, false).print();
 
-//        boolean remoteVerbose = false;
-//        boolean keepFiles = true;
-//        new RemoteSimulation(options.getNetlistFile(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(),
-//                              outputPinCapacitance, keepFiles, remoteVerbose).run();
+        boolean remoteVerbose = false;
+        boolean keepFiles = true;
+        new RemoteSimulation(options.getNetlistFile(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(),
+                              outputPinCapacitance, keepFiles, remoteVerbose).run();
 
         return 0;
     }

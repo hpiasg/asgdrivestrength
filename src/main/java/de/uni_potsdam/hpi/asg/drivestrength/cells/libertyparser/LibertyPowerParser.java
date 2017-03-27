@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uni_potsdam.hpi.asg.drivestrength.cells.PowerContainer;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.OutpinPowerContainer;
 
 public class LibertyPowerParser {
     private static final Pattern relatedPinPattern = Pattern.compile("^(\\s*)related_pin\\s*\\:\\s*(.*)\\;\\s*$");
@@ -17,8 +17,8 @@ public class LibertyPowerParser {
         this.statements = statements;
     }
 
-    public PowerContainer run() {
-        PowerContainer powerContainer = new PowerContainer();
+    public OutpinPowerContainer run() {
+        OutpinPowerContainer powerContainer = new OutpinPowerContainer();
 
         for (String statement : statements) {
             Matcher m = relatedPinPattern.matcher(statement);

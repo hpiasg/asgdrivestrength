@@ -24,6 +24,10 @@ import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 public class RemoteSimulation {
     protected static final Logger logger = LogManager.getLogger();
     private static final Pattern simulationResultSuccessPattern = Pattern.compile("[0-9]*\\s*TB_SUCCESS:\\s*([0-9]*)");
+    private static final Pattern totalPowerPattern = Pattern.compile("Total Power\\s* = ([0-9|\\-|e|\\.]+)\\s*.*");
+    private static final Pattern simulationTimePattern = Pattern.compile("(.*)at time ([0-9]*) PS(.*)");
+
+    //Simulation complete via $finish(1) at time 77210 PS + 0
 
     private String name;
     private String netlist;
@@ -80,8 +84,10 @@ public class RemoteSimulation {
         String command = "";
         for (String librarySuffix : librarySuffixes) {
             command += "selectLibrary " + librarySuffix + "\n";
-            command += "simulate " + name + ".v " + name + " " + outputPinCapacitance
-                    + " > output_full.txt; cat output_full.txt | grep -E 'ERROR|SUCCESS' > output" + librarySuffix + ".txt;";
+            command += "simulate " + name + ".v " + name + " " + outputPinCapacitance + " > output_full" + librarySuffix + ".txt;\n";
+            command += "cat output_full" + librarySuffix + ".txt | grep -E 'ERROR|SUCCESS' > output_tb" + librarySuffix + ".txt;\n";
+            command += "cat output_full" + librarySuffix + ".txt | grep -E 'Total Power' > output_power" + librarySuffix + ".txt;\n";
+            command += "cat output_full" + librarySuffix + ".txt | grep -E 'Simulation complete' > output_simtime" + librarySuffix + ".txt;\n";
             command += "cp simulation_" + name + "/" + name + ".sdf ./" + name + librarySuffix + ".sdf\n";
         }
 
@@ -101,6 +107,8 @@ public class RemoteSimulation {
             parseSdf(librarySuffix);
         }
 
+        parseTotalPowerAndSimTime(librarySuffixes[0]);
+
         if (!this.keepTempDir) {
             FileHelper.deleteDirectory(tempDir);
         }
@@ -116,7 +124,7 @@ public class RemoteSimulation {
     }
 
     private void parseTBSuccess(String librarySuffix) {
-        File resultFile = new File(tempDir + "output" + librarySuffix + ".txt");
+        File resultFile = new File(tempDir + "output_tb" + librarySuffix + ".txt");
         String result = FileHelper.readTextFileToString(resultFile).split("\r\n|\r|\n")[0].trim();
         Matcher m = simulationResultSuccessPattern.matcher(result);
 
@@ -128,6 +136,27 @@ public class RemoteSimulation {
             logger.info("Simulation result (" + librarySuffix + "): " + result);
             remoteSimulationResult.addTestbenchSuccessTime(librarySuffix, 0);
         }
+    }
+
+    private void parseTotalPowerAndSimTime(String librarySuffix) {
+        File resultFilePower = new File(tempDir + "output_power" + librarySuffix + ".txt");
+        String resultPower = FileHelper.readTextFileToString(resultFilePower).split("\r\n|\r|\n")[0].trim();
+        Matcher mPower = totalPowerPattern.matcher(resultPower);
+        if (mPower.matches()) {
+            File resultFileSimTime = new File(tempDir + "output_simtime" + librarySuffix + ".txt");
+            String resultSimTime = FileHelper.readTextFileToString(resultFileSimTime).split("\r\n|\r|\n")[0].trim();
+            Matcher mSimTime = simulationTimePattern.matcher(resultSimTime);
+            if (mSimTime.matches()) {
+                double totalPower = Double.parseDouble(mPower.group(1));
+                int simTime = Integer.parseInt(mSimTime.group(2));
+                double energy = totalPower * simTime;
+                logger.info("Simulated total energy: " + energy);
+                remoteSimulationResult.setTotalEnergy(energy);
+                return;
+            }
+        }
+        logger.warn("No total energy from Simulation");
+        remoteSimulationResult.setTotalEnergy(0.0);
     }
 
     private void parseSdf(String librarySuffix) {

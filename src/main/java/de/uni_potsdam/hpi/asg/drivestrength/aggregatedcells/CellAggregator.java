@@ -14,7 +14,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCou
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin;
-import de.uni_potsdam.hpi.asg.drivestrength.cells.PowerContainer;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.OutpinPowerContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.PowerMatrix;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.TimingContainer;
 
@@ -233,7 +233,7 @@ public class CellAggregator {
 
     private double extractPowerValueFor(String pinName, Cell rawSize) {
         List<Double> powerValues = new ArrayList<>();
-        for (PowerContainer p : rawSize.getOutputPin().getPowerContainers()) {
+        for (OutpinPowerContainer p : rawSize.getOutputPin().getOutpinPowerContainers()) {
             if (!p.getRelatedPinName().equals(pinName)) continue;
             if (p.getRisePower() == null || p.getFallPower() == null) continue;
             double avgRisePower = this.extractPower(p.getRisePower());

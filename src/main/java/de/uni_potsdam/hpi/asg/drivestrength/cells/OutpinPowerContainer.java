@@ -1,11 +1,11 @@
 package de.uni_potsdam.hpi.asg.drivestrength.cells;
 
-public class PowerContainer {
+public class OutpinPowerContainer {
     private String relatedPinName;
     private PowerMatrix risePower;
     private PowerMatrix fallPower;
 
-    public PowerContainer() {
+    public OutpinPowerContainer() {
     }
 
     public PowerMatrix getRisePower() {

@@ -47,7 +47,7 @@ public class LibertyPinParser {
             List<List<String>> powerBlocks = new IndentBlockSeparator(statements, startPowerPattern).run();
 
             for (List<String> powerBlock : powerBlocks) {
-                this.pin.addPowerContainer(new LibertyPowerParser(powerBlock).run());
+                this.pin.addOutpinPowerContainer(new LibertyPowerParser(powerBlock).run());
             }
         }
 
