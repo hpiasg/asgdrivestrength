@@ -161,6 +161,10 @@ public class AggregatedCell {
         return this.sizePowerValues;
     }
 
+    public double getPowerFor(String sizeName, String pinName) {
+        return this.sizePowerValues.get(pinName).get(sizeName);
+    }
+
     public double getParasiticDelayForPin(String pinName) {
         return this.delayParameterTriples.get(pinName).getParasiticDelay();
     }
