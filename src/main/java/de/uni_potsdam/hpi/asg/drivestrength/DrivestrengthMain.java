@@ -32,6 +32,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistBundleSplitt
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.SelectForLoadOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
 
 public class DrivestrengthMain {
@@ -96,7 +97,7 @@ public class DrivestrengthMain {
 //        boolean clampToImplementableCapacitances = true;
 //        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new NeighborStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
-        //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
+        new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
         //new SimulatedAnnealingOptimizer(inlinedNetlist, 100).run();
         //new EqualDelayMatrixOptimizer(inlinedNetlist).run();
@@ -111,7 +112,7 @@ public class DrivestrengthMain {
 
         boolean remoteVerbose = false;
         boolean keepFiles = true;
-        new RemoteSimulation(options.getNetlistFile(), inlinedNetlist.toVerilog(), options.getRemoteConfigFile(),
+        new RemoteSimulation(inlinedNetlist, options.getRemoteConfigFile(),
                               outputPinCapacitance, keepFiles, remoteVerbose).run();
 
         return 0;

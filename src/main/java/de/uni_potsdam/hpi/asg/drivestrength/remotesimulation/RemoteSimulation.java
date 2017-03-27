@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 
 import de.uni_potsdam.hpi.asg.common.remote.RemoteInformation;
 import de.uni_potsdam.hpi.asg.drivestrength.delayfiles.DelayFileParser;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.util.FileHelper;
 import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 
@@ -30,7 +31,7 @@ public class RemoteSimulation {
     //Simulation complete via $finish(1) at time 77210 PS + 0
 
     private String name;
-    private String netlist;
+    private Netlist netlist;
     private File remoteConfigFile;
     private boolean keepTempDir;
     private boolean verbose;
@@ -38,15 +39,10 @@ public class RemoteSimulation {
     private String tempDir;
     private RemoteSimulationResult remoteSimulationResult;
 
-    public RemoteSimulation(File netlistfile, String netlist, File remoteConfigFile,
+    public RemoteSimulation(Netlist netlist, File remoteConfigFile,
             double outputPinCapacitance, boolean keepTempDir, boolean verbose) {
-        this(FileHelper.basename(netlistfile.getName()), netlist, remoteConfigFile, outputPinCapacitance, keepTempDir, verbose);
-    }
-
-    public RemoteSimulation(String netlistName, String netlist, File remoteConfigFile,
-            double outputPinCapacitance, boolean keepTempDir, boolean verbose) {
-        this.name = netlistName;
         this.netlist = netlist;
+        this.name = netlist.getName();
         this.remoteConfigFile = remoteConfigFile;
         this.outputPinCapacitance = outputPinCapacitance;
         this.keepTempDir = keepTempDir;
@@ -77,7 +73,7 @@ public class RemoteSimulation {
         List<String> filesToExecute = new ArrayList<>();
 
         String netlistFilename = tempDir + name + ".v";
-        FileHelper.writeStringToTextFile(netlist, netlistFilename);
+        FileHelper.writeStringToTextFile(netlist.toVerilog(), netlistFilename);
         filesToMove.add(netlistFilename);
 
         String commandFilename = tempDir + name + ".sh";

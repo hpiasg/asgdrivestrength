@@ -24,34 +24,34 @@ public class Signal {
         }
         return zeroInstance;
     }
-    
+
     public static Signal getOneInstance() {
         if (oneInstance == null) {
             oneInstance = new Signal("1'b1", Direction.constant, 1);
         }
         return oneInstance;
     }
-    
+
     public static boolean isConstantName(String signalName) {
         return signalName.equals("0") || signalName.equals("1") || signalName.equals("1'b0") || signalName.equals("1'b1");
     }
-    
+
     public Signal(String name, Direction direction, int width) {
         this.direction = direction;
         this.name = name;
         this.width = width;
     }
-    
+
     public Signal(Signal signalToCopy) {
         this.direction = signalToCopy.getDirection();
         this.name = signalToCopy.getName();
         this.width = signalToCopy.getWidth();
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public void setName(String newName) {
     	this.name = newName;
     }
@@ -59,7 +59,7 @@ public class Signal {
     public int getWidth() {
         return width;
     }
-    
+
     public boolean isBundle() {
         return width > 1;
     }
@@ -68,28 +68,9 @@ public class Signal {
     public String toString() {
         return name + ":" + direction + ",width:" + width;
     }
-    
+
     public String toVerilog() {
-        String directionString = "";
-        switch (this.direction) {
-            case input:
-                directionString = "input";
-                break;
-            case output:
-                directionString = "output";
-                break;
-            case wire:
-                directionString = "wire";
-                break;
-            case supply0:
-                directionString = "supply0";
-                break;
-            case supply1:
-                directionString = "supply1";
-                break;
-            default:
-                throw new Error("Trying to serialize Signal with unknown direction type: " + directionString);
-        }
+        String directionString = this.direction.toString();
         String bundleString = "";
         if (width > 1) {
             bundleString = " [" + Integer.toString(width - 1) + ":0]";
@@ -100,15 +81,15 @@ public class Signal {
     public Direction getDirection() {
         return direction;
     }
-    
+
     public boolean isIOSignal() {
     	return (direction == Direction.input || direction == Direction.output);
     }
-    
+
     public boolean isWire() {
         return (direction == Direction.wire);
     }
-    
+
     public boolean isConstant() {
         return (direction == Direction.constant);
     }

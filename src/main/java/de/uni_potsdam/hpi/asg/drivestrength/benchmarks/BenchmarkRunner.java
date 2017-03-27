@@ -144,9 +144,8 @@ public class BenchmarkRunner {
 
             int estimatedDelay = new DelayEstimator(optimizer.getNetlist(), false, false).run();
 
-            RemoteSimulation rs = new RemoteSimulation(optimizer.getNetlist().getName(),
-                                           optimizer.getNetlist().toVerilog(), this.remoteConfigFile,
-                                           outputC, false, false);
+            RemoteSimulation rs = new RemoteSimulation(optimizer.getNetlist(), this.remoteConfigFile,
+                                                       outputC, false, false);
             rs.run();
             RemoteSimulationResult rsResult = rs.getResult();
 
