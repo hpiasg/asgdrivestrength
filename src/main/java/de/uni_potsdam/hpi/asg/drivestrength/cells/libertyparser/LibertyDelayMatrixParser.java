@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix7x7;
 
 public class LibertyDelayMatrixParser {
     private static final Pattern matrixTypePattern = Pattern.compile("^(\\s*)(.*)\\s*\\((.*)\\)\\s*$");
@@ -13,14 +13,14 @@ public class LibertyDelayMatrixParser {
     private static final Pattern delayValuesPattern = Pattern.compile("^(\\s*)values\\s*\\((.*)\\);\\s*$");
 
     private List<String> statements;
-    private DelayMatrix delayMatrix;
+    private DelayMatrix7x7 delayMatrix;
 
     public LibertyDelayMatrixParser(List<String> statements) {
         this.statements = statements;
     }
 
-    public DelayMatrix run() {
-        this.delayMatrix = new DelayMatrix();
+    public DelayMatrix7x7 run() {
+        this.delayMatrix = new DelayMatrix7x7();
 
         this.assertCorrectTemplateFormat();
 

@@ -3,13 +3,13 @@ package de.uni_potsdam.hpi.asg.drivestrength.cells;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PowerMatrix {
+public class PowerMatrix7x7 {
 
         private List<Double> loadCapacitanceSamples;
         private List<Double> inputSlewSamples;
         private List<Double> powerValues;
 
-        public PowerMatrix() {
+        public PowerMatrix7x7() {
             this.loadCapacitanceSamples = new ArrayList<Double>();
             this.inputSlewSamples = new ArrayList<Double>();
             this.powerValues = new ArrayList<Double>();

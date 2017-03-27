@@ -7,9 +7,9 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.uni_potsdam.hpi.asg.drivestrength.cells.PowerMatrix;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.PowerMatrix7x7;
 
-public class LibertyPowerMatrixParser {
+public class LibertyPowerMatrix7x7Parser {
 
     protected static final Logger logger = LogManager.getLogger();
 
@@ -19,14 +19,14 @@ public class LibertyPowerMatrixParser {
     private static final Pattern powerValuesPattern = Pattern.compile("^(\\s*)values\\s*\\((.*)\\);\\s*$");
 
     private List<String> statements;
-    private PowerMatrix powerMatrix;
+    private PowerMatrix7x7 powerMatrix;
 
-    public LibertyPowerMatrixParser(List<String> statements) {
+    public LibertyPowerMatrix7x7Parser(List<String> statements) {
         this.statements = statements;
     }
 
-    public PowerMatrix run() {
-        this.powerMatrix = new PowerMatrix();
+    public PowerMatrix7x7 run() {
+        this.powerMatrix = new PowerMatrix7x7();
 
         this.testCorrectTemplateFormat();
 

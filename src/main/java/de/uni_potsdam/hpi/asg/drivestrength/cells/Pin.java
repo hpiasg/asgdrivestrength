@@ -13,12 +13,14 @@ public class Pin {
     private double capacitance;
     private final List<TimingContainer> timings;
     private final List<OutpinPowerContainer> outpinPowerContainers;
+    private final List<InpinPowerContainer> inpinPowerContainers;
     private boolean isClockPin;
 
 
     public Pin() {
         this.timings = new ArrayList<>();
         this.outpinPowerContainers = new ArrayList<>();
+        this.inpinPowerContainers = new ArrayList<>();
         this.isClockPin = false;
     }
 
@@ -34,8 +36,16 @@ public class Pin {
         return this.outpinPowerContainers;
     }
 
+    public List<InpinPowerContainer> getInpinPowerContainers() {
+        return this.inpinPowerContainers;
+    }
+
     public void addOutpinPowerContainer(OutpinPowerContainer outpinPowerContainer) {
         this.outpinPowerContainers.add(outpinPowerContainer);
+    }
+
+    public void addInpinPowerContainer(InpinPowerContainer inpinPowerContainer) {
+        this.inpinPowerContainers.add(inpinPowerContainer);
     }
 
     public double getCapacitance() {
@@ -56,6 +66,11 @@ public class Pin {
 
     public boolean hasOutpinPowerContainers() {
         return (this.outpinPowerContainers != null && this.outpinPowerContainers.size() > 0);
+    }
+
+
+    public boolean hasInpinPowerContainers() {
+        return (this.inpinPowerContainers != null && this.inpinPowerContainers.size() > 0);
     }
 
     public void setName(String name) {

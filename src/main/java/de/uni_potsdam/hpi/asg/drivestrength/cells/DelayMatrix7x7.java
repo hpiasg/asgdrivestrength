@@ -3,12 +3,12 @@ package de.uni_potsdam.hpi.asg.drivestrength.cells;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DelayMatrix {
+public class DelayMatrix7x7 {
     private List<Double> loadCapacitanceSamples;
     private List<Double> inputSlewSamples;
     private List<Double> delayValues;
     
-    public DelayMatrix() {
+    public DelayMatrix7x7() {
         this.loadCapacitanceSamples = new ArrayList<Double>();
         this.inputSlewSamples = new ArrayList<Double>();
         this.delayValues = new ArrayList<Double>();

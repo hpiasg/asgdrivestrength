@@ -12,10 +12,10 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.Default
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.OrderedSizesContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
-import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix7x7;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.OutpinPowerContainer;
-import de.uni_potsdam.hpi.asg.drivestrength.cells.PowerMatrix;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.PowerMatrix7x7;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.TimingContainer;
 
 public class CellAggregator {
@@ -178,7 +178,7 @@ public class CellAggregator {
         return DelayLine.averageFrom(delayLines);
     }
 
-    private DelayLine extractDelayLine(DelayMatrix delayMatrix, double inputCapacitance) {
+    private DelayLine extractDelayLine(DelayMatrix7x7 delayMatrix, double inputCapacitance) {
         List<DelayPoint> delayPoints = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
             double loadCapacitance = delayMatrix.getLoadCapacitanceAt(i);
@@ -243,7 +243,7 @@ public class CellAggregator {
         return avgDobuleList(powerValues);
     }
 
-    private double extractPower(PowerMatrix powerMatrix) {
+    private double extractPower(PowerMatrix7x7 powerMatrix) {
         double sum = 0.0;
         double size = 7;
         for (int i = 0; i < size; i++) {
