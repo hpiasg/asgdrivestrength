@@ -8,7 +8,7 @@ public class PowerContainer {
     public PowerContainer() {
     }
 
-    public PowerMatrix getRiseDelays() {
+    public PowerMatrix getRisePower() {
         return risePower;
     }
 
@@ -16,7 +16,7 @@ public class PowerContainer {
         this.risePower = risePower;
     }
 
-    public PowerMatrix getFallDelays() {
+    public PowerMatrix getFallPower() {
         return fallPower;
     }
 

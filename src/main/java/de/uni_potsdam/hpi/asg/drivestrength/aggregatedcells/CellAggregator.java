@@ -14,6 +14,8 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCou
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.PowerContainer;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.PowerMatrix;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.TimingContainer;
 
 public class CellAggregator {
@@ -64,6 +66,8 @@ public class CellAggregator {
 
             aggregatedCell.setSizeDelayLines(this.extractDelayLinesFor(rawSizes, aggregatedCell.getInputPinNames(),
                                                                        aggregatedCell.getSizeCapacitances()));
+
+            aggregatedCell.setSizePowerValues(this.extractPowerValuesFor(rawSizes, aggregatedCell.getInputPinNames()));
 
             Map<String, Integer> stageCountsPerPin = this.stageCounts.getFootprintDefaults().get(aggregatedCell.getName());
             aggregatedCell.setDelayParameterTriples(this.extractDelayParameters(aggregatedCell.getSizeDelayLines(), stageCountsPerPin));;
@@ -210,5 +214,49 @@ public class CellAggregator {
             }
         }
         return filtered;
+    }
+
+    private Map<String, Map<String, Double>> extractPowerValuesFor(List<Cell> rawSizes, List<String> pinNames) {
+        Map<String, Map<String, Double>> powerPerPinPerSize = new HashMap<>();
+
+        for (String pinName : pinNames) {
+            powerPerPinPerSize.put(pinName, new HashMap<String, Double>());
+            for (Cell rawSize : rawSizes) {
+                String sizeName = rawSize.getName();
+                double powerValue = this.extractPowerValueFor(pinName, rawSize);
+                powerPerPinPerSize.get(pinName).put(sizeName, powerValue);
+            }
+        }
+
+        return powerPerPinPerSize;
+    }
+
+    private double extractPowerValueFor(String pinName, Cell rawSize) {
+        List<Double> powerValues = new ArrayList<>();
+        for (PowerContainer p : rawSize.getOutputPin().getPowerContainers()) {
+            if (!p.getRelatedPinName().equals(pinName)) continue;
+            if (p.getRisePower() == null || p.getFallPower() == null) continue;
+            double avgRisePower = this.extractPower(p.getRisePower());
+            double avgFallPower = this.extractPower(p.getFallPower());
+            powerValues.add((avgRisePower + avgFallPower)/2);
+        }
+        return avgDobuleList(powerValues);
+    }
+
+    private double extractPower(PowerMatrix powerMatrix) {
+        double sum = 0.0;
+        double size = 7;
+        for (int i = 0; i < size; i++) {
+            sum += powerMatrix.getPowerAt(this.inputSlewIndex, i);
+        }
+        return sum /= size;
+    }
+
+    private double avgDobuleList(List<Double> aListOfDouble) {
+        double sum = 0;
+        for (double d : aListOfDouble) {
+            sum += d;
+        }
+        return sum / aListOfDouble.size();
     }
 }
