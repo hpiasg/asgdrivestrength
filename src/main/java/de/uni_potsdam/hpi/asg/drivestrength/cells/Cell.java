@@ -78,6 +78,15 @@ public class Cell {
 	    return false;
 	}
 
+    public Pin getPinByName(String pinName) {
+        for (Pin pin : this.pins) {
+            if (pin.getName().equals(pinName)) {
+                return pin;
+            }
+        }
+        throw new Error("Cell " + this.getName() + " does not have pin with name " + pinName);
+    }
+
     public double getCapacitanceForPin(String pinName) {
         for (Pin pin : this.pins) {
             if (pin.getName().equals(pinName)) {

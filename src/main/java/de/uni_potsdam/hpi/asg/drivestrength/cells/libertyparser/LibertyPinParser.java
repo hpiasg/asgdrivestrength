@@ -51,7 +51,7 @@ public class LibertyPinParser {
             }
         }
 
-        if (this.pin.getDirection() == Direction.inout) {
+        if (this.pin.getDirection() == Direction.input) {
             List<List<String>> powerBlocks = new IndentBlockSeparator(statements, startPowerPattern).run();
             for (List<String> powerBlock : powerBlocks) {
                 this.pin.addInpinPowerContainer(new LibertyInpinPowerParser(powerBlock).run());

@@ -13,8 +13,9 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.Ordered
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix7x7;
-import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.InpinPowerContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.OutpinPowerContainer;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.PowerMatrix7x7;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.TimingContainer;
 
@@ -223,33 +224,49 @@ public class CellAggregator {
             powerPerPinPerSize.put(pinName, new HashMap<String, Double>());
             for (Cell rawSize : rawSizes) {
                 String sizeName = rawSize.getName();
-                double powerValue = this.extractPowerValueFor(pinName, rawSize);
-                powerPerPinPerSize.get(pinName).put(sizeName, powerValue);
+                double outpinPowerValue = this.extractOutpinPowerValueFor(pinName, rawSize);
+                double inpinPowervalue = this.extractInpinPowerValue(pinName, rawSize);
+                powerPerPinPerSize.get(pinName).put(sizeName, outpinPowerValue + inpinPowervalue);
             }
         }
 
         return powerPerPinPerSize;
     }
 
-    private double extractPowerValueFor(String pinName, Cell rawSize) {
+    private double extractOutpinPowerValueFor(String pinName, Cell rawSize) {
         List<Double> powerValues = new ArrayList<>();
         for (OutpinPowerContainer p : rawSize.getOutputPin().getOutpinPowerContainers()) {
             if (!p.getRelatedPinName().equals(pinName)) continue;
             if (p.getRisePower() == null || p.getFallPower() == null) continue;
-            double avgRisePower = this.extractPower(p.getRisePower());
-            double avgFallPower = this.extractPower(p.getFallPower());
+            double avgRisePower = this.extractOutpinPower(p.getRisePower());
+            double avgFallPower = this.extractOutpinPower(p.getFallPower());
             powerValues.add((avgRisePower + avgFallPower)/2);
         }
         return avgDobuleList(powerValues);
     }
 
-    private double extractPower(PowerMatrix7x7 powerMatrix) {
+    private double extractOutpinPower(PowerMatrix7x7 powerMatrix) {
         double sum = 0.0;
         double size = 7;
         for (int i = 0; i < size; i++) {
             sum += powerMatrix.getPowerAt(this.inputSlewIndex, i);
         }
         return sum /= size;
+    }
+
+    private double extractInpinPowerValue(String pinName, Cell rawSize) {
+        List<Double> powerValues = new ArrayList<>();
+        List<InpinPowerContainer> inpinPowerContainers = rawSize.getPinByName(pinName).getInpinPowerContainers();
+        if (inpinPowerContainers.size() == 0) {
+            return 0;
+        }
+        for (InpinPowerContainer p : inpinPowerContainers) {
+            if (p.getRisePower() == null || p.getFallPower() == null) continue;
+            double risePower = p.getRisePower().getPowerAt(this.inputSlewIndex);
+            double fallPower = p.getFallPower().getPowerAt(this.inputSlewIndex);
+            powerValues.add((risePower + fallPower) / 2);
+        }
+        return avgDobuleList(powerValues);
     }
 
     private double avgDobuleList(List<Double> aListOfDouble) {
