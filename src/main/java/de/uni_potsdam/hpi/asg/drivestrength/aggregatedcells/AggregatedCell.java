@@ -18,6 +18,7 @@ public class AggregatedCell {
     private Map<String, Map<String, Double>> monotonizedSizeCapacitances; // pin->size->value
     private Map<String, DelayParameterTriple> delayParameterTriples; //pin->triple
     private Map<String, Map<String, DelayLine>> sizeDelayLines; //pin->size->value
+    private Map<String, Map<String, Double>> sizePowerValues; //pin->size->value
     private List<String> orderedPinNames;
     private List<String> inputPinNames;
     private String outputPinName;
@@ -148,8 +149,20 @@ public class AggregatedCell {
         this.sizeDelayLines = sizeDelayLines;
     }
 
+	public void setSizePowerValues(Map<String, Map<String, Double>> sizePowerValues) {
+	    this.sizePowerValues = sizePowerValues;
+	}
+
     public Map<String, Map<String, DelayLine>> getSizeDelayLines() {
         return sizeDelayLines;
+    }
+
+    public Map<String, Map<String, Double>> getSizePowerValues() {
+        return this.sizePowerValues;
+    }
+
+    public double getPowerFor(String sizeName, String pinName) {
+        return this.sizePowerValues.get(pinName).get(sizeName);
     }
 
     public double getParasiticDelayForPin(String pinName) {

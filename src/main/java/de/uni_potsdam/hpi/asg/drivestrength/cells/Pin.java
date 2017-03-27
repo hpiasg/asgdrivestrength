@@ -11,22 +11,41 @@ public class Pin {
     private String name;
     private Direction direction;
     private double capacitance;
-    private final List<Timing> timings;
+    private final List<TimingContainer> timings;
+    private final List<OutpinPowerContainer> outpinPowerContainers;
+    private final List<InpinPowerContainer> inpinPowerContainers;
     private boolean isClockPin;
-    
+
 
     public Pin() {
         this.timings = new ArrayList<>();
+        this.outpinPowerContainers = new ArrayList<>();
+        this.inpinPowerContainers = new ArrayList<>();
         this.isClockPin = false;
     }
-    
-    
-    public List<Timing> getTimings() {
+
+    public List<TimingContainer> getTimings() {
         return timings;
     }
-    
-    public void addTiming(Timing timing) {
+
+    public void addTiming(TimingContainer timing) {
         this.timings.add(timing);
+    }
+
+    public List<OutpinPowerContainer> getOutpinPowerContainers() {
+        return this.outpinPowerContainers;
+    }
+
+    public List<InpinPowerContainer> getInpinPowerContainers() {
+        return this.inpinPowerContainers;
+    }
+
+    public void addOutpinPowerContainer(OutpinPowerContainer outpinPowerContainer) {
+        this.outpinPowerContainers.add(outpinPowerContainer);
+    }
+
+    public void addInpinPowerContainer(InpinPowerContainer inpinPowerContainer) {
+        this.inpinPowerContainers.add(inpinPowerContainer);
     }
 
     public double getCapacitance() {
@@ -36,19 +55,28 @@ public class Pin {
     public void setCapacitance(double capacitance) {
         this.capacitance = capacitance;
     }
-    
+
     public void markAsClockPin() {
     	this.isClockPin = true;
     }
-    
+
     public boolean hasTimings() {
         return (this.timings != null && this.timings.size() > 0);
     }
-    
+
+    public boolean hasOutpinPowerContainers() {
+        return (this.outpinPowerContainers != null && this.outpinPowerContainers.size() > 0);
+    }
+
+
+    public boolean hasInpinPowerContainers() {
+        return (this.inpinPowerContainers != null && this.inpinPowerContainers.size() > 0);
+    }
+
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public Direction getDirection() {
         return direction;
     }
@@ -65,6 +93,6 @@ public class Pin {
 	public boolean isClockPin() {
 		return isClockPin;
 	}
-    
-    
+
+
 }

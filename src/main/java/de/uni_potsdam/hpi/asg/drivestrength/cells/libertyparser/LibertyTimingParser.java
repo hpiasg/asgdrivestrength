@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uni_potsdam.hpi.asg.drivestrength.cells.Timing;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.TimingContainer;
 
 public class LibertyTimingParser {
 
@@ -18,8 +18,8 @@ public class LibertyTimingParser {
         this.statements = statements;
     }
     
-    public Timing run() {
-        Timing timing = new Timing();
+    public TimingContainer run() {
+        TimingContainer timing = new TimingContainer();
 
         for (String statement : statements) {
             Matcher m = relatedPinPattern.matcher(statement);

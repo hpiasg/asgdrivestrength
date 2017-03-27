@@ -63,7 +63,7 @@ public class DelayEstimator {
         return cellInstance.getInputPinSelectedCapacitance(pinName);
     }
 
-    private double estimateDelay(CellInstance cellInstance, String pinName, double loadCapacitance) {
+    public double estimateDelay(CellInstance cellInstance, String pinName, double loadCapacitance) {
         double inputCapacitance = this.findOwnInputCapacitance(cellInstance, pinName);
         double electricalEffort = loadCapacitance / inputCapacitance;
         int stageCount = cellInstance.getDefinition().getStageCountForPin(pinName);
