@@ -146,12 +146,12 @@ public class RemoteSimulation {
                 double totalPower = Double.parseDouble(mPower.group(1));
                 int simTime = Integer.parseInt(mSimTime.group(2));
                 double energy = totalPower * simTime;
-                logger.info("Simulated total energy: " + energy);
+                logger.info("Testbench total energy: " + energy);
                 remoteSimulationResult.setTotalEnergy(energy);
                 return;
             }
         }
-        logger.warn("No total energy from Simulation");
+        logger.warn("No total energy from testbench Simulation");
         remoteSimulationResult.setTotalEnergy(0.0);
     }
 
