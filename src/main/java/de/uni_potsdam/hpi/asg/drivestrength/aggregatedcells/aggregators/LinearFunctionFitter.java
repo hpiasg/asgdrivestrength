@@ -1,8 +1,11 @@
-package de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells;
+package de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.aggregators;
 
 import java.util.List;
 
 import org.apache.commons.math3.stat.regression.SimpleRegression;
+
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.DelayLine;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.DelayPoint;
 
 public class LinearFunctionFitter {
     SimpleRegression apacheSimpleRegression;

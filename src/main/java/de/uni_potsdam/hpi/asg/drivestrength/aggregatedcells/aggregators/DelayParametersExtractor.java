@@ -1,10 +1,14 @@
-package de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells;
+package de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.aggregators;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.DelayLine;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.DelayParameterTriple;
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.DelayPoint;
 
 public class DelayParametersExtractor {
     private List<DelayLine> delayLines;
