@@ -37,6 +37,7 @@ public class RemoteSimulation {
     private boolean verbose;
     private double outputPinCapacitance;
     private String tempDir;
+    private String date;
     private RemoteSimulationResult remoteSimulationResult;
 
     public RemoteSimulation(Netlist netlist, File remoteConfigFile,
@@ -54,20 +55,12 @@ public class RemoteSimulation {
             logger.info("Skipping Remote Simulation (no remoteConfig file specified)");
             return;
         }
-
         logger.info("Starting remote simulation, with testbench " + this.name + "...");
-
-        this.remoteSimulationResult = new RemoteSimulationResult();
 
         String[] librarySuffixes = {"_orig", "_noslew", "_noslew_nowire"};
 
-        String date = date();
-        tempDir = "tmp/" + date + "/";
-        new File(tempDir).mkdir();
-
-        String json = FileHelper.readTextFileToString(remoteConfigFile);
-        RemoteInformation remoteInfo = new Gson().fromJson(json, RemoteConfig.class).asRemoteInformation();
-
+        setupDate();
+        setupTempDir();
 
         Set<String> filesToMove = new HashSet<>();
         List<String> filesToExecute = new ArrayList<>();
@@ -77,26 +70,13 @@ public class RemoteSimulation {
         filesToMove.add(netlistFilename);
 
         String commandFilename = tempDir + name + ".sh";
-        String command = "";
-        for (String librarySuffix : librarySuffixes) {
-            command += "selectLibrary " + librarySuffix + "\n";
-            command += "simulate " + name + ".v " + name + " " + outputPinCapacitance + " > output_full" + librarySuffix + ".txt;\n";
-            command += "cat output_full" + librarySuffix + ".txt | grep -E 'ERROR|SUCCESS' > output_tb" + librarySuffix + ".txt;\n";
-            command += "cat output_full" + librarySuffix + ".txt | grep -E 'Total Power' > output_power" + librarySuffix + ".txt;\n";
-            command += "cat output_full" + librarySuffix + ".txt | grep -E 'Simulation complete' > output_simtime" + librarySuffix + ".txt;\n";
-            command += "cp simulation_" + name + "/" + name + ".sdf ./" + name + librarySuffix + ".sdf\n";
-        }
-
-        FileHelper.writeStringToTextFile(command, commandFilename);
+        FileHelper.writeStringToTextFile(buildSimulationCommand(librarySuffixes), commandFilename);
         filesToMove.add(commandFilename);
         filesToExecute.add(name + ".sh");
 
-        SimulationRemoteOperationWorkflow workFlow = new SimulationRemoteOperationWorkflow(remoteInfo, name + "_" + date);
-        boolean success = workFlow.run(filesToMove, filesToExecute, tempDir, true);
-        if (!success) {
-            FileHelper.deleteDirectory(tempDir);
-            throw new Error("Remote Simulation failed");
-        }
+        runWorkflow(filesToMove, filesToExecute);
+
+        this.remoteSimulationResult = new RemoteSimulationResult();
 
         for (String librarySuffix : librarySuffixes) {
             parseTBSuccess(librarySuffix);
@@ -114,9 +94,39 @@ public class RemoteSimulation {
         return this.remoteSimulationResult;
     }
 
-    private String date() {
+    private String buildSimulationCommand(String[] librarySuffixes) {
+        String command = "";
+        for (String librarySuffix : librarySuffixes) {
+            command += "selectLibrary " + librarySuffix + "\n";
+            command += "simulate " + name + ".v " + name + " " + outputPinCapacitance + " > output_full" + librarySuffix + ".txt;\n";
+            command += "cat output_full" + librarySuffix + ".txt | grep -E 'ERROR|SUCCESS' > output_tb" + librarySuffix + ".txt;\n";
+            command += "cat output_full" + librarySuffix + ".txt | grep -E 'Total Power' > output_power" + librarySuffix + ".txt;\n";
+            command += "cat output_full" + librarySuffix + ".txt | grep -E 'Simulation complete' > output_simtime" + librarySuffix + ".txt;\n";
+            command += "cp simulation_" + name + "/" + name + ".sdf ./" + name + librarySuffix + ".sdf\n";
+        }
+        return command;
+    }
+
+    private void setupDate() {
         DateFormat dfmt = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-        return dfmt.format(new Date());
+        this.date = dfmt.format(new Date());
+    }
+
+    private void setupTempDir() {
+        tempDir = "tmp/" + this.date + "/";
+        new File(tempDir).mkdir();
+    }
+
+    private void runWorkflow(Set<String> filesToMove, List<String> filesToExecute) {
+        String json = FileHelper.readTextFileToString(remoteConfigFile);
+        RemoteInformation remoteInfo = new Gson().fromJson(json, RemoteConfig.class).asRemoteInformation();
+
+        SimulationRemoteOperationWorkflow workFlow = new SimulationRemoteOperationWorkflow(remoteInfo, name + "_" + this.date);
+        boolean success = workFlow.run(filesToMove, filesToExecute, tempDir, true);
+        if (!success) {
+            FileHelper.deleteDirectory(tempDir);
+            throw new Error("Remote Simulation failed");
+        }
     }
 
     private void parseTBSuccess(String librarySuffix) {
