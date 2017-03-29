@@ -6,7 +6,7 @@ import java.util.Map;
 public class RemoteSimulationResult {
     private Map<String, Integer> testbenchSuccessTimes; //librarySuffix -> value
     private Map<String, Integer> sdfDelaySums; //librarySuffix -> value
-    private double totalEnergy;
+    private double testbenchEnergy;
 
     public RemoteSimulationResult() {
         testbenchSuccessTimes = new HashMap<>();
@@ -21,8 +21,8 @@ public class RemoteSimulationResult {
         sdfDelaySums.put(librarySuffix, sdfDelaySum);
     }
 
-    public void setTotalEnergy(double totalPowerValue) {
-        this.totalEnergy = totalPowerValue;
+    public void setTestbenchEnergy(double testbenchEnergyValue) {
+        this.testbenchEnergy = testbenchEnergyValue;
     }
 
     public Map<String, Integer> getTestbenchSuccessTimes() {
@@ -41,8 +41,8 @@ public class RemoteSimulationResult {
         return this.testbenchSuccessTimes.get(librarySuffix);
     }
 
-    public double getTotalEnergy() {
-        return totalEnergy;
+    public double getTestbenchEnergy() {
+        return testbenchEnergy;
     }
 
     public String toString() {

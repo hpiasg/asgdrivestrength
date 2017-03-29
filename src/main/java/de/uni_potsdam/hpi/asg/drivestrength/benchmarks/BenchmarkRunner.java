@@ -16,6 +16,7 @@ import java.util.Map;
 
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.EnergyEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.InputDrivenAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.LoadGraphAnnotator;
@@ -143,6 +144,7 @@ public class BenchmarkRunner {
             optimizer.run();
 
             int estimatedDelay = new DelayEstimator(optimizer.getNetlist(), false, false).run();
+            double estimatedEnergy = new EnergyEstimator(optimizer.getNetlist(), false).run();
 
             RemoteSimulation rs = new RemoteSimulation(optimizer.getNetlist(), this.remoteConfigFile,
                                                        outputC, false, false);
@@ -160,7 +162,9 @@ public class BenchmarkRunner {
             benchmarkOutput += rsResult.getSdfDelaySum("_noslew_nowire") + ",";
             benchmarkOutput += rsResult.getTestbenchSuccessTime("_orig") + ",";
             benchmarkOutput += rsResult.getTestbenchSuccessTime("_noslew") + ",";
-            benchmarkOutput += rsResult.getTestbenchSuccessTime("_noslew_nowire");
+            benchmarkOutput += rsResult.getTestbenchSuccessTime("_noslew_nowire") + ",";
+            benchmarkOutput += estimatedEnergy + ",";
+            benchmarkOutput += rsResult.getTestbenchEnergy();
 
             PrintWriter fileOut = new PrintWriter(new BufferedWriter(new FileWriter(outFileName, true)));
             fileOut.println(benchmarkOutput);

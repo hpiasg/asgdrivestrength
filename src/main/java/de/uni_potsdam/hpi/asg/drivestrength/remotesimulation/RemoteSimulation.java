@@ -157,12 +157,12 @@ public class RemoteSimulation {
                 int simTime = Integer.parseInt(mSimTime.group(2));
                 double energy = totalPower * simTime;
                 logger.info("Testbench total energy: " + energy);
-                remoteSimulationResult.setTotalEnergy(energy);
+                remoteSimulationResult.setTestbenchEnergy(energy);
                 return;
             }
         }
         logger.warn("No total energy from testbench Simulation");
-        remoteSimulationResult.setTotalEnergy(0.0);
+        remoteSimulationResult.setTestbenchEnergy(0.0);
     }
 
     private void parseSdf(String librarySuffix) {

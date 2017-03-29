@@ -37,7 +37,7 @@ public class EnergyEstimator {
                 double energy = delay * transitionPower;
                 sum += energy;
                 if (verbose) {
-                    System.out.println("Energy for " + cellInstance.getDefinitionName() + " "
+                    logger.info("Energy for " + cellInstance.getDefinitionName() + " "
                                        + cellInstance.getName() + " " + pinName + ": " + energy);
                 }
             }
