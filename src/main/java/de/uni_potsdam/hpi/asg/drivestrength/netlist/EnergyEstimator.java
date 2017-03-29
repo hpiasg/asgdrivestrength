@@ -32,7 +32,7 @@ public class EnergyEstimator {
         for (CellInstance cellInstance : this.netlist.getRootModule().getCellInstances()) {
             for (String pinName : cellInstance.getInputPinNames()) {
                 double loadCapacitance = cellInstance.getLoadCapacitanceSelected();
-                double delay = this.delayEstimator.estimateDelay(cellInstance, pinName, loadCapacitance);
+                double delay = this.delayEstimator.estimateDelayFromRawDelayLines(cellInstance, pinName, loadCapacitance);
                 double transitionPower = this.powerEstimator.estimatePower(cellInstance, pinName);
                 double energy = delay * transitionPower;
                 sum += energy;

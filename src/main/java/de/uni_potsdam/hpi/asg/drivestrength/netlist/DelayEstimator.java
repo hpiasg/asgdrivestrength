@@ -36,7 +36,7 @@ public class DelayEstimator {
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
             double loadCapacitance = this.findLoadCapacitance(c);
             for (String pinName : c.getInputPinNames()) {
-                double estimatedDelay = estimateDelayRaw(c, pinName, loadCapacitance) * 1000;
+                double estimatedDelay = estimateDelay(c, pinName, loadCapacitance) * 1000;
                 sum += estimatedDelay;
                 count++;
                 if (verbose) {
@@ -64,7 +64,14 @@ public class DelayEstimator {
         return cellInstance.getInputPinSelectedCapacitance(pinName);
     }
 
-    public double estimateDelay(CellInstance cellInstance, String pinName, double loadCapacitance) {
+    private double estimateDelay(CellInstance cellInstance, String pinName, double loadCapacitance) {
+        if (this.useTheoreticalLoad) {
+            return this.estimateDelayFromAggregatedDelayParams(cellInstance, pinName, loadCapacitance);
+        }
+        return this.estimateDelayFromRawDelayLines(cellInstance, pinName, loadCapacitance);
+    }
+
+    public double estimateDelayFromAggregatedDelayParams(CellInstance cellInstance, String pinName, double loadCapacitance) {
         double inputCapacitance = this.findOwnInputCapacitance(cellInstance, pinName);
         double electricalEffort = loadCapacitance / inputCapacitance;
         int stageCount = cellInstance.getDefinition().getStageCountForPin(pinName);
@@ -79,7 +86,7 @@ public class DelayEstimator {
         return stageCount * Math.pow(logicalEffort * electricalEffort, 1.0 / stageCount) + parasiticDelay;
     }
 
-    public double estimateDelayRaw(CellInstance cellInstance, String pinName, double loadCapacitance) {
+    public double estimateDelayFromRawDelayLines(CellInstance cellInstance, String pinName, double loadCapacitance) {
         double inputCapacitance = this.findOwnInputCapacitance(cellInstance, pinName);
         double electricalEffort = loadCapacitance / inputCapacitance;
         DelayLine delayLine = cellInstance.getDefinition().getSizeDelayLines().get(pinName).get(cellInstance.getSelectedSize().getName());
