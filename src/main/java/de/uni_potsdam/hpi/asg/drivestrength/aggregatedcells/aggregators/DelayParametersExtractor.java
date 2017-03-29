@@ -73,7 +73,7 @@ public class DelayParametersExtractor {
         double rightmostIntersectionX = intersections.get(intersections.size() - 1).getX();
         double deltaX = rightmostIntersectionX - intersections.get(intersections.size() - 2).getX();
         double newPointX = rightmostIntersectionX + deltaX;
-        intersections.add(new DelayPoint(newPointX, delayLines.get(delayLines.size() - 1).valueAtX(newPointX)));
+        intersections.add(new DelayPoint(newPointX, delayLines.get(delayLines.size() - 1).getValueAtX(newPointX)));
         
         return intersections;
     }

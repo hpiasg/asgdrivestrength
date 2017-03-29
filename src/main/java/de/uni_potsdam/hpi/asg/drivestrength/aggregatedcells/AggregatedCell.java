@@ -216,7 +216,7 @@ public class AggregatedCell {
             for (String pinName : this.inputPinNames) {
                 double inputCapacitance = this.sizeCapacitances.get(pinName).get(c.getName());
                 double electricalEffort = loadCapacitance / inputCapacitance;
-                double delay = this.sizeDelayLines.get(pinName).get(c.getName()).valueAtX(electricalEffort);
+                double delay = this.sizeDelayLines.get(pinName).get(c.getName()).getValueAtX(electricalEffort);
                 delaySum += delay;
                 delayCount++;
             }

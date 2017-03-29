@@ -3,6 +3,7 @@ package de.uni_potsdam.hpi.asg.drivestrength.netlist;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.DelayLine;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
@@ -35,7 +36,7 @@ public class DelayEstimator {
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
             double loadCapacitance = this.findLoadCapacitance(c);
             for (String pinName : c.getInputPinNames()) {
-                double estimatedDelay = estimateDelay(c, pinName, loadCapacitance) * 1000;
+                double estimatedDelay = estimateDelayRaw(c, pinName, loadCapacitance) * 1000;
                 sum += estimatedDelay;
                 count++;
                 if (verbose) {
@@ -76,5 +77,12 @@ public class DelayEstimator {
         double parasiticDelay = cellInstance.getDefinition().getParasiticDelayForPin(pinName);
 
         return stageCount * Math.pow(logicalEffort * electricalEffort, 1.0 / stageCount) + parasiticDelay;
+    }
+
+    public double estimateDelayRaw(CellInstance cellInstance, String pinName, double loadCapacitance) {
+        double inputCapacitance = this.findOwnInputCapacitance(cellInstance, pinName);
+        double electricalEffort = loadCapacitance / inputCapacitance;
+        DelayLine delayLine = cellInstance.getDefinition().getSizeDelayLines().get(pinName).get(cellInstance.getSelectedSize().getName());
+        return delayLine.getValueAtX(electricalEffort);
     }
 }

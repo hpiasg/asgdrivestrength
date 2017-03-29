@@ -34,10 +34,10 @@ public class DelayLine {
     
     public DelayPoint getIntersectionPoint(DelayLine other) {
         double x = this.getIntersectionX(other);
-        return new DelayPoint(x, this.valueAtX(x));
+        return new DelayPoint(x, this.getValueAtX(x));
     }
     
-    public double valueAtX(double x) {
+    public double getValueAtX(double x) {
         return this.offset + this.slope * x;
     }
 
