@@ -27,12 +27,8 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.AbstractDriveOptimizer;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.AllLargestOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualDelayMatrixOptimizer;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.NeighborStageEffortOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.NopOptimizer;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.SelectForLoadOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.SimulatedAnnealingOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
 import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulationResult;
@@ -63,7 +59,7 @@ public class BenchmarkRunner {
         //String[] benchmarkNetlists = {"inc"};
         String[] benchmarkNetlists = {"inc", "mod10", "count10", "bufferx", "gcd", "mult"};
         double[] benchmarkOutCs = {0.0, 0.003, 0.012, 0.1, 1.0};
-        boolean[] benchmarkLimitInputs = {true, false};
+        boolean[] benchmarkLimitInputs = {true};//, false};
 
         int combinationCount = benchmarkNetlists.length * benchmarkOutCs.length * benchmarkLimitInputs.length;
 
@@ -104,22 +100,22 @@ public class BenchmarkRunner {
 
         netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
         optimizers.put("NOP", new NopOptimizer(netlistCopy));
+//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
+//        optimizers.put("ESE-clamp", new EqualStageEffortOptimizer(netlistCopy, 100, true));
+//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
+//        optimizers.put("ESE-free", new EqualStageEffortOptimizer(netlistCopy, 100, false));
+//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
+//        optimizers.put("NSE-clamp", new NeighborStageEffortOptimizer(netlistCopy, 100, true));
+//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
+//        optimizers.put("NSE-free", new NeighborStageEffortOptimizer(netlistCopy, 100, false));
+//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
+//        optimizers.put("SFL", new SelectForLoadOptimizer(netlistCopy, 100));
+//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
+//        optimizers.put("Top", new AllLargestOptimizer(netlistCopy));
         netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-        optimizers.put("ESE-clamp", new EqualStageEffortOptimizer(netlistCopy, 100, true));
-        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-        optimizers.put("ESE-free", new EqualStageEffortOptimizer(netlistCopy, 100, false));
-        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-        optimizers.put("NSE-clamp", new NeighborStageEffortOptimizer(netlistCopy, 100, true));
-        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-        optimizers.put("NSE-free", new NeighborStageEffortOptimizer(netlistCopy, 100, false));
-        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-        optimizers.put("SFL", new SelectForLoadOptimizer(netlistCopy, 100));
-        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-        optimizers.put("Top", new AllLargestOptimizer(netlistCopy));
-        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-        optimizers.put("SA-step", new SimulatedAnnealingOptimizer(netlistCopy, false, 30));
-        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-        optimizers.put("SA-jump", new SimulatedAnnealingOptimizer(netlistCopy, true, 30));
+        optimizers.put("SA-step", new SimulatedAnnealingOptimizer(netlistCopy, false, 100, 100));
+//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
+//        optimizers.put("SA-jump", new SimulatedAnnealingOptimizer(netlistCopy, true, 30));
         if (netlist.isAllSingleStage()) {
             netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
             optimizers.put("EDM", new EqualDelayMatrixOptimizer(netlistCopy));

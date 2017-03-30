@@ -4,6 +4,7 @@ import java.util.Random;
 
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.EnergyEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 
@@ -16,22 +17,27 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
     private double alpha;
     private double temperature;
     private DelayEstimator delayEstimator;
+    private EnergyEstimator energyEstimator;
     private Random randomGenerator;
     private int indexForUndo;
     private Cell previousSizeForUndo;
+    private int percentageEnergy;
 
-    public SimulatedAnnealingOptimizer(Netlist netlist, boolean jumpNotStep, int roundPerCell) {
+    public SimulatedAnnealingOptimizer(Netlist netlist, boolean jumpNotStep, int roundPerCell, int percentageEnergy) {
         super(netlist);
         this.roundsPerCell = roundPerCell;
         this.jumpInMutation = jumpNotStep;
         this.delayEstimator = new DelayEstimator(netlist, false, false);
+        this.energyEstimator = new EnergyEstimator(netlist, false);
         this.randomGenerator = new Random();
         this.selectParameters();
+        this.percentageEnergy = percentageEnergy;
     }
 
     private void selectParameters() {
         int cellCount = this.cellInstances.size();
-        int expectedAvgDelta = 50; //from test with count10 and selectRandomSize
+        double expectedAvgDelta = 0.002; //energy
+        //double expectedAvgDelta = 30; //delay
         this.iterationCount = roundsPerCell * cellCount;
         int becomeGreedyAfter = (int) Math.round(iterationCount * 0.7);
         double initialAcceptanceP = 0.95;
@@ -84,6 +90,8 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
     }
 
     private double calculateCost() {
-        return delayEstimator.run();
+        double weightEnergy = this.percentageEnergy / 100.0;
+        double weightDelay = (100 - this.percentageEnergy) / 100.0;
+        return energyEstimator.run() * weightEnergy + delayEstimator.run() * weightDelay;
     }
 }
