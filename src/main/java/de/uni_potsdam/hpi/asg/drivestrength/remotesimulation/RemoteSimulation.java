@@ -145,6 +145,11 @@ public class RemoteSimulation {
     }
 
     private void parseTotalPowerAndSimTime(String librarySuffix) {
+        if (this.remoteSimulationResult.getTestbenchSuccessTime(librarySuffix) == 0) {
+            remoteSimulationResult.setTestbenchEnergy(0.0);
+            return;
+        }
+
         File resultFilePower = new File(tempDir + "output_power" + librarySuffix + ".txt");
         String resultPower = FileHelper.readTextFileToString(resultFilePower).split("\r\n|\r|\n")[0].trim();
         Matcher mPower = totalPowerPattern.matcher(resultPower);

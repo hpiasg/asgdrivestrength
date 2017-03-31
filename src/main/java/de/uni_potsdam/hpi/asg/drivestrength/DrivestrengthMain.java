@@ -23,7 +23,6 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.EnergyEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.LoadGraphExporter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.PowerEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.InputDrivenAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.LoadGraphAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.PredecessorAnnotator;
@@ -85,12 +84,11 @@ public class DrivestrengthMain {
         new NetlistAssignCleaner(inlinedNetlist).run();
         new PredecessorAnnotator(inlinedNetlist).run();
 
-        double outputPinCapacitance = 0.03;
+        double outputPinCapacitance = 0.012;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         new InputDrivenAnnotator(inlinedNetlist).run();
 
         new DelayEstimator(inlinedNetlist, false, false).print();
-        new PowerEstimator(inlinedNetlist, false).print();
         new EnergyEstimator(inlinedNetlist, false).print();
 
         //boolean clampToImplementableCapacitances = true;
@@ -99,7 +97,7 @@ public class DrivestrengthMain {
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
         //new AllSmallestOptimizer(inlinedNetlist).run();
-        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 100, 100).run();
+        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 100, 15).run();
         //new EqualDelayMatrixOptimizer(inlinedNetlist).run();
 
         boolean exportTheoreticalLoad = false;
@@ -107,7 +105,6 @@ public class DrivestrengthMain {
 
         boolean estimateWithTheoreticalLoad = false;
         new DelayEstimator(inlinedNetlist, estimateWithTheoreticalLoad, false).print();
-        new PowerEstimator(inlinedNetlist, false).print();
         new EnergyEstimator(inlinedNetlist, false).print();
 
 
