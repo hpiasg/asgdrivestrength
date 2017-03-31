@@ -23,7 +23,6 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.EnergyEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.LoadGraphExporter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.PowerEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.InputDrivenAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.LoadGraphAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.PredecessorAnnotator;
@@ -32,8 +31,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistBundleSplitt
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
-import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.SimulatedAnnealingOptimizer;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -86,21 +84,20 @@ public class DrivestrengthMain {
         new NetlistAssignCleaner(inlinedNetlist).run();
         new PredecessorAnnotator(inlinedNetlist).run();
 
-        double outputPinCapacitance = 0.03;
+        double outputPinCapacitance = 0.012;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         new InputDrivenAnnotator(inlinedNetlist).run();
 
         new DelayEstimator(inlinedNetlist, false, false).print();
-        new PowerEstimator(inlinedNetlist, false).print();
         new EnergyEstimator(inlinedNetlist, false).print();
 
-        boolean clampToImplementableCapacitances = true;
-        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
+        //boolean clampToImplementableCapacitances = true;
+        //new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new NeighborStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
         //new AllSmallestOptimizer(inlinedNetlist).run();
-        //new SimulatedAnnealingOptimizer(inlinedNetlist, 100).run();
+        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 100, 15).run();
         //new EqualDelayMatrixOptimizer(inlinedNetlist).run();
 
         boolean exportTheoreticalLoad = false;
@@ -108,16 +105,15 @@ public class DrivestrengthMain {
 
         boolean estimateWithTheoreticalLoad = false;
         new DelayEstimator(inlinedNetlist, estimateWithTheoreticalLoad, false).print();
-        new PowerEstimator(inlinedNetlist, false).print();
         new EnergyEstimator(inlinedNetlist, false).print();
 
 
-        logger.info(netlist.toVerilog());
+        //logger.info(netlist.toVerilog());
 
-        boolean remoteVerbose = false;
-        boolean keepFiles = true;
-        new RemoteSimulation(inlinedNetlist, options.getRemoteConfigFile(),
-                              outputPinCapacitance, keepFiles, remoteVerbose).run();
+//        boolean remoteVerbose = false;
+//        boolean keepFiles = true;
+//        new RemoteSimulation(inlinedNetlist, options.getRemoteConfigFile(),
+//                              outputPinCapacitance, keepFiles, remoteVerbose).run();
 
         return 0;
     }

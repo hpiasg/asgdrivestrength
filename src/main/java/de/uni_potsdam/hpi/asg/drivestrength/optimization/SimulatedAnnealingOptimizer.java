@@ -3,35 +3,32 @@ package de.uni_potsdam.hpi.asg.drivestrength.optimization;
 import java.util.Random;
 
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
-import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
 
 public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
 
-    private int roundsPerCell;
     private int iterationCount;
     private boolean jumpInMutation;
     private double initialTemperature;
     private double alpha;
     private double temperature;
-    private DelayEstimator delayEstimator;
     private Random randomGenerator;
     private int indexForUndo;
     private Cell previousSizeForUndo;
+    private SACostFunction costFunction;
 
-    public SimulatedAnnealingOptimizer(Netlist netlist, boolean jumpNotStep, int roundPerCell) {
+    public SimulatedAnnealingOptimizer(Netlist netlist, boolean jumpNotStep, int roundsPerCell, int percentageEnergy) {
         super(netlist);
-        this.roundsPerCell = roundPerCell;
         this.jumpInMutation = jumpNotStep;
-        this.delayEstimator = new DelayEstimator(netlist, false, false);
+        this.costFunction = new SACostFunction(netlist, percentageEnergy);
         this.randomGenerator = new Random();
-        this.selectParameters();
+        this.selectParameters(roundsPerCell);
     }
 
-    private void selectParameters() {
+    private void selectParameters(int roundsPerCell) {
         int cellCount = this.cellInstances.size();
-        int expectedAvgDelta = 50; //from test with count10 and selectRandomSize
+        double expectedAvgDelta = this.costFunction.estimateAvgDelta();
         this.iterationCount = roundsPerCell * cellCount;
         int becomeGreedyAfter = (int) Math.round(iterationCount * 0.7);
         double initialAcceptanceP = 0.95;
@@ -39,18 +36,18 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
         this.initialTemperature = (-expectedAvgDelta) / Math.log(initialAcceptanceP);
         this.alpha = Math.pow(-expectedAvgDelta / (initialTemperature * Math.log(greedyAcceptanceP)), 1.0 / becomeGreedyAfter);
 
-        logger.info("SA: alpha: " + alpha + ", T0: " + initialTemperature + ", G: " + becomeGreedyAfter);
+        logger.info("SA: i: " + this.iterationCount + ", alpha: " + alpha + ", T0: " + initialTemperature + ", G: " + becomeGreedyAfter);
     }
 
     @Override
     protected void optimize() {
-        double beforeCost = calculateCost();
+        double beforeCost = this.costFunction.calculateCost();
 
         temperature = initialTemperature;
         for (int i = 0; i < iterationCount; i++) {
-            double currentCost = calculateCost();
+            double currentCost = this.costFunction.calculateCost();
             this.performRandomStep();
-            double newCost = calculateCost();
+            double newCost = this.costFunction.calculateCost();
             if (newCost > currentCost) {
                 double delta = newCost - currentCost;
                 double condition = Math.exp(- delta / this.temperature);
@@ -60,7 +57,7 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
             }
             this.temperature *= alpha;
         }
-        logger.info("SA: result cost: " + calculateCost() + " vs before " + beforeCost);
+        logger.info("SA: result cost: " + this.costFunction.calculateCost() + " vs before " + beforeCost);
     }
 
     private void performRandomStep() {
@@ -81,9 +78,5 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
 
     private void undoRandomStep() {
         this.cellInstances.get(indexForUndo).selectSize(previousSizeForUndo);
-    }
-
-    private double calculateCost() {
-        return delayEstimator.run();
     }
 }
