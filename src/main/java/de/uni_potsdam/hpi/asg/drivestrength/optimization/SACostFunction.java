@@ -27,6 +27,12 @@ public class SACostFunction {
     }
 
     public double calculateCost() {
+        if (weightEnergy < 0.00000001) {
+            return delayEstimator.run() * weightDelay;
+        }
+        if (weightDelay < 0.00000001) {
+            return energyEstimator.run() * weightEnergy;
+        }
         return energyEstimator.run() * weightEnergy + delayEstimator.run() * weightDelay;
     }
 

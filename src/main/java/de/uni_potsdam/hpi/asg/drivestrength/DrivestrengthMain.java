@@ -97,7 +97,7 @@ public class DrivestrengthMain {
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
         //new AllSmallestOptimizer(inlinedNetlist).run();
-        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 100, 100).run();
+        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, 90).run();
         //new EqualDelayMatrixOptimizer(inlinedNetlist).run();
 
         boolean exportTheoreticalLoad = false;
