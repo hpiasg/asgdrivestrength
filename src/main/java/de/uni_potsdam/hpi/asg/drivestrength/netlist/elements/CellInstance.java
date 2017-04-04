@@ -21,6 +21,7 @@ public class CellInstance extends AbstractInstance {
     private Set<CellInstance> predecessors;
     private Cell selectedSize;
     private boolean isInputDriven;
+    private EstimatorCache estimatorCache;
 
     public CellInstance(String name, AggregatedCell definition, List<PinAssignment> pinAssignments) {
         super(name, pinAssignments);
@@ -31,6 +32,7 @@ public class CellInstance extends AbstractInstance {
         this.selectedSize = definition.getDefaultSize();
         this.isInputDriven = false;
         this.predecessors = new HashSet<>();
+        this.estimatorCache = new EstimatorCache();
     }
 
     public CellInstance(String name, String definitionName, List<PinAssignment> pinAssignments) {
@@ -124,8 +126,16 @@ public class CellInstance extends AbstractInstance {
 
     public void selectSizeFromTheoreticalCapacitances() {
         this.selectedSize = definition.getSizeForInputCapacitances(this.inputPinTheoreticalCapacitances);
+        this.invalidateCache();
         if (this.avatar != null) {
             this.avatar.selectSizeFromTheoreticalCapacitances();
+        }
+    }
+
+    private void invalidateCache() {
+        this.getEstimatorCache().invalidate();
+        for (CellInstance p : this.predecessors) {
+            p.getEstimatorCache().invalidate();
         }
     }
 
@@ -144,6 +154,7 @@ public class CellInstance extends AbstractInstance {
     public void selectSize(Cell sizeToSelect) {
         if (this.isInputDriven) return;
         this.selectedSize = sizeToSelect;
+        this.invalidateCache();
         if (this.avatar != null) {
             this.avatar.selectSize(this.selectedSize);
         }
@@ -156,6 +167,7 @@ public class CellInstance extends AbstractInstance {
     public void selectFastestSizeForLoad(double loadCapacitance) {
         if (this.isInputDriven) return;
         this.selectedSize = definition.getFastestSizeForLoad(loadCapacitance);
+        this.invalidateCache();
         if (this.avatar != null) {
             this.avatar.selectFastestSizeForLoad(loadCapacitance);
         }
@@ -172,6 +184,7 @@ public class CellInstance extends AbstractInstance {
             newInputPinCapacitance = Math.max(newInputPinCapacitance, this.definition.getSmallestPossibleCapacitance(inputPin));
         }
         this.inputPinTheoreticalCapacitances.put(inputPin, newInputPinCapacitance);
+        this.invalidateCache();
         if (this.avatar != null) {
             this.avatar.setInputPinTheoreticalCapacitance(inputPin, newInputPinCapacitance, false);
         }
@@ -275,6 +288,10 @@ public class CellInstance extends AbstractInstance {
 
     public String toString() {
         return this.getName();
+    }
+
+    public EstimatorCache getEstimatorCache() {
+        return estimatorCache;
     }
 
 }

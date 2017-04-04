@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.DelayLine;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.EstimatorCache;
 import de.uni_potsdam.hpi.asg.drivestrength.util.NumberFormatter;
 
 public class DelayEstimator {
@@ -19,6 +20,13 @@ public class DelayEstimator {
         this.netlist = netlist;
         this.useTheoreticalLoad = useTheoreticalLoad;
         this.verbose = verbose;
+        this.resetCache();
+    }
+
+    private void resetCache() {
+        for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
+            c.getEstimatorCache().invalidate();
+        }
     }
 
     public void print() {
@@ -32,20 +40,24 @@ public class DelayEstimator {
 
     public int run() {
         double sum = 0.0;
-        int count = 0;
         for (CellInstance c : this.netlist.getRootModule().getCellInstances()) {
-            double loadCapacitance = this.findLoadCapacitance(c);
-            for (String pinName : c.getInputPinNames()) {
-                double estimatedDelay = estimateDelay(c, pinName, loadCapacitance) * 1000;
-                sum += estimatedDelay;
-                count++;
-                if (verbose) {
-                    System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + estimatedDelay);
+            EstimatorCache cache = c.getEstimatorCache();
+            if (cache.isDelayInvalidated()) {
+                double cellInstanceSum = 0.0;
+                double loadCapacitance = this.findLoadCapacitance(c);
+                for (String pinName : c.getInputPinNames()) {
+                    double estimatedDelay = estimateDelay(c, pinName, loadCapacitance) * 1000;
+                    cellInstanceSum += estimatedDelay;
+                    if (verbose) {
+                        System.out.println(Cell.sortableName(c.getDefinitionName()) + "__" + pinName + "__" + c.getName() + ", " + estimatedDelay);
+                    }
                 }
+                cache.setDelayValue(cellInstanceSum);
             }
+            sum += cache.getDelayValue();
         }
         if (verbose) {
-            System.out.println("Estimated cell delay sum: " + NumberFormatter.spacedRounded(sum) + "   avg=" + sum/count);
+            System.out.println("Estimated cell delay sum: " + NumberFormatter.spacedRounded(sum));
         }
         return (int)Math.round(sum);
     }

@@ -82,11 +82,11 @@ public class DrivestrengthMain {
 
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
-        new PredecessorAnnotator(inlinedNetlist).run();
 
-        double outputPinCapacitance = 0.012;
+        double outputPinCapacitance = 0.1;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
         new InputDrivenAnnotator(inlinedNetlist).run();
+        new PredecessorAnnotator(inlinedNetlist).run();
 
         new DelayEstimator(inlinedNetlist, false, false).print();
         new EnergyEstimator(inlinedNetlist, false).print();
@@ -97,7 +97,7 @@ public class DrivestrengthMain {
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
         //new AllSmallestOptimizer(inlinedNetlist).run();
-        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 100, 15).run();
+        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, 90).run();
         //new EqualDelayMatrixOptimizer(inlinedNetlist).run();
 
         boolean exportTheoreticalLoad = false;
