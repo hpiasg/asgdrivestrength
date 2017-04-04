@@ -163,6 +163,10 @@ public class VerilogModuleParser {
             ModuleInstance instance = new ModuleInstance(instanceName, definition, pinAssignments);
             this.module.addInstance(instance);
         } catch (Error e) {
+            if (this.aggregatedCellLibrary == null) {
+                this.module.addInstance(new CellInstance(instanceName, definitionName, pinAssignments));
+                return true;
+            }
             if (this.aggregatedCellLibrary.isTieZero(definitionName)) {
                 this.handleTie0(pinAssignments);
                 return true;

@@ -13,24 +13,24 @@ import de.uni_potsdam.hpi.asg.drivestrength.testhelper.TestHelper;
 
 public class VerilogParserTest {
     protected static TestHelper testHelper = new TestHelper();
-    
+
     @Test
     public void testVerilogParser() {
-        File verilogFile = testHelper.getResourceAsFile("/minimalNetlist.v");        
+        File verilogFile = testHelper.getResourceAsFile("/minimalNetlist.v");
         Netlist aNetlist = new VerilogParser(verilogFile).createNetlist();
-        
+
         assertEquals(aNetlist.getRootModule().getName(), "aModule");
     }
-    
+
     @Test
     public void testNetlistFlattener() {
         File verilogFile = testHelper.getResourceAsFile("/netlistWithSubmodules.v");
         Netlist aNetlist = new VerilogParser(verilogFile).createNetlist();
 
         assertEquals(aNetlist.getModules().size(), 2);
-        
+
         new NetlistFlattener(aNetlist).run();
-        
+
         assertEquals(aNetlist.getModules().size(), 3);
     }
 
@@ -39,15 +39,15 @@ public class VerilogParserTest {
         File verilogFile = testHelper.getResourceAsFile("/netlistWithSubmodules.v");
         Netlist aNetlist = new VerilogParser(verilogFile).createNetlist();
         Module submodule = aNetlist.getRootModule().getModuleInstances().get(0).getDefinition();
-        assertEquals(submodule.getSignalByInterfacePosition(0).getName(), "in"); 
+        assertEquals(submodule.getSignalByInterfacePosition(0).getName(), "in");
     }
-    
+
     @Test
     public void testSignalMappingNamed() {
         File verilogFile = testHelper.getResourceAsFile("/netlistWithSubmodules.v");
         Netlist aNetlist = new VerilogParser(verilogFile).createNetlist();
         Module submodule = aNetlist.getRootModule().getModuleInstances().get(0).getDefinition();
-        assertEquals(submodule.getSignalByName("in").getName(), "in"); 
+        assertEquals(submodule.getSignalByName("in").getName(), "in");
     }
 
 }

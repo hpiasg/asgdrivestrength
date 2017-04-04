@@ -14,6 +14,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.Load;
 public class CellInstance extends AbstractInstance {
 
     private AggregatedCell definition;
+    private String definitionName;
     private Map<String, Double> inputPinTheoreticalCapacitances;
     private CellInstance avatar; //the CellInstance this one was copied from (if copy was called accordingly). Capacitance setter also modifies avatar
     private List<Load> loads;
@@ -32,6 +33,11 @@ public class CellInstance extends AbstractInstance {
         this.isInputDriven = false;
         this.predecessors = new HashSet<>();
         this.estimatorCache = new EstimatorCache();
+    }
+
+    public CellInstance(String name, String definitionName, List<PinAssignment> pinAssignments) {
+        super(name, pinAssignments);
+        this.definitionName = definitionName;
     }
 
     public void setAvatar(CellInstance avatar) {
@@ -112,6 +118,9 @@ public class CellInstance extends AbstractInstance {
 
     @Override
     public String getDefinitionName() {
+        if (definitionName != null) {
+            return definitionName;
+        }
         return selectedSize.getName();
     }
 
@@ -267,6 +276,10 @@ public class CellInstance extends AbstractInstance {
             }
         }
         throw new Error("Signal " + aSignal.getName() + " is not connected to CellInstance " + this.getName());
+    }
+
+    public boolean isDummyCellInstance() {
+        return (this.definition == null);
     }
 
     public boolean hasPredecessors() {
