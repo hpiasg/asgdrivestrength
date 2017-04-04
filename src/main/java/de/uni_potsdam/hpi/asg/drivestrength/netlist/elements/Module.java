@@ -47,13 +47,8 @@ public class Module {
         this.cellInstances = new ArrayList<>();
         for (CellInstance i : moduleToCopy.getCellInstances()) {
             CellInstance newCellInstance;
-            if (i.isDummyCellInstance()) {
-                newCellInstance = new CellInstance(i.getName(), i.getDefinitionName(),
-                        this.copyPinAssignments(i.getPinAssignments()));
-            } else {
-                newCellInstance = new CellInstance(i.getName(), i.getDefinition(),
-                        this.copyPinAssignments(i.getPinAssignments()));
-            }
+            newCellInstance = new CellInstance(i.getName(), i.getDefinition(),
+                    this.copyPinAssignments(i.getPinAssignments()));
             if (keepCellAvatars) {
                 newCellInstance.setAvatar(i.getAvatarOrSelf());
             }

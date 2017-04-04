@@ -14,13 +14,13 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.Load;
 public class CellInstance extends AbstractInstance {
 
     private AggregatedCell definition;
-    private String definitionName;
     private Map<String, Double> inputPinTheoreticalCapacitances;
     private CellInstance avatar; //the CellInstance this one was copied from (if copy was called accordingly). Capacitance setter also modifies avatar
     private List<Load> loads;
     private Set<CellInstance> predecessors;
     private Cell selectedSize;
     private boolean isInputDriven;
+    private EstimatorCache estimatorCache;
 
     public CellInstance(String name, AggregatedCell definition, List<PinAssignment> pinAssignments) {
         super(name, pinAssignments);
@@ -31,11 +31,7 @@ public class CellInstance extends AbstractInstance {
         this.selectedSize = definition.getDefaultSize();
         this.isInputDriven = false;
         this.predecessors = new HashSet<>();
-    }
-
-    public CellInstance(String name, String definitionName, List<PinAssignment> pinAssignments) {
-        super(name, pinAssignments);
-        this.definitionName = definitionName;
+        this.estimatorCache = new EstimatorCache();
     }
 
     public void setAvatar(CellInstance avatar) {
@@ -116,16 +112,21 @@ public class CellInstance extends AbstractInstance {
 
     @Override
     public String getDefinitionName() {
-        if (definitionName != null) {
-            return definitionName;
-        }
         return selectedSize.getName();
     }
 
     public void selectSizeFromTheoreticalCapacitances() {
         this.selectedSize = definition.getSizeForInputCapacitances(this.inputPinTheoreticalCapacitances);
+        this.invalidateCache();
         if (this.avatar != null) {
             this.avatar.selectSizeFromTheoreticalCapacitances();
+        }
+    }
+
+    private void invalidateCache() {
+        this.getEstimatorCache().invalidate();
+        for (CellInstance p : this.predecessors) {
+            p.getEstimatorCache().invalidate();
         }
     }
 
@@ -144,6 +145,7 @@ public class CellInstance extends AbstractInstance {
     public void selectSize(Cell sizeToSelect) {
         if (this.isInputDriven) return;
         this.selectedSize = sizeToSelect;
+        this.invalidateCache();
         if (this.avatar != null) {
             this.avatar.selectSize(this.selectedSize);
         }
@@ -156,6 +158,7 @@ public class CellInstance extends AbstractInstance {
     public void selectFastestSizeForLoad(double loadCapacitance) {
         if (this.isInputDriven) return;
         this.selectedSize = definition.getFastestSizeForLoad(loadCapacitance);
+        this.invalidateCache();
         if (this.avatar != null) {
             this.avatar.selectFastestSizeForLoad(loadCapacitance);
         }
@@ -172,6 +175,7 @@ public class CellInstance extends AbstractInstance {
             newInputPinCapacitance = Math.max(newInputPinCapacitance, this.definition.getSmallestPossibleCapacitance(inputPin));
         }
         this.inputPinTheoreticalCapacitances.put(inputPin, newInputPinCapacitance);
+        this.invalidateCache();
         if (this.avatar != null) {
             this.avatar.setInputPinTheoreticalCapacitance(inputPin, newInputPinCapacitance, false);
         }
@@ -265,16 +269,16 @@ public class CellInstance extends AbstractInstance {
         throw new Error("Signal " + aSignal.getName() + " is not connected to CellInstance " + this.getName());
     }
 
-    public boolean isDummyCellInstance() {
-        return (this.definition == null);
-    }
-
     public boolean hasPredecessors() {
         return this.predecessors.size() > 0;
     }
 
     public String toString() {
         return this.getName();
+    }
+
+    public EstimatorCache getEstimatorCache() {
+        return estimatorCache;
     }
 
 }
