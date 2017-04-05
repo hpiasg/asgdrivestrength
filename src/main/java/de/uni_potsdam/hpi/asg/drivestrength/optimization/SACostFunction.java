@@ -14,6 +14,8 @@ public class SACostFunction {
     private EnergyEstimator energyEstimator;
     private double weightEnergy;
     private double weightDelay;
+    private double avgDeltaEnergy;
+    private double avgDeltaDelay;
 
     public SACostFunction(Netlist netlist, int percentageEnergy) {
         this.delayEstimator = new DelayEstimator(netlist, false, false);
@@ -26,6 +28,11 @@ public class SACostFunction {
         this.weightDelay /= delayEstimator.run();
     }
 
+    public void setCalibrationDeltas(double avgDeltaEnergy, double avgDeltaDelay) {
+        this.avgDeltaEnergy = avgDeltaEnergy;
+        this.avgDeltaDelay = avgDeltaDelay;
+    }
+
     public double calculateCost() {
         if (weightEnergy < 0.00000001) {
             return delayEstimator.run() * weightDelay;
@@ -36,11 +43,20 @@ public class SACostFunction {
         return energyEstimator.run() * weightEnergy + delayEstimator.run() * weightDelay;
     }
 
-    public double estimateAvgDelta() {
-        double expectedAvgDeltaEnergy = 0.002; //energy
-        double expectedAvgDeltaDelay = 30; //delay, picoseconds
-        double expectedAvgDelayWeighted = expectedAvgDeltaEnergy * weightEnergy + expectedAvgDeltaDelay * weightDelay;
-        logger.info("SA expected avg score delta: " + expectedAvgDelayWeighted);
+    public double estimateEnergy() {
+        return energyEstimator.run();
+    }
+
+    public double estimateDelay() {
+        return delayEstimator.run();
+    }
+
+    public double estimateAvgDeltaWeighted() {
+//        double expectedAvgDeltaEnergy = 0.002;
+//        double expectedAvgDeltaDelay = 30;
+        logger.info("SA: estimated avg deltas: energy: " + this.avgDeltaEnergy + ", delay: " + this.avgDeltaDelay);
+        double expectedAvgDelayWeighted = this.avgDeltaEnergy * weightEnergy + this.avgDeltaDelay * weightDelay;
+        logger.info("SA: estimated avg score delta: " + expectedAvgDelayWeighted);
         return expectedAvgDelayWeighted;
     }
 }

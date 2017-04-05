@@ -21,22 +21,38 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
     public SimulatedAnnealingOptimizer(Netlist netlist, boolean jumpNotStep, int roundsPerCell, int percentageEnergy) {
         super(netlist);
         this.jumpInMutation = jumpNotStep;
-        this.costFunction = new SACostFunction(netlist, percentageEnergy);
         this.randomGenerator = new Random();
+        this.costFunction = new SACostFunction(netlist, percentageEnergy);
+        this.calibrate();
         this.selectParameters(roundsPerCell);
     }
 
     private void selectParameters(int roundsPerCell) {
         int cellCount = this.cellInstances.size();
-        double expectedAvgDelta = this.costFunction.estimateAvgDelta();
         this.iterationCount = roundsPerCell * cellCount;
         int becomeGreedyAfter = (int) Math.round(iterationCount * 0.7);
         double initialAcceptanceP = 0.95;
         double greedyAcceptanceP = 0.05;
+        double expectedAvgDelta = this.costFunction.estimateAvgDeltaWeighted();
         this.initialTemperature = (-expectedAvgDelta) / Math.log(initialAcceptanceP);
         this.alpha = Math.pow(-expectedAvgDelta / (initialTemperature * Math.log(greedyAcceptanceP)), 1.0 / becomeGreedyAfter);
 
-        logger.info("SA: i: " + this.iterationCount + ", alpha: " + alpha + ", T0: " + initialTemperature + ", G: " + becomeGreedyAfter);
+        logger.info("SA: iterations: " + this.iterationCount + ", alpha: " + alpha + ", T0: " + initialTemperature + ", G: " + becomeGreedyAfter);
+    }
+
+    private void calibrate() {
+        double beforeEnergy = this.costFunction.estimateEnergy();
+        double beforeDelay = this.costFunction.estimateDelay();
+        double sumDeltaEnergy = 0;
+        double sumDeltaDelay = 0;
+        int calibrationIterations = 1000;
+        for (int i = 0; i < calibrationIterations; i++) {
+            performRandomStep();
+            sumDeltaEnergy += Math.abs(this.costFunction.estimateEnergy() - beforeEnergy);
+            sumDeltaDelay += Math.abs(this.costFunction.estimateDelay() - beforeDelay);
+            undoRandomStep();
+        }
+        this.costFunction.setCalibrationDeltas(sumDeltaEnergy / calibrationIterations, sumDeltaDelay / calibrationIterations);
     }
 
     @Override
@@ -47,6 +63,7 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
         for (int i = 0; i < iterationCount; i++) {
             double currentCost = this.costFunction.calculateCost();
             this.performRandomStep();
+            //System.out.println(this.costFunction.estimateDelay());
             double newCost = this.costFunction.calculateCost();
             if (newCost > currentCost) {
                 double delta = newCost - currentCost;
