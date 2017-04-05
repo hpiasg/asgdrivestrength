@@ -83,9 +83,10 @@ public class DrivestrengthMain {
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
 
-        double outputPinCapacitance = 0.1;
+        double outputPinCapacitance = 0.012;
         new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
-        new InputDrivenAnnotator(inlinedNetlist).run();
+        double inputDrivenMaxCIn = 0.007;
+        new InputDrivenAnnotator(inlinedNetlist, inputDrivenMaxCIn).run();
         new PredecessorAnnotator(inlinedNetlist).run();
 
         new DelayEstimator(inlinedNetlist, false, false).print();
@@ -93,13 +94,13 @@ public class DrivestrengthMain {
 
 //        new BruteForceRunner(inlinedNetlist).run();
 
-        //boolean clampToImplementableCapacitances = true;
-        //new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
+//        boolean clampToImplementableCapacitances = true;
+//        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new NeighborStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
         //new AllSmallestOptimizer(inlinedNetlist).run();
-        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, 100).run();
+        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, 0).run();
         //new EqualDelayMatrixOptimizer(inlinedNetlist).run();
 
         boolean exportTheoreticalLoad = false;

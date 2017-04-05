@@ -114,6 +114,15 @@ public class Cell {
         return cellName;
     }
 
+    public boolean violatesMaxCIn(double maxCIn) {
+        for (Pin pin : this.pins) {
+            if (pin.getDirection() == Direction.input && pin.getCapacitance() > maxCIn) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String toString() {
         return "<raw cell " + this.getName() + ">";
     }

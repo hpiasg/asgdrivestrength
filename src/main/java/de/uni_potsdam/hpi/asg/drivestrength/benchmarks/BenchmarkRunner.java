@@ -59,18 +59,18 @@ public class BenchmarkRunner {
         //String[] benchmarkNetlists = {"inc"};
         String[] benchmarkNetlists = {"inc", "mod10", "count10", "bufferx", "gcd", "mult"};
         double[] benchmarkOutCs = {0.0, 0.003, 0.012, 0.1, 1.0};
-        boolean[] benchmarkLimitInputs = {true};//, false};
+        double[] inputDrivenMaxCIns = {0.005, 1.0};
 
-        int combinationCount = benchmarkNetlists.length * benchmarkOutCs.length * benchmarkLimitInputs.length;
+        int combinationCount = benchmarkNetlists.length * benchmarkOutCs.length * inputDrivenMaxCIns.length;
 
         for (String netlistName : benchmarkNetlists) {
             File netlistFile = new File("netlists/benchmarks-original/" + netlistName + ".v");
             Netlist inlinedNetlist = this.loadNetlist(netlistFile);
 
             for (double outputC : benchmarkOutCs) {
-                for (boolean limitInput : benchmarkLimitInputs) {
+                for (double inputDrivenMaxCIn : inputDrivenMaxCIns) {
                     try {
-                        runBenchmarkEntry(inlinedNetlist, outputC, limitInput, combinationCount);
+                        runBenchmarkEntry(inlinedNetlist, outputC, inputDrivenMaxCIn, combinationCount);
                     } catch (IOException e) {
                         throw new Error(e);
                     }
@@ -93,12 +93,12 @@ public class BenchmarkRunner {
         return inlinedNetlist;
     }
 
-    Map<String, AbstractDriveOptimizer> setupOptimizers(Netlist netlist, double outputC, boolean limitInput) {
+    Map<String, AbstractDriveOptimizer> setupOptimizers(Netlist netlist, double outputC, double inputDrivenMaxCIn) {
         Map<String, AbstractDriveOptimizer> optimizers = new HashMap<>();
 
         Netlist netlistCopy;
 
-        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
+        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
         optimizers.put("NOP", new NopOptimizer(netlistCopy));
 //        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
 //        optimizers.put("ESE-clamp", new EqualStageEffortOptimizer(netlistCopy, 100, true));
@@ -112,12 +112,12 @@ public class BenchmarkRunner {
 //        optimizers.put("SFL", new SelectForLoadOptimizer(netlistCopy, 100));
 //        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
 //        optimizers.put("Top", new AllLargestOptimizer(netlistCopy));
-        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
+        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
         optimizers.put("SA-step", new SimulatedAnnealingOptimizer(netlistCopy, false, 100, 100));
 //        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
 //        optimizers.put("SA-jump", new SimulatedAnnealingOptimizer(netlistCopy, true, 30));
         if (netlist.isAllSingleStage()) {
-            netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
+            netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
             optimizers.put("EDM", new EqualDelayMatrixOptimizer(netlistCopy));
         }
 
@@ -125,10 +125,10 @@ public class BenchmarkRunner {
     }
 
 
-    private void runBenchmarkEntry(Netlist netlist, double outputC, boolean limitInput, int combinationCount) throws IOException {
-        System.out.println("Benchmark Entry " + netlist.getName() + ", outputC: " + outputC + ", limitInput: " + limitInput);
+    private void runBenchmarkEntry(Netlist netlist, double outputC, double inputDrivenMaxCIn, int combinationCount) throws IOException {
+        System.out.println("Benchmark Entry " + netlist.getName() + ", outputC: " + outputC + ", inputDrivenMaxCIn: " + inputDrivenMaxCIn);
 
-        Map<String, AbstractDriveOptimizer> optimizers = setupOptimizers(netlist, outputC, limitInput);
+        Map<String, AbstractDriveOptimizer> optimizers = setupOptimizers(netlist, outputC, inputDrivenMaxCIn);
 
         int totalcount = optimizers.size() * combinationCount;
 
@@ -150,7 +150,7 @@ public class BenchmarkRunner {
             String benchmarkOutput = "benchmark-entry,";
             benchmarkOutput += netlist.getName() + ",";
             benchmarkOutput += outputC + ",";
-            benchmarkOutput += limitInput + ",";
+            benchmarkOutput += inputDrivenMaxCIn + ",";
             benchmarkOutput += optimizerName + ",";
             benchmarkOutput += estimatedDelay + ",";
             benchmarkOutput += rsResult.getSdfDelaySum("_orig") + ",";
@@ -185,12 +185,12 @@ public class BenchmarkRunner {
 
     }
 
-    private Netlist copyAndReAnnotateNetlist(Netlist originalNetlist, double outputC, boolean limitInput) {
+    private Netlist copyAndReAnnotateNetlist(Netlist originalNetlist, double outputC, double inputDrivenMaxCIn) {
         Netlist copiedNetlist = new Netlist(originalNetlist);
         new LoadGraphAnnotator(copiedNetlist, outputC).run();
         new PredecessorAnnotator(copiedNetlist).run();
-        if (limitInput) {
-            new InputDrivenAnnotator(copiedNetlist).run();
+        if (inputDrivenMaxCIn > 0) {
+            new InputDrivenAnnotator(copiedNetlist, inputDrivenMaxCIn).run();
         }
 
         return copiedNetlist;
