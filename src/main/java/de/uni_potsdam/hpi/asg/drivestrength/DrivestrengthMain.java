@@ -91,13 +91,15 @@ public class DrivestrengthMain {
         new DelayEstimator(inlinedNetlist, false, false).print();
         new EnergyEstimator(inlinedNetlist, false).print();
 
+//        new BruteForceRunner(inlinedNetlist).run();
+
         //boolean clampToImplementableCapacitances = true;
         //new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new NeighborStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
         //new AllSmallestOptimizer(inlinedNetlist).run();
-        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, 90).run();
+        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, 0).run();
         //new EqualDelayMatrixOptimizer(inlinedNetlist).run();
 
         boolean exportTheoreticalLoad = false;
