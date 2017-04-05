@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
+import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper.Mode;
 import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.aggregators.CellAggregator;
@@ -38,6 +39,21 @@ public class DrivestrengthMain {
     private static DrivestrengthCommandlineOptions options;
 
     public static void main(String[] args) {
+        int status = -1;
+        try {
+            status = main2(args);
+        } catch(Exception e) {
+            if(options != null && options.isDebug()) {
+                e.printStackTrace();
+            } else {
+                System.err.println("Something really bad happend");
+                status = -2;
+            }
+        }
+        System.exit(status);
+    }
+
+    public static int main2(String[] args) {
         System.out.println("Hello World from ASGdrivestrength");
 
         try {
@@ -45,7 +61,7 @@ public class DrivestrengthMain {
             options = new DrivestrengthCommandlineOptions();
             if (options.parseCmdLine(args)) {
                 logger = LoggerHelper.initLogger(options.getOutputlevel(),
-                        options.getLogfile(), options.isDebug());
+                        options.getLogfile(), options.isDebug(), Mode.cmdline);
                 logger.debug("Args: " + Arrays.asList(args).toString());
                 WorkingdirGenerator.getInstance().create(
                         options.getWorkingdir(), "", "drivestrengthwork", null);
@@ -56,11 +72,11 @@ public class DrivestrengthMain {
             if (logger != null) {
                 logger.info("Runtime: " + LoggerHelper.formatRuntime(end - start, false));
             }
-            System.exit(0);
+            return 0;
         } catch (Error | Exception e) {
             System.out.println("An error occurred: " + e.getLocalizedMessage());
             e.printStackTrace();
-            System.exit(1);
+            return 1;
         }
     }
 

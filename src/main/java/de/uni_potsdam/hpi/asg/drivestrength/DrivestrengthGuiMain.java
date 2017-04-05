@@ -1,17 +1,22 @@
 package de.uni_potsdam.hpi.asg.drivestrength;
 
+import java.io.File;
+
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import de.uni_potsdam.hpi.asg.common.gui.WatchForCloseWindowAdapter;
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
+import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper.Mode;
+import de.uni_potsdam.hpi.asg.common.misc.CommonConstants;
 import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters;
 import de.uni_potsdam.hpi.asg.drivestrength.gui.RunDrivestrengthPanel;
 
 public class DrivestrengthGuiMain {
 
-    //public static final File DRIVESTRENGTH_BIN = new File(CommonConstants.DEF_BIN_DIR_FILE, "ASGdrivestrength");
+    public static final File DRIVESTRENGTH_BIN = new File(CommonConstants.DEF_BIN_DIR_FILE,
+                                                  "ASGdrivestrength" + CommonConstants.SCRIPT_FILE_EXTENSION);
 
     public static void main(String[] args) {
         System.out.println("Hello World from ASGdrivestrength runner GUI");
@@ -27,7 +32,7 @@ public class DrivestrengthGuiMain {
             }
         }
 
-        LoggerHelper.initLogger(3, null, false/*, Mode.gui*/);
+        LoggerHelper.initLogger(3, null, false, Mode.cmdline);
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

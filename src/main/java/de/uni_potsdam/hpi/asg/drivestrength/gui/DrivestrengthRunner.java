@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractRunner;
+import de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthGuiMain;
 
 public class DrivestrengthRunner extends AbstractRunner {
     private static final Logger logger = LogManager.getLogger();
@@ -28,8 +29,7 @@ public class DrivestrengthRunner extends AbstractRunner {
             return;
         }
         List<String> cmd = buildCmd();
-        logger.warn("TODO: run cmd");
-        //exec(cmd, "ASGdrivestrength terminal", mode, null, parent);
+        exec(cmd, "ASGdrivestrength terminal", mode, null, parent);
     }
 
     private boolean parametersAreValid() {
@@ -39,9 +39,7 @@ public class DrivestrengthRunner extends AbstractRunner {
 
     private List<String> buildCmd() {
         List<String> cmd = new ArrayList<>();
-        cmd.add("");
-
-        logger.warn("TODO: build cmd");
+        cmd.add(DrivestrengthGuiMain.DRIVESTRENGTH_BIN.getAbsolutePath());
 
         return cmd;
     }
