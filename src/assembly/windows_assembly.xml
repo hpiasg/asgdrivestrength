@@ -9,16 +9,16 @@
 		<format>dir</format>
 	</formats>
 	<files>
-		<!--<file>
+		<file>
 			<source>LICENSE.txt</source>
 			<outputDirectory>legal</outputDirectory>
-			<destName>ASGlogic_LICENSE.txt</destName>
+			<destName>ASGdrivestrength_LICENSE.txt</destName>
 		</file>
 		<file>
 			<source>NOTICE.txt</source>
 			<outputDirectory>legal</outputDirectory>
-			<destName>ASGlogic_NOTICE.txt</destName>
-		</file>  -->
+			<destName>ASGdrivestrength_NOTICE.txt</destName>
+		</file>
 		<file>
 			<source>README.md</source>
 			<outputDirectory>readme</outputDirectory>
