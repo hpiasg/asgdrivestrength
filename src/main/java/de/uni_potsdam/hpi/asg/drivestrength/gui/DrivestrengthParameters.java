@@ -7,7 +7,9 @@ import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractParameters;
 public class DrivestrengthParameters extends AbstractParameters {
 
     public enum TextParam implements AbstractTextParam {
-        /*general*/ NetlistFile
+        /*general*/ NetlistFile,
+        /*cells*/ LibertyFile, DefaultSizesFile, OrderedSizesFile, StageCountsFile,
+        /*remote*/ RemoteConfigFile,
     }
 
     public DrivestrengthParameters() {

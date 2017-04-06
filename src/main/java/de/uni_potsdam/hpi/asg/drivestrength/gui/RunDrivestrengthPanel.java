@@ -6,6 +6,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.nio.file.Paths;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -22,6 +23,7 @@ public class RunDrivestrengthPanel extends AbstractRunPanel {
     private DrivestrengthParameters params;
     private Window parent;
     private boolean userHitRun;
+    private String dataDir;
 
     public RunDrivestrengthPanel(Window parent, final DrivestrengthParameters params, boolean isDebug) {
         this(parent, params, isDebug, false, false);
@@ -29,11 +31,17 @@ public class RunDrivestrengthPanel extends AbstractRunPanel {
 
     public RunDrivestrengthPanel(final Window parent, final DrivestrengthParameters params,
                                    boolean isDebug, boolean hideGeneral, final boolean closeOnRun) {
+        this(parent, params, isDebug, hideGeneral, closeOnRun, "");
+    }
+
+    public RunDrivestrengthPanel(final Window parent, final DrivestrengthParameters params,
+            boolean isDebug, boolean hideGeneral, final boolean closeOnRun, String dataDir) {
         super(params);
 
         this.params = params;
         this.parent = parent;
         this.userHitRun = false;
+        this.dataDir = dataDir;
 
         this.setLayout(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -57,11 +65,30 @@ public class RunDrivestrengthPanel extends AbstractRunPanel {
         gbl_generalpanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         panel.setLayout(gbl_generalpanel);
 
-        panel.addTextEntry(0, TextParam.NetlistFile, "Netlist file", "defaultNetlist.v",
-                             true, JFileChooser.FILES_ONLY, false);
+        panel.addTextEntry(0, TextParam.NetlistFile, "Netlist file to optimize", normalizedPath("netlists/aNetlist.v"),
+                true, JFileChooser.FILES_ONLY, false);
 
-        addOutSection(panel, 2, "defaultOutfile.v", "defaultOutdir");
+        panel.addTextEntry(2, TextParam.LibertyFile, "Liberty file", normalizedPath("cells/cellLibrary.lib"),
+                true, JFileChooser.FILES_ONLY, false);
+
+        panel.addTextEntry(3, TextParam.DefaultSizesFile, "Default sizes file", normalizedPath("cells/defaultsizes.json"),
+                true, JFileChooser.FILES_ONLY, false);
+
+        panel.addTextEntry(4, TextParam.OrderedSizesFile, "Ordered sizes file", normalizedPath("cells/orderedsizes.json"),
+                true, JFileChooser.FILES_ONLY, false);
+
+        panel.addTextEntry(5, TextParam.StageCountsFile, "Stage counts file", normalizedPath("cells/stagecounts.json"),
+                true, JFileChooser.FILES_ONLY, false);
+
+        panel.addTextEntry(8, TextParam.RemoteConfigFile, "Remote config file", normalizedPath("remoteConfig.json"),
+                true, JFileChooser.FILES_ONLY, false);
+
+        addOutSection(panel, 10, "aNetlist_optimized.v", "defaultOutdir");
         getDataFromPanel(panel);
+    }
+
+    private String normalizedPath(String path) {
+        return Paths.get(dataDir + path).normalize().toString();
     }
 
     private void constructRunButton(boolean closeOnRun) {

@@ -25,12 +25,8 @@ public class DrivestrengthGuiMain {
     }
 
     public static int main2(String[] args) {
-        boolean isDebug = false;
-        for(String str : args) {
-            if(str.equals("-debug")) {
-                isDebug = true;
-            }
-        }
+        boolean isDebug = extractIsDebug(args);
+        String dataDir = extractDataDir(args);
 
         LoggerHelper.initLogger(3, null, false, Mode.cmdline);
 
@@ -43,7 +39,7 @@ public class DrivestrengthGuiMain {
         DrivestrengthParameters params = new DrivestrengthParameters();
 
         JFrame runframe = new JFrame("ASGdrivestrength runner");
-        RunDrivestrengthPanel runpanel = new RunDrivestrengthPanel(runframe, params, isDebug);
+        RunDrivestrengthPanel runpanel = new RunDrivestrengthPanel(runframe, params, isDebug, false, false, dataDir);
         if(runpanel.hasErrorOccured()) {
             return 1;
         }
@@ -62,7 +58,28 @@ public class DrivestrengthGuiMain {
             }
         }
         return 0;
+    }
 
+    private static String extractDataDir(String[] args) {
+        boolean nextIsDataDir = false;
+        for (String str : args) {
+            if (nextIsDataDir) {
+                return str;
+            }
+            if (str.equals("-dataDir")) {
+                nextIsDataDir = true;
+            }
+        }
+        return "";
+    }
+
+    private static boolean extractIsDebug(String[] args) {
+        for (String str : args) {
+            if (str.equals("-debug")) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

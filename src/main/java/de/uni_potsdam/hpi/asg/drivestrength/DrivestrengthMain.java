@@ -42,8 +42,8 @@ public class DrivestrengthMain {
         int status = -1;
         try {
             status = main2(args);
-        } catch(Exception e) {
-            if(options != null && options.isDebug()) {
+        } catch (Exception e) {
+            if (options != null && options.isDebug()) {
                 e.printStackTrace();
             } else {
                 System.err.println("Something really bad happend");
@@ -113,7 +113,7 @@ public class DrivestrengthMain {
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
         //new AllSmallestOptimizer(inlinedNetlist).run();
-        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, 90).run();
+        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, options.getOptimizeEnergyPercentage()).run();
         //new EqualDelayMatrixOptimizer(inlinedNetlist).run();
 
         boolean exportTheoreticalLoad = false;
