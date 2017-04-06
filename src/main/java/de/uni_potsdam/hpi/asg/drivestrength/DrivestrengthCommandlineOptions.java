@@ -43,6 +43,9 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     @Option(name = "-remoteConfig", metaVar = "<remoteConfigFile>", usage ="Remote Config JSON File containing username, host, ...", required = false)
     private File remoteConfigFile;
 
+    @Option(name = "-optimizeEnergyPercentage", metaVar = "<optimizeEnergyPercentage>", usage ="Percentage for Energy in SA Optimizer (0: Minimize only Delay, 100: Minimize only Energy)", required = false)
+    private int optimizeEnergyPercentage = 0;
+
     @Argument(metaVar = "Verilog Netlist File", required = true)
     private File netlistFile;
 
@@ -91,6 +94,10 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
 
     public File getOrderedSizesFile() {
         return orderedSizesFile;
+    }
+
+    public int getOptimizeEnergyPercentage() {
+        return optimizeEnergyPercentage;
     }
 
 }
