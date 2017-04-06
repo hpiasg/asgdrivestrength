@@ -15,6 +15,7 @@ import javax.swing.JTabbedPane;
 import de.uni_potsdam.hpi.asg.common.gui.PropertiesPanel;
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractRunPanel;
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractRunner.TerminalMode;
+import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.IntParam;
 import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.TextParam;
 
 public class RunDrivestrengthPanel extends AbstractRunPanel {
@@ -48,12 +49,26 @@ public class RunDrivestrengthPanel extends AbstractRunPanel {
         this.add(tabbedPane, BorderLayout.CENTER);
 
         this.constructGeneralPanel(tabbedPane);
-        //this.constructAdvancedPanel(tabbedPane);
+        this.constructAdvancedPanel(tabbedPane);
         //this.constructDebugPanel(tabbedPane, isDebug);
 
         this.constructRunButton(closeOnRun);
     }
 
+    private void constructAdvancedPanel(JTabbedPane tabbedPane) {
+        PropertiesPanel panel = new PropertiesPanel(parent);
+        tabbedPane.addTab("Advanced", null, panel, null);
+        GridBagLayout gbl_advpanel = new GridBagLayout();
+        gbl_advpanel.columnWidths = new int[]{200, 300, 30, 80, 0};
+        gbl_advpanel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_advpanel.rowHeights = new int[]{15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 0};
+        gbl_advpanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        panel.setLayout(gbl_advpanel);
+
+        panel.addSliderEntry(1, IntParam.optimizeEnergyPercentage, "Energy weight in SA-Optimizer", 0, 100, 0);
+
+        getDataFromPanel(panel);
+    }
 
     private void constructGeneralPanel(JTabbedPane tabbedPane) {
         PropertiesPanel panel = new PropertiesPanel(parent);

@@ -1,6 +1,7 @@
 package de.uni_potsdam.hpi.asg.drivestrength.gui;
 
 import de.uni_potsdam.hpi.asg.common.gui.PropertiesPanel.AbstractEnumParam;
+import de.uni_potsdam.hpi.asg.common.gui.PropertiesPanel.AbstractIntParam;
 import de.uni_potsdam.hpi.asg.common.gui.PropertiesPanel.AbstractTextParam;
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractParameters;
 
@@ -10,6 +11,10 @@ public class DrivestrengthParameters extends AbstractParameters {
         /*general*/ NetlistFile,
         /*cells*/ LibertyFile, DefaultSizesFile, OrderedSizesFile, StageCountsFile,
         /*remote*/ RemoteConfigFile,
+    }
+
+    public enum IntParam implements AbstractIntParam {
+        optimizeEnergyPercentage
     }
 
     public DrivestrengthParameters() {

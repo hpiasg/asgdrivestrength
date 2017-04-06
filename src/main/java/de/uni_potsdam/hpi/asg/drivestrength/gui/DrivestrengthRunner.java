@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractRunner;
 import de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthGuiMain;
+import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.IntParam;
 import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.TextParam;
 
 public class DrivestrengthRunner extends AbstractRunner {
@@ -30,6 +31,7 @@ public class DrivestrengthRunner extends AbstractRunner {
         cmd.add(DrivestrengthGuiMain.DRIVESTRENGTH_BIN.getAbsolutePath());
 
         this.addGeneralParamsTo(cmd);
+        this.addAdvancedParamsTo(cmd);
 
         cmd.add(params.getTextValue(TextParam.NetlistFile));
 
@@ -57,6 +59,11 @@ public class DrivestrengthRunner extends AbstractRunner {
             cmd.add("-remoteConfig");
             cmd.add(remoteConfigPath);
         }
+    }
+
+    private void addAdvancedParamsTo(List<String> cmd) {
+        cmd.add("-optimizeEnergyPercentage");
+        cmd.add(Integer.toString(params.getIntValue(IntParam.optimizeEnergyPercentage)));
     }
 
 }
