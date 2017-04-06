@@ -18,6 +18,7 @@ public class SACostFunction {
     private double avgDeltaDelay;
 
     public SACostFunction(Netlist netlist, int percentageEnergy) {
+        logger.info("SA: using energy weight " + percentageEnergy + " %");
         this.delayEstimator = new DelayEstimator(netlist, false, false);
         this.energyEstimator = new EnergyEstimator(netlist, false);
 
