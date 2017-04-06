@@ -21,6 +21,7 @@ public class CellInstance extends AbstractInstance {
     private Set<CellInstance> predecessors;
     private Cell selectedSize;
     private boolean isInputDriven;
+    private double inputDrivenMaxCIn;
     private EstimatorCache estimatorCache;
 
     public CellInstance(String name, AggregatedCell definition, List<PinAssignment> pinAssignments) {
@@ -51,8 +52,9 @@ public class CellInstance extends AbstractInstance {
             return this.avatar;
     }
 
-    public void markAsInputDriven() {
+    public void markAsInputDriven(double inputDrivenMaxCIn) {
         this.isInputDriven = true;
+        this.inputDrivenMaxCIn = inputDrivenMaxCIn;
     }
 
     public void addPredecessor(CellInstance newPredecessor) {
@@ -152,7 +154,7 @@ public class CellInstance extends AbstractInstance {
     }
 
     public void selectSize(Cell sizeToSelect) {
-        if (this.isInputDriven) return;
+        if (this.isInputDriven && sizeToSelect.violatesMaxCIn(inputDrivenMaxCIn)) return;
         this.selectedSize = sizeToSelect;
         this.invalidateCache();
         if (this.avatar != null) {
@@ -165,12 +167,7 @@ public class CellInstance extends AbstractInstance {
     }
 
     public void selectFastestSizeForLoad(double loadCapacitance) {
-        if (this.isInputDriven) return;
-        this.selectedSize = definition.getFastestSizeForLoad(loadCapacitance);
-        this.invalidateCache();
-        if (this.avatar != null) {
-            this.avatar.selectFastestSizeForLoad(loadCapacitance);
-        }
+        this.selectSize(definition.getFastestSizeForLoad(loadCapacitance));
     }
 
     public AggregatedCell getDefinition() {
@@ -178,7 +175,9 @@ public class CellInstance extends AbstractInstance {
     }
 
     public void setInputPinTheoreticalCapacitance(String inputPin, double newInputPinCapacitance, boolean clampToPossible) {
-        if (this.isInputDriven) return;
+        if (this.isInputDriven) {
+            newInputPinCapacitance = Math.min(newInputPinCapacitance, this.inputDrivenMaxCIn);
+        }
         if (clampToPossible) {
             newInputPinCapacitance = Math.min(newInputPinCapacitance, this.definition.getLargestPossibleCapacitance(inputPin));
             newInputPinCapacitance = Math.max(newInputPinCapacitance, this.definition.getSmallestPossibleCapacitance(inputPin));
