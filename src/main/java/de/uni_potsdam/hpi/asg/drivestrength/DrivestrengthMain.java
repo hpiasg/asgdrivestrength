@@ -32,7 +32,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistBundleSplitt
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
-import de.uni_potsdam.hpi.asg.drivestrength.optimization.SimulatedAnnealingOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.FanoutOptimizer;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -116,8 +116,9 @@ public class DrivestrengthMain {
         //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
         //new AllLargestOptimizer(inlinedNetlist).run();
         //new AllSmallestOptimizer(inlinedNetlist).run();
-        new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, options.getOptimizeEnergyPercentage()).run();
+        //new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, options.getOptimizeEnergyPercentage()).run();
         //new EqualDelayMatrixOptimizer(inlinedNetlist).run();
+        new FanoutOptimizer(inlinedNetlist).run();
 
         boolean exportTheoreticalLoad = false;
         new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run();
