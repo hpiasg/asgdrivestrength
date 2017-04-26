@@ -14,7 +14,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.PinAssignment;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Signal;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Signal.Direction;
 
-public class ModuleInliner {
+public class NetlistModuleInliner {
     private Module sourceModule;
     private Module inlinedModule;
     private int nextInstanceId;
@@ -23,7 +23,7 @@ public class ModuleInliner {
     private Map<String, Signal> signalTransformation;
     Map<String, Integer> signalBitIndexTransformation;
     
-    public ModuleInliner(Module sourceModule) {
+    public NetlistModuleInliner(Module sourceModule) {
         this.sourceModule = sourceModule;
         this.nextInstanceId = 0;
         this.nextNonIOSignalId = 0;
@@ -33,7 +33,7 @@ public class ModuleInliner {
         this.inlinedModule = new Module(this.sourceModule, true);
         
         for (ModuleInstance childInstance : this.sourceModule.getModuleInstances()) {
-            Module inlinedChild = new ModuleInliner(childInstance.getDefinition()).run();
+            Module inlinedChild = new NetlistModuleInliner(childInstance.getDefinition()).run();
             
             signalTransformation = new HashMap<>();
             signalBitIndexTransformation = new HashMap<>();

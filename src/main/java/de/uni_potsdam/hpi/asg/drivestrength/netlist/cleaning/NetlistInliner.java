@@ -18,7 +18,7 @@ public class NetlistInliner {
         assertNetlistIsFlat();
         Netlist inlinedNetlist = new Netlist();
         inlinedNetlist.setName(originalNetlist.getName());
-        inlinedNetlist.addModule(new ModuleInliner(originalNetlist.getRootModule()).run());
+        inlinedNetlist.addModule(new NetlistModuleInliner(originalNetlist.getRootModule()).run());
         return inlinedNetlist;
     }
 

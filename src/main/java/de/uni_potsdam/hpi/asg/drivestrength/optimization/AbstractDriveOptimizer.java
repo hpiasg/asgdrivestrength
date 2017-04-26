@@ -28,7 +28,11 @@ public abstract class AbstractDriveOptimizer {
         long startTime = System.currentTimeMillis();
         this.optimize();
         long stopTime = System.currentTimeMillis();
-        logger.info("Optimization runtime: " + (stopTime - startTime) + " ms");
+        if (stopTime - startTime == 0) {
+            logger.info("Optimization runtime: < 1 ms");
+        } else {
+            logger.info("Optimization runtime: " + (stopTime - startTime) + " ms");
+        }
     }
 
     protected void selectSizesFromTheoretical() {
