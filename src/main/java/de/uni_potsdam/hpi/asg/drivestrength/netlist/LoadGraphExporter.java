@@ -23,7 +23,17 @@ public class LoadGraphExporter {
         this.useTheoreticalLoad = useTheoreticalLoad;
     }
 
-    public void run() {
+    public void print() {
+        if (this.useTheoreticalLoad) {
+            logger.info("Load graph (from theoretical sizes): ");
+        } else {
+            logger.info("Load graph (from chosen sizes): ");
+        }
+
+        System.out.println(this.run());
+    }
+
+    public String run() {
         int staticLoadId = 0;
         for (CellInstance c : module.getCellInstances()) {
             this.nodesJson +=  makeNodeJson(id(c), this.findAppropriateCapacitance(c), c.isInputDriven());
@@ -41,12 +51,7 @@ public class LoadGraphExporter {
         nodesJson = nodesJson.substring(0, nodesJson.length()-1);
         linksJson = linksJson.substring(0, linksJson.length()-1);
 
-        if (this.useTheoreticalLoad) {
-            logger.info("Load graph (from theoretical sizes): ");
-        } else {
-            logger.info("Load graph (from chosen sizes): ");
-        }
-        System.out.println("{\"nodes\": [" + this.nodesJson + "], \n\"links\": [" + this.linksJson + "]}");
+        return "{\"nodes\": [" + this.nodesJson + "], \n\"links\": [" + this.linksJson + "]}";
     }
 
     private double findAppropriateCapacitance(CellInstance c) {

@@ -18,6 +18,10 @@ public class FileHelper {
         }
     }
 
+    public static void writeStringToTextFile(String fileContent, File file) {
+        writeStringToTextFile(fileContent, file.getAbsolutePath());
+    }
+
     public static void writeStringToTextFile(String fileContent, String fileName) {
         try {
             PrintWriter out = new PrintWriter(fileName);

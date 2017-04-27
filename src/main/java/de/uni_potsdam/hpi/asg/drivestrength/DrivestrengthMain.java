@@ -33,6 +33,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.FanoutOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.util.FileHelper;
 
 public class DrivestrengthMain {
     private static Logger logger;
@@ -120,15 +121,13 @@ public class DrivestrengthMain {
         //new EqualDelayMatrixOptimizer(inlinedNetlist).run();
         new FanoutOptimizer(inlinedNetlist).run();
 
-        boolean exportTheoreticalLoad = false;
-        new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run();
 
         boolean estimateWithTheoreticalLoad = false;
         new DelayEstimator(inlinedNetlist, estimateWithTheoreticalLoad, false).print();
         new EnergyEstimator(inlinedNetlist, false).print();
 
-
-        //logger.info(netlist.toVerilog());
+        writeLoadGraphToFile(inlinedNetlist);
+        writeOptimizedNetlistToFile(netlist);
 
 //        boolean remoteVerbose = false;
 //        boolean keepFiles = true;
@@ -136,6 +135,29 @@ public class DrivestrengthMain {
 //                              outputPinCapacitance, keepFiles, remoteVerbose).run();
 
         return 0;
+    }
+
+    private static void writeLoadGraphToFile(Netlist inlinedNetlist) {
+        boolean exportTheoreticalLoad = false;
+        String loadGraphOutput = new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run();
+
+        if (options.getOutputLoadGraphFile() != null) {
+            FileHelper.writeStringToTextFile(loadGraphOutput, options.getOutputLoadGraphFile());
+            logger.info("Wrote capacitance load graph to " + options.getOutputLoadGraphFile());
+        } else {
+            logger.info("No load graph output file specified. Writing capacitance load graph to console:");
+            logger.info(loadGraphOutput);
+        }
+    }
+
+    private static void writeOptimizedNetlistToFile(Netlist netlist) {
+        if (options.getOutputNetlistFile() != null) {
+            FileHelper.writeStringToTextFile(netlist.toVerilog(), options.getOutputNetlistFile());
+            logger.info("Wrote optimized netlist to " + options.getOutputNetlistFile());
+        } else {
+            logger.info("No output file specified. Writing optimized netlist to console:");
+            logger.info(netlist.toVerilog());
+        }
     }
 
     private static AggregatedCellLibrary loadCellInformation() {

@@ -46,10 +46,14 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     @Option(name = "-optimizeEnergyPercentage", metaVar = "<optimizeEnergyPercentage>", usage ="Percentage for Energy in SA Optimizer (0: Minimize only Delay, 100: Minimize only Energy)", required = false)
     private int optimizeEnergyPercentage = 0;
 
-    @Argument(metaVar = "Verilog Netlist File", required = true)
-    private File netlistFile;
+    @Option(name = "-out", metaVar="<outputNetlistFile>", usage="Output file name for the optimized verilog netlist", required = false)
+    private File outputNetlistFile;
 
+    @Option(name = "-outLoadGraph", metaVar="<outputLoadGraphFile>", usage="Output file name for the capacitance load graph", required = false)
+    private File outputLoadGraphFile;
 
+    @Argument(metaVar = "Verilog Netlist Input File", required = true)
+    private File netlistFileIn;
 
 
     public int getOutputlevel() {
@@ -69,7 +73,7 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     }
 
     public File getNetlistFile() {
-        return netlistFile;
+        return netlistFileIn;
     }
 
     public File getLibertyFile() {
@@ -98,6 +102,14 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
 
     public int getOptimizeEnergyPercentage() {
         return optimizeEnergyPercentage;
+    }
+
+    public File getOutputNetlistFile() {
+        return outputNetlistFile;
+    }
+
+    public File getOutputLoadGraphFile() {
+        return outputLoadGraphFile;
     }
 
 }
