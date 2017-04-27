@@ -32,7 +32,14 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistBundleSplitt
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.AllLargestOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.AllSmallestOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualDelayMatrixOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.FanoutOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.NeighborStageEffortOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.SelectForLoadOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.SimulatedAnnealingOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.util.FileHelper;
 
 public class DrivestrengthMain {
@@ -94,16 +101,11 @@ public class DrivestrengthMain {
         Netlist netlist = new VerilogParser(options.getNetlistFile(), cellLibrary, replaceBySingleStageCells).createNetlist();
 
         new NetlistFlattener(netlist).run();
-
         Netlist inlinedNetlist = new NetlistInliner(netlist).run();
-
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
-
-        double outputPinCapacitance = 0.012;
-        new LoadGraphAnnotator(inlinedNetlist, outputPinCapacitance).run();
-        double inputDrivenMaxCIn = 0.007;
-        new InputDrivenAnnotator(inlinedNetlist, inputDrivenMaxCIn).run();
+        new LoadGraphAnnotator(inlinedNetlist, options.getOutputPinCapacitance()).run();
+        new InputDrivenAnnotator(inlinedNetlist, options.getInputDrivenMaxCIn()).run();
         new PredecessorAnnotator(inlinedNetlist).run();
 
         new DelayEstimator(inlinedNetlist, false, false).print();
@@ -111,15 +113,7 @@ public class DrivestrengthMain {
 
 //        new BruteForceRunner(inlinedNetlist).run();
 
-//        boolean clampToImplementableCapacitances = true;
-//        new EqualStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
-        //new NeighborStageEffortOptimizer(inlinedNetlist, 100, clampToImplementableCapacitances).run();
-        //new SelectForLoadOptimizer(inlinedNetlist, 100).run();
-        //new AllLargestOptimizer(inlinedNetlist).run();
-        //new AllSmallestOptimizer(inlinedNetlist).run();
-        //new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, options.getOptimizeEnergyPercentage()).run();
-        //new EqualDelayMatrixOptimizer(inlinedNetlist).run();
-        new FanoutOptimizer(inlinedNetlist).run();
+        optimize(inlinedNetlist);
 
 
         boolean estimateWithTheoreticalLoad = false;
@@ -135,6 +129,53 @@ public class DrivestrengthMain {
 //                              outputPinCapacitance, keepFiles, remoteVerbose).run();
 
         return 0;
+    }
+
+    private static AggregatedCellLibrary loadCellInformation() {
+        List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
+
+        boolean skipDeviatingSizes = false;
+
+        StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
+        DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
+        OrderedSizesContainer orderedSizes = new OrderedSizesParser(options.getOrderedSizesFile(),
+                                                            skipDeviatingSizes, stageCounts.listDeviatingSizes()).run();
+
+        CellAggregator ca = new CellAggregator(cells, stageCounts, defaultSizes, orderedSizes, skipDeviatingSizes);
+        AggregatedCellLibrary aggregatedCellLibrary = ca.run();
+        new SizeCapacitanceMonotonizer(aggregatedCellLibrary, orderedSizes).run();
+        return aggregatedCellLibrary;
+    }
+
+    private static void optimize(Netlist inlinedNetlist) {
+        switch (options.getOptimizer()) {
+        case "ESE":
+            new EqualStageEffortOptimizer(inlinedNetlist, 100, true).run();
+            break;
+        case "NSE":
+            new NeighborStageEffortOptimizer(inlinedNetlist, 100, true).run();
+            break;
+        case "SFL":
+            new SelectForLoadOptimizer(inlinedNetlist, 100).run();
+            break;
+        case "TOP":
+            new AllLargestOptimizer(inlinedNetlist).run();
+            break;
+        case "BOT":
+            new AllSmallestOptimizer(inlinedNetlist).run();
+            break;
+        case "EDM":
+            new EqualDelayMatrixOptimizer(inlinedNetlist).run();
+            break;
+        case "FO":
+            new FanoutOptimizer(inlinedNetlist).run();
+            break;
+        case "SA":
+            new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, options.getOptimizeEnergyPercentage()).run();
+            break;
+        default:
+            throw new Error("Specified optimizer " + options.getOptimizer() + " does not exist");
+        }
     }
 
     private static void writeLoadGraphToFile(Netlist inlinedNetlist) {
@@ -158,22 +199,6 @@ public class DrivestrengthMain {
             logger.info("No output file specified. Writing optimized netlist to console:");
             logger.info(netlist.toVerilog());
         }
-    }
-
-    private static AggregatedCellLibrary loadCellInformation() {
-        List<Cell> cells = new LibertyParser(options.getLibertyFile()).run();
-
-        boolean skipDeviatingSizes = false;
-
-        StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
-        DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
-        OrderedSizesContainer orderedSizes = new OrderedSizesParser(options.getOrderedSizesFile(),
-                                                            skipDeviatingSizes, stageCounts.listDeviatingSizes()).run();
-
-        CellAggregator ca = new CellAggregator(cells, stageCounts, defaultSizes, orderedSizes, skipDeviatingSizes);
-        AggregatedCellLibrary aggregatedCellLibrary = ca.run();
-        new SizeCapacitanceMonotonizer(aggregatedCellLibrary, orderedSizes).run();
-        return aggregatedCellLibrary;
     }
 
 }

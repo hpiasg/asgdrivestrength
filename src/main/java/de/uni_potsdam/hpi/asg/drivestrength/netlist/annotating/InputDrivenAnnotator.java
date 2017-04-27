@@ -25,7 +25,7 @@ public class InputDrivenAnnotator {
     }
 
     public void run() {
-        logger.info("Restricting input driven capacitances to max. " + this.inputDrivenMaxCIn + " pF");
+        logger.info("Limiting capacitances of input-driven cells to max. " + this.inputDrivenMaxCIn + " pF");
         Set<Signal> inputDrivenSignals = new HashSet<>();
 
         for (Signal ioSignal : module.getIOSignals()) {

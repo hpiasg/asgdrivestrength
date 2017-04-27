@@ -43,6 +43,15 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     @Option(name = "-remoteConfig", metaVar = "<remoteConfigFile>", usage ="Remote Config JSON File containing username, host, ...", required = false)
     private File remoteConfigFile;
 
+    @Option(name = "-outputPinCapacitance", metaVar = "<outputPinCapacitance>", usage="Load capacitance applied to each output pin [unit: pF]. Default: 0.012")
+    private double outputPinCapacitance = 0.012;
+
+    @Option(name = "-inputDrivenMaxCIn", metaVar = "<inputDrivenMaxCIn>", usage="Limit the capacitance of cells driven by circuit input pins [unit: pF]. Default: 0.007")
+    private double inputDrivenMaxCIn = 0.007;
+
+    @Option(name = "-optimizer", metaVar = "<optimizer>", usage ="Selected Optimizer. Values are SA (default), NOP, TOP, BOT, SFL, ESE, NSE, EDM (only for all-single-stage cells), and FO", required = false)
+    private String optimizer = "SA";
+
     @Option(name = "-optimizeEnergyPercentage", metaVar = "<optimizeEnergyPercentage>", usage ="Percentage for Energy in SA Optimizer (0: Minimize only Delay, 100: Minimize only Energy)", required = false)
     private int optimizeEnergyPercentage = 0;
 
@@ -110,6 +119,18 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
 
     public File getOutputLoadGraphFile() {
         return outputLoadGraphFile;
+    }
+
+    public String getOptimizer() {
+        return optimizer;
+    }
+
+    public double getOutputPinCapacitance() {
+        return outputPinCapacitance;
+    }
+
+    public double getInputDrivenMaxCIn() {
+        return inputDrivenMaxCIn;
     }
 
 }
