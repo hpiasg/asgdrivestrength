@@ -38,6 +38,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualDelayMatrixOptimiz
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.FanoutOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.NeighborStageEffortOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.NopOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.SelectForLoadOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.SimulatedAnnealingOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.util.FileHelper;
@@ -149,6 +150,9 @@ public class DrivestrengthMain {
 
     private static void optimize(Netlist inlinedNetlist) {
         switch (options.getOptimizer()) {
+        case "NOP":
+            new NopOptimizer(inlinedNetlist).run();
+            break;
         case "ESE":
             new EqualStageEffortOptimizer(inlinedNetlist, 100, true).run();
             break;

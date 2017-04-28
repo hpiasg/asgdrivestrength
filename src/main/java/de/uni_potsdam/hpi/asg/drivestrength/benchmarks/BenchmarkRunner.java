@@ -57,6 +57,7 @@ public class BenchmarkRunner {
         this.startTime = System.currentTimeMillis();
 
         //String[] benchmarkNetlists = {"inc"};
+        //String[] benchmarkNetlists = {"single-inv", "four-inv", "loop", "fanout-chain", "adder-nand"};
         String[] benchmarkNetlists = {"inc", "mod10", "count10", "bufferx", "gcd", "mult"};
         double[] benchmarkOutCs = {0.0, 0.003, 0.012, 0.1, 1.0};
         double[] inputDrivenMaxCIns = {0.005, 1.0};
