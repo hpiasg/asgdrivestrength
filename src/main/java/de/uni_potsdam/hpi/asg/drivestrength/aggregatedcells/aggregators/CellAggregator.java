@@ -10,31 +10,24 @@ import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesContainer;
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.OrderedSizesContainer;
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Pin;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.additionalinfo.AdditionalCellInfoContainer;
 
 public class CellAggregator {
     protected static final Logger logger = LogManager.getLogger();
 
     private final List<Cell> rawCells;
     private Map<String, AggregatedCell> aggregatedCells;
-    private StageCountsContainer stageCounts;
-    private DefaultSizesContainer defaultSizes;
-    private OrderedSizesContainer orderedSizes;
+    private AdditionalCellInfoContainer additionalCellInfo;
     private boolean skipDeviatingSizes;
 
     // We use values for input slew = 0.0161238 ns, as it is closest to the 0.0181584ns used in cell pdfs
     private final int inputSlewIndex = 0;
 
-    public CellAggregator(List<Cell> rawCells, StageCountsContainer stageCounts,
-            DefaultSizesContainer defaultSizes, OrderedSizesContainer orderedSizes, boolean skipDeviatingSizes) {
+    public CellAggregator(List<Cell> rawCells, AdditionalCellInfoContainer additionalCellInfo, boolean skipDeviatingSizes) {
         this.rawCells = rawCells;
-        this.stageCounts = stageCounts;
-        this.defaultSizes = defaultSizes;
-        this.orderedSizes = orderedSizes;
+        this.additionalCellInfo = additionalCellInfo;
         this.skipDeviatingSizes = skipDeviatingSizes;
     }
 
@@ -59,11 +52,11 @@ public class CellAggregator {
             aggregatedCell.setInputPinNames(this.extractInputPinNames(rawSizes.get(0)));
             aggregatedCell.setOutputPinName(this.extractOutputPinName(rawSizes.get(0)));
             aggregatedCell.setSizeCapacitances(this.extractSizeCapacitances(rawSizes));
-            aggregatedCell.setDefaultSizeName(this.defaultSizes.get(aggregatedCell.getName()));
-            aggregatedCell.orderRawSizes(this.orderedSizes.get(aggregatedCell.getName()));
+            aggregatedCell.setDefaultSizeName(this.additionalCellInfo.getDefaultSizeFor(aggregatedCell.getName()));
+            aggregatedCell.orderRawSizes(this.additionalCellInfo.getOrderedSizesFor(aggregatedCell.getName()));
 
             new CellPowerAggregator(aggregatedCell, this.inputSlewIndex).run();
-            new CellDelayAggregator(aggregatedCell, this.stageCounts, this.inputSlewIndex).run();
+            new CellDelayAggregator(aggregatedCell, this.additionalCellInfo, this.inputSlewIndex).run();
         }
 
         logger.info("Aggregated to " + aggregatedCells.size() + " distinct (single-output) cells");
@@ -81,7 +74,7 @@ public class CellAggregator {
             logger.debug(logPrefix + "(no input pins)");
             return false;
         }
-        if (!this.stageCounts.getFootprintDefaults().containsKey(rawCell.getFootprint())) {
+        if (!this.additionalCellInfo.getDefaultStageCounts().containsKey(rawCell.getFootprint())) {
             logger.debug(logPrefix + "(no stage count information)");
             return false;
         }
@@ -93,7 +86,7 @@ public class CellAggregator {
     }
 
     private boolean isDeviatingSize(String rawCellName) {
-        return this.stageCounts.getDeviatingSizes().containsKey(rawCellName);
+        return this.additionalCellInfo.listDeviatingSizes().contains(rawCellName);
     }
 
     private List<String> getOrderedPinNames(Cell rawCell) {

@@ -11,14 +11,10 @@ import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.aggregators.CellAggregator;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.aggregators.SizeCapacitanceMonotonizer;
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesContainer;
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.defaultsizes.DefaultSizesParser;
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.OrderedSizesContainer;
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.OrderedSizesParser;
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsParser;
 import de.uni_potsdam.hpi.asg.drivestrength.benchmarks.BenchmarkRunner;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.additionalinfo.AdditionalCellInfoContainer;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.additionalinfo.AdditionalCellInfoParser;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.libertyparser.LibertyParser;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.EnergyEstimator;
@@ -137,14 +133,12 @@ public class DrivestrengthMain {
 
         boolean skipDeviatingSizes = false;
 
-        StageCountsContainer stageCounts = new StageCountsParser(options.getStageCountsFile()).run();
-        DefaultSizesContainer defaultSizes = new DefaultSizesParser(options.getDefaultSizesFile()).run();
-        OrderedSizesContainer orderedSizes = new OrderedSizesParser(options.getOrderedSizesFile(),
-                                                            skipDeviatingSizes, stageCounts.listDeviatingSizes()).run();
-
-        CellAggregator ca = new CellAggregator(cells, stageCounts, defaultSizes, orderedSizes, skipDeviatingSizes);
+        AdditionalCellInfoContainer additionalCellInfo 
+         = new AdditionalCellInfoParser(options.getAdditionalCellInfoJsonFile(), skipDeviatingSizes).run();
+        
+        CellAggregator ca = new CellAggregator(cells, additionalCellInfo, skipDeviatingSizes);
         AggregatedCellLibrary aggregatedCellLibrary = ca.run();
-        new SizeCapacitanceMonotonizer(aggregatedCellLibrary, orderedSizes).run();
+        new SizeCapacitanceMonotonizer(aggregatedCellLibrary, additionalCellInfo).run();
         return aggregatedCellLibrary;
     }
 

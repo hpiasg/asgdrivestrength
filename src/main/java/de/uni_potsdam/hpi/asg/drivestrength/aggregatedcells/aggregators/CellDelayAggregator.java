@@ -9,21 +9,21 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.DelayLine;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.DelayParameterTriple;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.DelayPoint;
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.stagecounts.StageCountsContainer;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.DelayMatrix7x7;
 import de.uni_potsdam.hpi.asg.drivestrength.cells.TimingContainer;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.additionalinfo.AdditionalCellInfoContainer;
 
 public class CellDelayAggregator {
 
     private int inputSlewIndex;
     private AggregatedCell aggregatedCell;
-    private StageCountsContainer stageCounts;
+    private AdditionalCellInfoContainer additionalCellInfo;
 
-    public CellDelayAggregator(AggregatedCell aggregatedCell, StageCountsContainer stageCounts, int inputSlewIndex) {
+    public CellDelayAggregator(AggregatedCell aggregatedCell, AdditionalCellInfoContainer additionalCellInfo, int inputSlewIndex) {
         this.aggregatedCell = aggregatedCell;
         this.inputSlewIndex = inputSlewIndex;
-        this.stageCounts = stageCounts;
+        this.additionalCellInfo = additionalCellInfo;
     }
 
     public void run() {
@@ -32,7 +32,7 @@ public class CellDelayAggregator {
                                                                    aggregatedCell.getSizeCapacitances()));
 
 
-        Map<String, Integer> stageCountsPerPin = this.stageCounts.getFootprintDefaults().get(aggregatedCell.getName());
+        Map<String, Integer> stageCountsPerPin = this.additionalCellInfo.getDefaultStageCounts().get(aggregatedCell.getName());
         aggregatedCell.setDelayParameterTriples(this.extractDelayParameters(aggregatedCell.getSizeDelayLines(), stageCountsPerPin));
     }
 
@@ -108,7 +108,7 @@ public class CellDelayAggregator {
     }
 
     private boolean isDeviatingSize(String rawCellName) {
-        return this.stageCounts.getDeviatingSizes().containsKey(rawCellName);
+        return this.additionalCellInfo.listDeviatingSizes().contains(rawCellName);
     }
 
 }

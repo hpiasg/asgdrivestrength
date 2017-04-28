@@ -7,7 +7,7 @@ import java.util.Map;
 
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
-import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.OrderedSizesContainer;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.additionalinfo.AdditionalCellInfoContainer;
 
 /**
  * As displayed in rawcell-input-capacitances.ods some multi-stage cells exhibit the behavior
@@ -17,16 +17,16 @@ import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.orderedsizes.Ordered
  */
 public class SizeCapacitanceMonotonizer {
     private List<AggregatedCell> aggregatedCells;
-    private OrderedSizesContainer allOrderedSizes;
+    private AdditionalCellInfoContainer additionalCellInfo;
 
-    public SizeCapacitanceMonotonizer(AggregatedCellLibrary aggregatedCellLibrary, OrderedSizesContainer allOrderedSizes) {
+    public SizeCapacitanceMonotonizer(AggregatedCellLibrary aggregatedCellLibrary, AdditionalCellInfoContainer additionalCellInfo) {
         this.aggregatedCells = aggregatedCellLibrary.getAll();
-        this.allOrderedSizes = allOrderedSizes;
+        this.additionalCellInfo = additionalCellInfo;
     }
 
     public void run() {
         for (AggregatedCell c : this.aggregatedCells) {
-            ArrayList<String> orderedSizes = allOrderedSizes.get(c.getName());
+            ArrayList<String> orderedSizes = additionalCellInfo.getOrderedSizesFor(c.getName());
             c.setMonotonizedSizeCapacitances(monotonize(c.getSizeCapacitances(), orderedSizes));
         }
     }

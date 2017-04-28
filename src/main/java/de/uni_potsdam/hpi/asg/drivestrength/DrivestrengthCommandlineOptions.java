@@ -31,14 +31,8 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     @Option(name = "-lib", metaVar = "<libertyfile>", usage ="Liberty Cell Library File", required = true)
     private File libertyFile;
 
-    @Option(name = "-stage", metaVar = "<stageCountsFile>", usage ="Cell Stage Counts JSON File", required = true)
-    private File stageCountsFile;
-
-    @Option(name = "-defaultSizes", metaVar = "<defaultSizesFile>", usage ="Cell Default Sizes JSON File", required = true)
-    private File defaultSizesFile;
-
-    @Option(name = "-orderedSizes", metaVar = "<orderedSizesFile>", usage ="Cell Ordered Sizes JSON File", required = true)
-    private File orderedSizesFile;
+    @Option(name = "-cellInfoJson", metaVar = "<additionalCellInfoJsonFile>", usage="JSON file containing cell stage counts, default sizes and ordered size names", required = true)
+    private File additionalCellInfoJsonFile;
 
     @Option(name = "-remoteConfig", metaVar = "<remoteConfigFile>", usage ="Remote Config JSON File containing username, host, ...", required = false)
     private File remoteConfigFile;
@@ -89,14 +83,6 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
         return libertyFile;
     }
 
-    public File getStageCountsFile() {
-        return stageCountsFile;
-    }
-
-    public File getDefaultSizesFile() {
-        return defaultSizesFile;
-    }
-
     public File getWorkingdir() {
         return workingdir;
     }
@@ -104,11 +90,6 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     public File getRemoteConfigFile() {
         return remoteConfigFile;
     }
-
-    public File getOrderedSizesFile() {
-        return orderedSizesFile;
-    }
-
     public int getOptimizeEnergyPercentage() {
         return optimizeEnergyPercentage;
     }
@@ -133,4 +114,7 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
         return inputDrivenMaxCIn;
     }
 
+    public File getAdditionalCellInfoJsonFile() {
+        return additionalCellInfoJsonFile;
+    }
 }
