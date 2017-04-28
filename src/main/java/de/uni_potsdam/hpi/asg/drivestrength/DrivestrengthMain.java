@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper.Mode;
-import de.uni_potsdam.hpi.asg.common.iohelper.WorkingdirGenerator;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.aggregators.CellAggregator;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.aggregators.SizeCapacitanceMonotonizer;
@@ -68,9 +67,6 @@ public class DrivestrengthMain {
                 logger = LoggerHelper.initLogger(options.getOutputlevel(),
                         options.getLogfile(), options.isDebug(), Mode.cmdline);
                 logger.debug("Args: " + Arrays.asList(args).toString());
-                WorkingdirGenerator.getInstance().create(
-                        options.getWorkingdir(), "", "drivestrengthwork", null);
-
                 execute();
             }
             long end = System.currentTimeMillis();
@@ -123,7 +119,7 @@ public class DrivestrengthMain {
 //        boolean remoteVerbose = false;
 //        boolean keepFiles = true;
 //        new RemoteSimulation(inlinedNetlist, options.getRemoteConfigFile(),
-//                              outputPinCapacitance, keepFiles, remoteVerbose).run();
+//                              options.getOutputPinCapacitance(), keepFiles, remoteVerbose).run();
 
         return 0;
     }

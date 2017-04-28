@@ -12,15 +12,11 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
         return super.parseCmdLine(args, "Usage: ASGdrivestrength");
     }
 
-
     @Option(name = "-o", metaVar = "<level>", usage = "Outputlevel: 0:nothing\n1:errors\n[2:+warnings]\n3:+info")
     private int outputlevel             = 2;
+    
     @Option(name = "-log", metaVar = "<logfile>", usage = "Define output Logfile, default is drivestrength.log")
     private File logfile = new File("drivestrength.log");
-
-    @Option(name = "-w", metaVar = "<workingdir>", usage = "Working directory. If not given, the value in configfile is used. If there is no entry, 'resynwork*' in the os default tmp dir is used.")
-    private File workingdir = null;
-
 
     @Option(name = "-debug")
     private boolean debug = false;
@@ -81,10 +77,6 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
 
     public File getLibertyFile() {
         return libertyFile;
-    }
-
-    public File getWorkingdir() {
-        return workingdir;
     }
 
     public File getRemoteConfigFile() {
