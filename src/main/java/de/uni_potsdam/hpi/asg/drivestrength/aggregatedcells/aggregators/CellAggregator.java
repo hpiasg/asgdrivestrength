@@ -53,6 +53,7 @@ public class CellAggregator {
             aggregatedCell.setOutputPinName(this.extractOutputPinName(rawSizes.get(0)));
             aggregatedCell.setSizeCapacitances(this.extractSizeCapacitances(rawSizes));
             aggregatedCell.setDefaultSizeName(this.additionalCellInfo.getDefaultSizeFor(aggregatedCell.getName()));
+            aggregatedCell.setSizeDrivestrengthFanoutFactors(this.selectCellFanoutFactorsFor(aggregatedCell.getName()));
             aggregatedCell.orderRawSizes(this.additionalCellInfo.getOrderedSizesFor(aggregatedCell.getName()));
 
             new CellPowerAggregator(aggregatedCell, this.inputSlewIndex).run();
@@ -130,6 +131,14 @@ public class CellAggregator {
             pinCapacitances.put(pin.getName(), pin.getCapacitance());
         }
         return pinCapacitances;
+    }
+    
+    private Map<String, Double> selectCellFanoutFactorsFor(String cellFootprint) {
+        Map<String, Double> fanoutFactors = new HashMap<>();
+        for (String sizeName : this.additionalCellInfo.getOrderedSizesFor(cellFootprint)) {
+            fanoutFactors.put(sizeName, additionalCellInfo.getDrivestrengthFanoutFactorFor(sizeName));
+        }
+        return fanoutFactors;
     }
 
 }

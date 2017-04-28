@@ -10,6 +10,7 @@ public class AdditionalCellInfoContainer {
     private HashMap<String, HashMap<String, Integer>> deviatingStageCountSizes;
     HashMap<String, String> defaultSizes;
     private HashMap<String, ArrayList<String>> orderedSizes;
+    private HashMap<String, Double> drivestrengthFanoutFactors;
     
     public AdditionalCellInfoContainer() {
     }
@@ -46,5 +47,11 @@ public class AdditionalCellInfoContainer {
     
     public String getDefaultSizeFor(String footprint) {
         return defaultSizes.get(footprint);
+    }
+    
+    
+    
+    public double getDrivestrengthFanoutFactorFor(String sizeName) {
+        return drivestrengthFanoutFactors.get(sizeName);
     }
 }
