@@ -1,6 +1,7 @@
 package de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.aggregators;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,9 +53,9 @@ public class CellAggregator {
             aggregatedCell.setInputPinNames(this.extractInputPinNames(rawSizes.get(0)));
             aggregatedCell.setOutputPinName(this.extractOutputPinName(rawSizes.get(0)));
             aggregatedCell.setSizeCapacitances(this.extractSizeCapacitances(rawSizes));
-            aggregatedCell.setDefaultSizeName(this.additionalCellInfo.getDefaultSizeFor(aggregatedCell.getName()));
-            aggregatedCell.setSizeDrivestrengthFanoutFactors(this.selectCellFanoutFactorsFor(aggregatedCell.getName()));
-            aggregatedCell.orderRawSizes(this.additionalCellInfo.getOrderedSizesFor(aggregatedCell.getName()));
+            aggregatedCell.setDefaultSizeName(this.findDefaultSize(aggregatedCell.getName(), rawSizes));
+            aggregatedCell.setSizeDrivestrengthFanoutFactors(this.findCellFanoutFactorsFor(aggregatedCell.getName(), rawSizes));
+            aggregatedCell.setOrderedRawSizes(this.orderRawSizes(aggregatedCell.getName(), rawSizes));
 
             new CellPowerAggregator(aggregatedCell, this.inputSlewIndex).run();
             new CellDelayAggregator(aggregatedCell, this.additionalCellInfo, this.inputSlewIndex).run();
@@ -63,6 +64,28 @@ public class CellAggregator {
         logger.info("Aggregated to " + aggregatedCells.size() + " distinct (single-output) cells");
 
         return new AggregatedCellLibrary(aggregatedCells);
+    }
+
+    private List<Cell> orderRawSizes(String footprint, List<Cell> rawSizes) {
+        List<Cell> rawSizesOrdered = new ArrayList<>(rawSizes);
+        Collections.sort(rawSizesOrdered, (a,b) -> this.compareRawSizes(a, b));
+        return rawSizesOrdered;
+    }
+
+    private int compareRawSizes(Cell a, Cell b) {
+        double aSize = this.additionalCellInfo.getDrivestrengthFanoutFactorFor(a.getName());
+        double bSize = this.additionalCellInfo.getDrivestrengthFanoutFactorFor(b.getName());
+        return aSize < bSize ? -1 : aSize == bSize ? 0 : 1;
+    }
+
+    private String findDefaultSize(String footprint, List<Cell> rawSizes) {
+        for (Cell rawSize : rawSizes) {
+            double fanoutFactor = this.additionalCellInfo.getDrivestrengthFanoutFactorFor(rawSize.getName());
+            if (Math.abs(fanoutFactor - 1.0) < 0.000001) {
+                return rawSize.getName();
+            }
+        }
+        throw new Error("Could not find default (1x) size in additional cell info for " + footprint);
     }
 
     private boolean isFitForAggregation(Cell rawCell) {
@@ -132,11 +155,11 @@ public class CellAggregator {
         }
         return pinCapacitances;
     }
-    
-    private Map<String, Double> selectCellFanoutFactorsFor(String cellFootprint) {
+
+    private Map<String, Double> findCellFanoutFactorsFor(String cellFootprint, List<Cell> rawSizes) {
         Map<String, Double> fanoutFactors = new HashMap<>();
-        for (String sizeName : this.additionalCellInfo.getOrderedSizesFor(cellFootprint)) {
-            fanoutFactors.put(sizeName, additionalCellInfo.getDrivestrengthFanoutFactorFor(sizeName));
+        for (Cell rawSize : rawSizes) {
+            fanoutFactors.put(rawSize.getName(), additionalCellInfo.getDrivestrengthFanoutFactorFor(rawSize.getName()));
         }
         return fanoutFactors;
     }

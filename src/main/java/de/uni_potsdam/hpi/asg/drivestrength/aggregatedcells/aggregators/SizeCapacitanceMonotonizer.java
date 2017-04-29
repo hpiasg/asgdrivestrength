@@ -1,13 +1,12 @@
 package de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.aggregators;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCellLibrary;
-import de.uni_potsdam.hpi.asg.drivestrength.cells.additionalinfo.AdditionalCellInfoContainer;
+import de.uni_potsdam.hpi.asg.drivestrength.cells.Cell;
 
 /**
  * As displayed in rawcell-input-capacitances.ods some multi-stage cells exhibit the behavior
@@ -17,33 +16,31 @@ import de.uni_potsdam.hpi.asg.drivestrength.cells.additionalinfo.AdditionalCellI
  */
 public class SizeCapacitanceMonotonizer {
     private List<AggregatedCell> aggregatedCells;
-    private AdditionalCellInfoContainer additionalCellInfo;
 
-    public SizeCapacitanceMonotonizer(AggregatedCellLibrary aggregatedCellLibrary, AdditionalCellInfoContainer additionalCellInfo) {
+    public SizeCapacitanceMonotonizer(AggregatedCellLibrary aggregatedCellLibrary) {
         this.aggregatedCells = aggregatedCellLibrary.getAll();
-        this.additionalCellInfo = additionalCellInfo;
     }
 
     public void run() {
         for (AggregatedCell c : this.aggregatedCells) {
-            ArrayList<String> orderedSizes = additionalCellInfo.getOrderedSizesFor(c.getName());
+            List<Cell> orderedSizes = c.getRawSizes();
             c.setMonotonizedSizeCapacitances(monotonize(c.getSizeCapacitances(), orderedSizes));
         }
     }
 
-    private Map<String, Map<String, Double>> monotonize(Map<String, Map<String, Double>> originalSizeCapacitances, List<String> orderedSizes) {
+    private Map<String, Map<String, Double>> monotonize(Map<String, Map<String, Double>> originalSizeCapacitances, List<Cell> orderedSizes) {
         Map<String, Map<String, Double>> monotonizedCapacitances = new HashMap<>();
         for (String pinName : originalSizeCapacitances.keySet()) {
             monotonizedCapacitances.put(pinName, new HashMap<>());
             double previousC = 0;
-            for (String sizeName : orderedSizes) {
-                double currentOriginalC = originalSizeCapacitances.get(pinName).get(sizeName);
+            for (Cell rawSize : orderedSizes) {
+                double currentOriginalC = originalSizeCapacitances.get(pinName).get(rawSize.getName());
                 if (currentOriginalC > previousC) {
-                    monotonizedCapacitances.get(pinName).put(sizeName, currentOriginalC);
+                    monotonizedCapacitances.get(pinName).put(rawSize.getName(), currentOriginalC);
                     previousC = currentOriginalC;
                 } else {
                     double correctedC = previousC + 0.000001;
-                    monotonizedCapacitances.get(pinName).put(sizeName, correctedC);
+                    monotonizedCapacitances.get(pinName).put(rawSize.getName(), correctedC);
                     previousC = correctedC;
                 }
             }

@@ -129,12 +129,11 @@ public class DrivestrengthMain {
 
         boolean skipDeviatingSizes = false;
 
-        AdditionalCellInfoContainer additionalCellInfo 
-         = new AdditionalCellInfoParser(options.getAdditionalCellInfoJsonFile(), skipDeviatingSizes).run();
-        
+        AdditionalCellInfoContainer additionalCellInfo = new AdditionalCellInfoParser(options.getAdditionalCellInfoJsonFile()).run();
+
         CellAggregator ca = new CellAggregator(cells, additionalCellInfo, skipDeviatingSizes);
         AggregatedCellLibrary aggregatedCellLibrary = ca.run();
-        new SizeCapacitanceMonotonizer(aggregatedCellLibrary, additionalCellInfo).run();
+        new SizeCapacitanceMonotonizer(aggregatedCellLibrary).run();
         return aggregatedCellLibrary;
     }
 

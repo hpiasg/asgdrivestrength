@@ -75,19 +75,8 @@ public class AggregatedCell {
         this.sizeNames.add(cellSizeRaw.getName());
     }
 
-    public void orderRawSizes(List<String> orderedSizeNames) {
-        for (Cell rawCell : this.sizesRaw) {
-            if (!orderedSizeNames.contains(rawCell.getName())) {
-                logger.warn("Size " + rawCell.getName() + " missing in ordered size names. Skipping it in AggregatedCell.");
-            }
-        }
-
-        List<Cell> orderedSizesRaw = new ArrayList<>();
-        for (String name : orderedSizeNames) {
-            Cell rawCell = this.getSizeByName(name);
-            orderedSizesRaw.add(rawCell);
-        }
-        this.sizesRaw = orderedSizesRaw;
+    public void setOrderedRawSizes(List<Cell> orderedSizes) {
+        this.sizesRaw = orderedSizes;
     }
 
     public void setMonotonizedSizeCapacitances(Map<String, Map<String, Double>> monotonizedSizeCapacitances) {
@@ -133,7 +122,7 @@ public class AggregatedCell {
 	public void setSizeCapacitances(Map<String, Map<String, Double>> sizeCapacitances) {
 		this.sizeCapacitances = sizeCapacitances;
 	}
-	
+
 	public void setSizeDrivestrengthFanoutFactors(Map<String, Double> sizeDrivestrengthFanoutFactors) {
 	    this.sizeDrivestrengthFanoutFactors = sizeDrivestrengthFanoutFactors;
 	}
@@ -165,7 +154,7 @@ public class AggregatedCell {
     public Map<String, Map<String, Double>> getSizePowerValues() {
         return this.sizePowerValues;
     }
-    
+
     public Map<String, Double> getSizeDrivestrengthFanoutFactors() {
         return sizeDrivestrengthFanoutFactors;
     }
@@ -297,11 +286,6 @@ public class AggregatedCell {
         return this.sizesRaw.get(0);
     }
 
-    @Override
-    public String toString() {
-        return "AggregatedCell " + this.getName() + " with " + this.getSizeCount() + " cell sizes";
-    }
-
     public boolean isSingleStageCell() {
         for (String pinName : this.getInputPinNames()) {
             int stageCount = this.getStageCountForPin(pinName);
@@ -312,12 +296,9 @@ public class AggregatedCell {
         return true;
     }
 
-    private Cell getSizeByName(String name) {
-        for (Cell c : this.sizesRaw) {
-            if (c.getName().equals(name)) {
-                return c;
-            }
-        }
-        throw new Error("AggregatedCell " + this.getName() + " has no raw size of name " + name);
+    @Override
+    public String toString() {
+        return "AggregatedCell " + this.getName() + " with " + this.getSizeCount() + " cell sizes";
     }
+
 }

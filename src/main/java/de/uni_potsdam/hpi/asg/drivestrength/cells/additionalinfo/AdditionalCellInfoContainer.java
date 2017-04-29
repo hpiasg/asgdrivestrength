@@ -8,10 +8,8 @@ public class AdditionalCellInfoContainer {
 
     private HashMap<String, HashMap<String, Integer>> defaultStageCounts;
     private HashMap<String, HashMap<String, Integer>> deviatingStageCountSizes;
-    HashMap<String, String> defaultSizes;
-    private HashMap<String, ArrayList<String>> orderedSizes;
     private HashMap<String, Double> drivestrengthFanoutFactors;
-    
+
     public AdditionalCellInfoContainer() {
     }
 
@@ -26,31 +24,7 @@ public class AdditionalCellInfoContainer {
     public List<String> listDeviatingSizes() {
         return new ArrayList<String>(this.deviatingStageCountSizes.keySet());
     }
-    
-    
-    
-    public ArrayList<String> getOrderedSizesFor(String footprint) {
-        return orderedSizes.get(footprint);
-    }
 
-    public void removeOrderedSize(String size) {
-        for (List<String> sizes: orderedSizes.values()) {
-            sizes.remove(size);
-        }
-    }
-
-    public String listOrderedSizes() {
-        return orderedSizes.toString();
-    }
-    
-
-    
-    public String getDefaultSizeFor(String footprint) {
-        return defaultSizes.get(footprint);
-    }
-    
-    
-    
     public double getDrivestrengthFanoutFactorFor(String sizeName) {
         return drivestrengthFanoutFactors.get(sizeName);
     }
