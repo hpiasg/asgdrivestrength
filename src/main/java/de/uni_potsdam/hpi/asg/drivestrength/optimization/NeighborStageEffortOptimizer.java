@@ -58,7 +58,8 @@ public class NeighborStageEffortOptimizer extends AbstractDriveOptimizer {
             } else if (c.hasPredecessors()) {
                 targetEffort = avgPredecessorStageEffort(c);
             } else {
-                throw new Error("CellInstance " + c.getName() + " has neither successors nor predecessors.");
+                logger.warn("CellInstance " + c.getName() + " has neither successors nor predecessors.");
+                targetEffort = 0;
             }
             targetEfforts.put(c, targetEffort);
         }

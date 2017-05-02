@@ -57,7 +57,7 @@ public class RemoteSimulation {
         }
         logger.info("Starting remote simulation, with testbench " + this.name + "...");
 
-        String[] librarySuffixes = {"_orig", "_noslew", "_noslew_nowire"};
+        String[] librarySuffixes = {"_orig", "_noslew_nowire"}; //"_noslew",
 
         setupDate();
         setupTempDir();

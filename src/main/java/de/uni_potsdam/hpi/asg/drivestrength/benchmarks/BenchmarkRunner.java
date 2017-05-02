@@ -27,8 +27,14 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.AbstractDriveOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.AllLargestOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.AllSmallestOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualDelayMatrixOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.EqualStageEffortOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.FanoutOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.NeighborStageEffortOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.NopOptimizer;
+import de.uni_potsdam.hpi.asg.drivestrength.optimization.SelectForLoadOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.SimulatedAnnealingOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulation;
 import de.uni_potsdam.hpi.asg.drivestrength.remotesimulation.RemoteSimulationResult;
@@ -57,15 +63,17 @@ public class BenchmarkRunner {
         this.startTime = System.currentTimeMillis();
 
         //String[] benchmarkNetlists = {"inc"};
-        //String[] benchmarkNetlists = {"single-inv", "four-inv", "loop", "fanout-chain", "adder-nand"};
-        String[] benchmarkNetlists = {"inc", "mod10", "count10", "bufferx", "gcd", "mult"};
+        String benchmarkSubdir = "";
+        String[] benchmarkNetlists = {"single-inv", "four-inv", "loop", "fanout-chain", "adder-nand"};
+//        String benchmarkSubdir = "benchmarks-original/";
+//        String[] benchmarkNetlists = {"inc", "mod10", "count10", "bufferx", "gcd", "mult"};
         double[] benchmarkOutCs = {0.0, 0.003, 0.012, 0.1, 1.0};
         double[] inputDrivenMaxCIns = {0.005, 1.0};
 
         int combinationCount = benchmarkNetlists.length * benchmarkOutCs.length * inputDrivenMaxCIns.length;
 
         for (String netlistName : benchmarkNetlists) {
-            File netlistFile = new File("netlists/benchmarks-original/" + netlistName + ".v");
+            File netlistFile = new File("netlists/" + benchmarkSubdir + netlistName + ".v");
             Netlist inlinedNetlist = this.loadNetlist(netlistFile);
 
             for (double outputC : benchmarkOutCs) {
@@ -101,22 +109,24 @@ public class BenchmarkRunner {
 
         netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
         optimizers.put("NOP", new NopOptimizer(netlistCopy));
-//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-//        optimizers.put("ESE-clamp", new EqualStageEffortOptimizer(netlistCopy, 100, true));
-//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-//        optimizers.put("ESE-free", new EqualStageEffortOptimizer(netlistCopy, 100, false));
-//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-//        optimizers.put("NSE-clamp", new NeighborStageEffortOptimizer(netlistCopy, 100, true));
-//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-//        optimizers.put("NSE-free", new NeighborStageEffortOptimizer(netlistCopy, 100, false));
-//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-//        optimizers.put("SFL", new SelectForLoadOptimizer(netlistCopy, 100));
-//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-//        optimizers.put("Top", new AllLargestOptimizer(netlistCopy));
         netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
-        optimizers.put("SA-step", new SimulatedAnnealingOptimizer(netlistCopy, false, 100, 100));
-//        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, limitInput);
-//        optimizers.put("SA-jump", new SimulatedAnnealingOptimizer(netlistCopy, true, 30));
+        optimizers.put("ESE-clamp", new EqualStageEffortOptimizer(netlistCopy, 100, true));
+        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
+        optimizers.put("ESE-free", new EqualStageEffortOptimizer(netlistCopy, 100, false));
+        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
+        optimizers.put("NSE-clamp", new NeighborStageEffortOptimizer(netlistCopy, 100, true));
+        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
+        optimizers.put("SFL", new SelectForLoadOptimizer(netlistCopy, 100));
+        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
+        optimizers.put("TOP", new AllLargestOptimizer(netlistCopy));
+        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
+        optimizers.put("BOT", new AllSmallestOptimizer(netlistCopy));
+        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
+        optimizers.put("SA-D", new SimulatedAnnealingOptimizer(netlistCopy, false, 1000, 0));
+        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
+        optimizers.put("SA-E", new SimulatedAnnealingOptimizer(netlistCopy, false, 1000, 100));
+        netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
+        optimizers.put("FO", new FanoutOptimizer(netlistCopy));
         if (netlist.isAllSingleStage()) {
             netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
             optimizers.put("EDM", new EqualDelayMatrixOptimizer(netlistCopy));
@@ -154,14 +164,14 @@ public class BenchmarkRunner {
             benchmarkOutput += inputDrivenMaxCIn + ",";
             benchmarkOutput += optimizerName + ",";
             benchmarkOutput += estimatedDelay + ",";
-            benchmarkOutput += rsResult.getSdfDelaySum("_orig") + ",";
-            benchmarkOutput += rsResult.getSdfDelaySum("_noslew") + ",";
+          /*  benchmarkOutput += rsResult.getSdfDelaySum("_orig") + ",";
+            //benchmarkOutput += rsResult.getSdfDelaySum("_noslew") + ",";
             benchmarkOutput += rsResult.getSdfDelaySum("_noslew_nowire") + ",";
             benchmarkOutput += rsResult.getTestbenchSuccessTime("_orig") + ",";
-            benchmarkOutput += rsResult.getTestbenchSuccessTime("_noslew") + ",";
+            //benchmarkOutput += rsResult.getTestbenchSuccessTime("_noslew") + ",";
             benchmarkOutput += rsResult.getTestbenchSuccessTime("_noslew_nowire") + ",";
             benchmarkOutput += estimatedEnergy + ",";
-            benchmarkOutput += rsResult.getTestbenchEnergy();
+            benchmarkOutput += rsResult.getTestbenchEnergy();*/
 
             PrintWriter fileOut = new PrintWriter(new BufferedWriter(new FileWriter(outFileName, true)));
             fileOut.println(benchmarkOutput);
