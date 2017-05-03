@@ -68,6 +68,7 @@ public class VerilogModuleParser {
             return false;
         }
         this.module.setName(m.group(1));
+        logger.debug("Parsing module " + this.module.getName());
 
         for(String signal : m.group(2).split(",")) {
             this.module.addInterfaceSignal(signal.trim());

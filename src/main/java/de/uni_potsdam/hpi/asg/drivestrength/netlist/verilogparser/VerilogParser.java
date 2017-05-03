@@ -55,6 +55,7 @@ public class VerilogParser {
 
     private List<String> mergeMultilineStatements(List<String> lines) {
         List<String> statements = new ArrayList<String>();
+        boolean isMultiLineComment = false;
 
         String statement = "";
         String comment = "";
@@ -64,7 +65,14 @@ public class VerilogParser {
                 comment += line.substring(line.indexOf("//"));
                 line = line.substring(0, line.indexOf("//"));
             }
-            if(line.equals("")) {
+            if(line.startsWith("/*")) {
+                isMultiLineComment = true;
+            }
+            if(line.endsWith("*/")) {
+                isMultiLineComment = false;
+                continue;
+            }
+            if(line.startsWith("`timescale") || line.equals("") || isMultiLineComment) {
                 continue;
             }
             statement += line;

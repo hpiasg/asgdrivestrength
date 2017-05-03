@@ -63,10 +63,10 @@ public class BenchmarkRunner {
         this.startTime = System.currentTimeMillis();
 
         //String[] benchmarkNetlists = {"inc"};
-        String benchmarkSubdir = "";
-        String[] benchmarkNetlists = {"single-inv", "four-inv", "loop", "fanout-chain", "adder-nand"};
-//        String benchmarkSubdir = "benchmarks-original/";
-//        String[] benchmarkNetlists = {"inc", "mod10", "count10", "bufferx", "gcd", "mult"};
+//        String benchmarkSubdir = "";
+//        String[] benchmarkNetlists = {"single-inv", "four-inv", "loop", "fanout-chain", "adder-nand"};
+        String benchmarkSubdir = "benchmarks-original/";
+        String[] benchmarkNetlists = {/*"inc", "mod10", "count10", "bufferx", "gcd", */"mult"};
         double[] benchmarkOutCs = {0.0, 0.003, 0.012, 0.1, 1.0};
         double[] inputDrivenMaxCIns = {0.005, 1.0};
 
@@ -164,14 +164,14 @@ public class BenchmarkRunner {
             benchmarkOutput += inputDrivenMaxCIn + ",";
             benchmarkOutput += optimizerName + ",";
             benchmarkOutput += estimatedDelay + ",";
-          /*  benchmarkOutput += rsResult.getSdfDelaySum("_orig") + ",";
+            benchmarkOutput += rsResult.getSdfDelaySum("_orig") + ",";
             //benchmarkOutput += rsResult.getSdfDelaySum("_noslew") + ",";
             benchmarkOutput += rsResult.getSdfDelaySum("_noslew_nowire") + ",";
             benchmarkOutput += rsResult.getTestbenchSuccessTime("_orig") + ",";
             //benchmarkOutput += rsResult.getTestbenchSuccessTime("_noslew") + ",";
             benchmarkOutput += rsResult.getTestbenchSuccessTime("_noslew_nowire") + ",";
             benchmarkOutput += estimatedEnergy + ",";
-            benchmarkOutput += rsResult.getTestbenchEnergy();*/
+            benchmarkOutput += rsResult.getTestbenchEnergy();
 
             PrintWriter fileOut = new PrintWriter(new BufferedWriter(new FileWriter(outFileName, true)));
             fileOut.println(benchmarkOutput);
