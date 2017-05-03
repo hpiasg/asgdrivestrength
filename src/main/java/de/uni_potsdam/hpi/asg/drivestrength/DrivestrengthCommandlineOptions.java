@@ -51,6 +51,9 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     @Option(name = "-outLoadGraph", metaVar="<outputLoadGraphFile>", usage="Output file name for the capacitance load graph", required = false)
     private File outputLoadGraphFile;
 
+    @Option(name = "-printLoadGraph", metaVar="<printLoadGraph>", usage="Enable to print load graph to the console", required = false)
+    private boolean printLoadGraph = false;
+
     @Argument(metaVar = "Verilog Netlist Input File", required = true)
     private File netlistFileIn;
 
@@ -108,5 +111,9 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
 
     public File getAdditionalCellInfoJsonFile() {
         return additionalCellInfoJsonFile;
+    }
+    
+    public boolean getPrintLoadGraph() {
+        return printLoadGraph;
     }
 }

@@ -113,7 +113,7 @@ public class DrivestrengthMain {
         new DelayEstimator(inlinedNetlist, estimateWithTheoreticalLoad, false).print();
         new EnergyEstimator(inlinedNetlist, false).print();
 
-        writeLoadGraphToFile(inlinedNetlist);
+        writeLoadGraph(inlinedNetlist);
         writeOptimizedNetlistToFile(netlist);
 
 //        boolean remoteVerbose = false;
@@ -171,15 +171,16 @@ public class DrivestrengthMain {
         }
     }
 
-    private static void writeLoadGraphToFile(Netlist inlinedNetlist) {
+    private static void writeLoadGraph(Netlist inlinedNetlist) {
         boolean exportTheoreticalLoad = false;
         String loadGraphOutput = new LoadGraphExporter(inlinedNetlist, exportTheoreticalLoad).run();
 
         if (options.getOutputLoadGraphFile() != null) {
             FileHelper.writeStringToTextFile(loadGraphOutput, options.getOutputLoadGraphFile());
             logger.info("Wrote capacitance load graph to " + options.getOutputLoadGraphFile());
-        } else {
-            logger.info("No load graph output file specified. Writing capacitance load graph to console:");
+        }
+        if (options.getPrintLoadGraph()) {
+            logger.info("Printing capacitance load graph to console:");
             logger.info(loadGraphOutput);
         }
     }
@@ -189,7 +190,7 @@ public class DrivestrengthMain {
             FileHelper.writeStringToTextFile(netlist.toVerilog(), options.getOutputNetlistFile());
             logger.info("Wrote optimized netlist to " + options.getOutputNetlistFile());
         } else {
-            logger.info("No output file specified. Writing optimized netlist to console:");
+            logger.info("No output file specified. Printing optimized netlist to console:");
             logger.info(netlist.toVerilog());
         }
     }
