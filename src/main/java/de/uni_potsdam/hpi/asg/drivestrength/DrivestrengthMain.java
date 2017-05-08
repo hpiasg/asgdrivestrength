@@ -76,6 +76,7 @@ public class DrivestrengthMain {
             return 0;
         } catch (Error | Exception e) {
             if (options.isDebug()) {
+                logger.error("An error occurred: " + e.getLocalizedMessage());
                 e.printStackTrace();
             } else {
                 logger.error("An error occurred: " + e.getLocalizedMessage() + " (run with -debug for stack trace)");

@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.uni_potsdam.hpi.asg.drivestrength.aggregatedcells.AggregatedCell;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.AssignConnection;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.CellInstance;
@@ -23,6 +26,8 @@ public class NetlistModuleInliner {
     private Map<String, Signal> signalTransformation;
     Map<String, Integer> signalBitIndexTransformation;
     
+    protected static final Logger logger = LogManager.getLogger();
+
     public NetlistModuleInliner(Module sourceModule) {
         this.sourceModule = sourceModule;
         this.nextInstanceId = 0;
@@ -55,6 +60,7 @@ public class NetlistModuleInliner {
             if (!s.isIOSignal() && !s.isConstant()) {
                 Signal newSignal = new Signal(s);
                 newSignal.setName("inlS" + nextNonIOSignalId++);
+                logger.debug("inlining unconnected IO signal " + s.getName() + " from " + childDefinition.getName() + ", now called " + newSignal.getName());
                 signalTransformation.put(s.getName(), newSignal);
                 inlinedModule.addSignal(newSignal);
             }
@@ -65,6 +71,7 @@ public class NetlistModuleInliner {
         for (Signal s : childDefinition.getSignals()) {
             if (s.isIOSignal() && getNewSignalFor(s) == null) {
                 Signal newSignal = new Signal("inlS" + nextNonIOSignalId++, Direction.wire, s.getWidth());
+                logger.debug("inlining unconnected IO signal " + s.getName() + " from " + childDefinition.getName() + ", now called " + newSignal.getName());
                 signalTransformation.put(s.getName(), newSignal);
                 inlinedModule.addSignal(newSignal);
             }
