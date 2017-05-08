@@ -13,6 +13,7 @@ public class Signal {
     protected String    name;
     protected Direction direction;
     protected int       width;
+    protected int       bitOffset;
 
 
     private static Signal zeroInstance;
@@ -20,14 +21,14 @@ public class Signal {
 
     public static Signal getZeroInstance() {
         if (zeroInstance == null) {
-            zeroInstance = new Signal("1'b0", Direction.constant, 1);
+            zeroInstance = new Signal("1'b0", Direction.constant, 1, 0);
         }
         return zeroInstance;
     }
 
     public static Signal getOneInstance() {
         if (oneInstance == null) {
-            oneInstance = new Signal("1'b1", Direction.constant, 1);
+            oneInstance = new Signal("1'b1", Direction.constant, 1, 0);
         }
         return oneInstance;
     }
@@ -36,16 +37,18 @@ public class Signal {
         return signalName.equals("0") || signalName.equals("1") || signalName.equals("1'b0") || signalName.equals("1'b1");
     }
 
-    public Signal(String name, Direction direction, int width) {
+    public Signal(String name, Direction direction, int width, int bitOffset) {
         this.direction = direction;
         this.name = name;
         this.width = width;
+        this.bitOffset = bitOffset;
     }
 
     public Signal(Signal signalToCopy) {
         this.direction = signalToCopy.getDirection();
         this.name = signalToCopy.getName();
         this.width = signalToCopy.getWidth();
+        this.bitOffset = signalToCopy.getBitOffset();
     }
 
     public String getName() {
@@ -58,6 +61,10 @@ public class Signal {
 
     public int getWidth() {
         return width;
+    }
+
+    public int getBitOffset() {
+        return bitOffset;
     }
 
     public boolean isBundle() {
@@ -73,7 +80,7 @@ public class Signal {
         String directionString = this.direction.toString();
         String bundleString = "";
         if (width > 1) {
-            bundleString = " [" + Integer.toString(width - 1) + ":0]";
+            bundleString = " [" + Integer.toString(width - 1 + bitOffset) + ":" + Integer.toString(bitOffset) + "]";
         }
         return directionString + bundleString + " " + this.name + ";";
     }

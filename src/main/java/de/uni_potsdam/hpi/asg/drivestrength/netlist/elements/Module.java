@@ -204,7 +204,7 @@ public class Module {
                 return s;
             }
         }
-        throw new Error("Module does not have a Signal named " + signalName);
+        throw new Error("Module " + this.name + " does not have a Signal named " + signalName);
     }
 
     public Signal getSignalByInterfacePosition(int position) {

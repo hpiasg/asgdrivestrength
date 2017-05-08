@@ -37,8 +37,8 @@ public class NetlistAssignCleaner {
     }
     
     public void createConstantsIfNecessary() {
-        Signal constantZeroWire = new Signal("constantZero", Direction.wire, 1);
-        Signal constantOneWire = new Signal("constantOne", Direction.wire, 1);
+        Signal constantZeroWire = new Signal("constantZero", Direction.wire, 1, 0);
+        Signal constantOneWire = new Signal("constantOne", Direction.wire, 1, 0);
         boolean hasZero = false;
         boolean hasOne = false;
         for (Signal s : netlistModule.getSignals()) {

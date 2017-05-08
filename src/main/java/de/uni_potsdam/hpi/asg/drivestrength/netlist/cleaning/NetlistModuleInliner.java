@@ -70,7 +70,7 @@ public class NetlistModuleInliner {
     private void inlineUnconnectedIOSignalsOf(Module childDefinition) {
         for (Signal s : childDefinition.getSignals()) {
             if (s.isIOSignal() && getNewSignalFor(s) == null) {
-                Signal newSignal = new Signal("inlS" + nextNonIOSignalId++, Direction.wire, s.getWidth());
+                Signal newSignal = new Signal("inlS" + nextNonIOSignalId++, Direction.wire, s.getWidth(), s.getBitOffset());
                 logger.debug("inlining unconnected IO signal " + s.getName() + " from " + childDefinition.getName() + ", now called " + newSignal.getName());
                 signalTransformation.put(s.getName(), newSignal);
                 inlinedModule.addSignal(newSignal);
@@ -124,7 +124,7 @@ public class NetlistModuleInliner {
                 Signal newSignal = getNewSignalFor(a.getSignal());
                 int signalBitIndex = getNewBitIndexFor(a.getSignal(), a.getSignalBitIndex());
                 if (newSignal == null) {
-                    System.out.println("newSignal null in " + childDefinition.getName() + " for oldSignal " + a.getSignal().getName() + " for pin " + a.getPinName() + " of cell " + childCellInstance.getName());
+                    logger.debug("inliner could not find signal in " + childDefinition.getName() + " for oldSignal " + a.getSignal().getName() + " for pin " + a.getPinName() + " of cell " + childCellInstance.getName());
                     newSignal = makeWire(a.getSignal());
                 }
                 if (a.isPositional()) {
@@ -142,7 +142,7 @@ public class NetlistModuleInliner {
     private Signal makeWire(Signal oldSignal) {
         String wireName = oldSignal.getName() + "_toWire";
         if (!inlinedModule.hasSignalOfName(wireName)) {
-            inlinedModule.addSignal(new Signal(wireName, Direction.wire, 1));
+            inlinedModule.addSignal(new Signal(wireName, Direction.wire, 1, 0));
         }
         return inlinedModule.getSignalByName(wireName);
     }

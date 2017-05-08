@@ -68,9 +68,9 @@ public class NetlistBundleSplitter {
         }
     }
     
-    private void createBitWiresForBundle(Signal bundle) {        
+    private void createBitWiresForBundle(Signal bundle) {
         for (int bitIndex = 0; bitIndex < bundle.getWidth(); bitIndex++) {
-            Signal bitWire = new Signal(singleBitSignalName(bundle, bitIndex), Direction.wire, 1);
+            Signal bitWire = new Signal(singleBitSignalName(bundle, bitIndex + bundle.getBitOffset()), Direction.wire, 1, 0);
             netlistModule.addSignal(bitWire);
         }
     }

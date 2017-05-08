@@ -84,20 +84,20 @@ public class VerilogModuleParser {
             int widthLeftIndex = Integer.parseInt(matcherBundle.group(2));
             int widthRightIndex = Integer.parseInt(matcherBundle.group(3));
             int width = Math.abs(widthLeftIndex - widthRightIndex) + 1;
-            registerSignals(matcherBundle.group(4), matcherBundle.group(1), width);
+            registerSignals(matcherBundle.group(4), matcherBundle.group(1), width, widthRightIndex);
         } else if (matcherSingle.matches()) {
-            registerSignals(matcherSingle.group(2), matcherSingle.group(1), 1);
+            registerSignals(matcherSingle.group(2), matcherSingle.group(1), 1, 0);
         } else {
             return false;
         }
         return true;
     }
 
-    private void registerSignals(String namesString, String directionString, int width) {
+    private void registerSignals(String namesString, String directionString, int width, int offset) {
         Direction direction = parseSignalDirection(directionString);
         List<String> names = Arrays.asList(namesString.split(","));
         for (String name : names) {
-            this.module.addSignal(new Signal(name.trim(), direction, width));
+            this.module.addSignal(new Signal(name.trim(), direction, width, offset));
         }
     }
 
