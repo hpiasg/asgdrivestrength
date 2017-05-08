@@ -99,7 +99,6 @@ public class DrivestrengthMain {
 
         new NetlistFlattener(netlist).run();
         Netlist inlinedNetlist = new NetlistInliner(netlist).run();
-        System.out.println(inlinedNetlist.toVerilog());
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
         new LoadGraphAnnotator(inlinedNetlist, options.getOutputPinCapacitance()).run();
