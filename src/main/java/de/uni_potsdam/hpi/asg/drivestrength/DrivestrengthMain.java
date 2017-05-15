@@ -206,7 +206,7 @@ public class DrivestrengthMain {
         if (options.getOutputConstraintFile() == null) {
             return;
         }
-        String constraintFileContent = "";
+        String constraintFileContent = "set sdc_version 1.8\nset_units -time ns -resistance kOhm -capacitance pF -voltage V -current mA\n";
         double outputC = options.getOutputPinCapacitance();
         for (Signal ioSignal : netlist.getRootModule().getIOSignals()) {
             if (ioSignal.getDirection() == Direction.output) {
