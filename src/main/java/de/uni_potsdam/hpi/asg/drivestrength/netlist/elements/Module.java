@@ -232,4 +232,8 @@ public class Module {
         this.signals.remove(signalToRemove);
     }
 
+    public String toString() {
+        return "<Module " + this.getName() + " (" + this.hashCode() + ")";
+    }
+
 }

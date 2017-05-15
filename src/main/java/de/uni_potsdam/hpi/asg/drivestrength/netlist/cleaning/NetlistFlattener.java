@@ -37,7 +37,7 @@ public class NetlistFlattener {
     private void flattenFromModule(Module module) {
         for (ModuleInstance instance : module.getModuleInstances()) {
             Module definition = instance.getDefinition();
-            if (definition.hasAssignStatementsOnly() || this.isUniqueInNetlist(definition)) {
+            if (definition.hasAssignStatementsOnly()) {
                 addModuleUnique(definition);
                 continue;
             }
@@ -66,6 +66,9 @@ public class NetlistFlattener {
     }
 
     private Module createFlattenedCopy(Module originalModule, String instanceName, String parentName) {
+        if (this.isUniqueInNetlist(originalModule)) {
+            return originalModule;
+        }
         Module module = new Module(originalModule);
         module.setName(parentName + "__" + module.getName() + "___" + instanceName);
         return module;
