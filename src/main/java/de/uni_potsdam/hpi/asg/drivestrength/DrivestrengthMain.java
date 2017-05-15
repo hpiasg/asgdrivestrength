@@ -26,6 +26,8 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistAssignCleane
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistBundleSplitter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistFlattener;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.cleaning.NetlistInliner;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Signal;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.elements.Signal.Direction;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.verilogparser.VerilogParser;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.AllLargestOptimizer;
 import de.uni_potsdam.hpi.asg.drivestrength.optimization.AllSmallestOptimizer;
@@ -119,6 +121,7 @@ public class DrivestrengthMain {
 
         writeLoadGraph(inlinedNetlist);
         writeOptimizedNetlistToFile(netlist);
+        writeConstraintFile(netlist);
 
 //        boolean remoteVerbose = false;
 //        boolean keepFiles = true;
@@ -197,6 +200,21 @@ public class DrivestrengthMain {
             logger.info("No output file specified. Printing optimized netlist to console:");
             logger.info(netlist.toVerilog());
         }
+    }
+
+    private static void writeConstraintFile(Netlist netlist) {
+        if (options.getOutputConstraintFile() == null) {
+            return;
+        }
+        String constraintFileContent = "";
+        double outputC = options.getOutputPinCapacitance();
+        for (Signal ioSignal : netlist.getRootModule().getIOSignals()) {
+            if (ioSignal.getDirection() == Direction.output) {
+                constraintFileContent += "set_load " + outputC + " " + ioSignal.getName() + "\n";
+            }
+        }
+        FileHelper.writeStringToTextFile(constraintFileContent, options.getOutputConstraintFile());
+        logger.info("Wrote constraint file with output pin loads to " + options.getOutputConstraintFile());
     }
 
 }

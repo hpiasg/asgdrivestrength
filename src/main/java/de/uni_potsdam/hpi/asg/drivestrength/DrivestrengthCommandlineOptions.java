@@ -14,7 +14,7 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
 
     @Option(name = "-o", metaVar = "<level>", usage = "Outputlevel: 0:nothing\n1:errors\n[2:+warnings]\n3:+info")
     private int outputlevel             = 2;
-    
+
     @Option(name = "-log", metaVar = "<logfile>", usage = "Define output Logfile, default is drivestrength.log")
     private File logfile = new File("drivestrength.log");
 
@@ -50,6 +50,9 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
 
     @Option(name = "-outLoadGraph", metaVar="<outputLoadGraphFile>", usage="Output file name for the capacitance load graph", required = false)
     private File outputLoadGraphFile;
+
+    @Option(name = "-outSdc", metaVar="<outputConstraintFile>", usage="Output file name for the constraints (sdc format)", required = false)
+    private File outputConstraintFile;
 
     @Option(name = "-printLoadGraph", metaVar="<printLoadGraph>", usage="Enable to print load graph to the console", required = false)
     private boolean printLoadGraph = false;
@@ -112,8 +115,12 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     public File getAdditionalCellInfoJsonFile() {
         return additionalCellInfoJsonFile;
     }
-    
+
     public boolean getPrintLoadGraph() {
         return printLoadGraph;
+    }
+
+    public File getOutputConstraintFile() {
+        return outputConstraintFile;
     }
 }
