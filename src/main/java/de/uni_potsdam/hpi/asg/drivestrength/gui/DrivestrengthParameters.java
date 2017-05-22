@@ -9,7 +9,7 @@ public class DrivestrengthParameters extends AbstractParameters {
 
     public enum TextParam implements AbstractTextParam {
         /*general*/ NetlistFile,
-        /*cells*/ LibertyFile, DefaultSizesFile, OrderedSizesFile, StageCountsFile,
+        /*cells*/ LibertyFile, cellInfoJsonFile,
         /*remote*/ RemoteConfigFile,
     }
 

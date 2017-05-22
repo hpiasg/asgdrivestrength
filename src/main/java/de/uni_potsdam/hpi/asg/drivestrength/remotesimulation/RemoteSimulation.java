@@ -158,10 +158,10 @@ public class RemoteSimulation {
             String resultSimTime = FileHelper.readTextFileToString(resultFileSimTime).split("\r\n|\r|\n")[0].trim();
             Matcher mSimTime = simulationTimePattern.matcher(resultSimTime);
             if (mSimTime.matches()) {
-                double totalPower = Double.parseDouble(mPower.group(1));
-                int simTime = Integer.parseInt(mSimTime.group(2));
-                double energy = totalPower * simTime;
-                logger.info("Testbench total energy: " + energy);
+                double totalPower = Double.parseDouble(mPower.group(1)); //watts
+                int simTime = Integer.parseInt(mSimTime.group(2)); //picoseconds
+                double energy = totalPower * simTime; // picojoule
+                logger.info("Testbench total energy: " + energy + " pJ");
                 remoteSimulationResult.setTestbenchEnergy(energy);
                 return;
             }

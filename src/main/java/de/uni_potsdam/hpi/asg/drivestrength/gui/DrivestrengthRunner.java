@@ -4,6 +4,7 @@ import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractParameters.GeneralTextParam;
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractRunner;
 import de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthGuiMain;
 import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.IntParam;
@@ -45,14 +46,11 @@ public class DrivestrengthRunner extends AbstractRunner {
         cmd.add("-lib");
         cmd.add(params.getTextValue(TextParam.LibertyFile));
 
-        cmd.add("-stage");
-        cmd.add(params.getTextValue(TextParam.StageCountsFile));
+        cmd.add("-cellInfoJson");
+        cmd.add(params.getTextValue(TextParam.cellInfoJsonFile));
 
-        cmd.add("-defaultSizes");
-        cmd.add(params.getTextValue(TextParam.DefaultSizesFile));
-
-        cmd.add("-orderedSizes");
-        cmd.add(params.getTextValue(TextParam.OrderedSizesFile));
+        cmd.add("-out");
+        cmd.add(params.getTextValue(GeneralTextParam.OutDir) + "/" + params.getTextValue(GeneralTextParam.OutFile));
 
         String remoteConfigPath = params.getTextValue(TextParam.RemoteConfigFile);
         if (!remoteConfigPath.isEmpty()) {

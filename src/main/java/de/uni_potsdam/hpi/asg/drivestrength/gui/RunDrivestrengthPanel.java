@@ -86,19 +86,13 @@ public class RunDrivestrengthPanel extends AbstractRunPanel {
         panel.addTextEntry(2, TextParam.LibertyFile, "Liberty file", normalizedPath("cells/cellLibrary.lib"),
                 true, JFileChooser.FILES_ONLY, false);
 
-        panel.addTextEntry(3, TextParam.DefaultSizesFile, "Default sizes file", normalizedPath("cells/defaultsizes.json"),
-                true, JFileChooser.FILES_ONLY, false);
-
-        panel.addTextEntry(4, TextParam.OrderedSizesFile, "Ordered sizes file", normalizedPath("cells/orderedsizes.json"),
-                true, JFileChooser.FILES_ONLY, false);
-
-        panel.addTextEntry(5, TextParam.StageCountsFile, "Stage counts file", normalizedPath("cells/stagecounts.json"),
+        panel.addTextEntry(3, TextParam.cellInfoJsonFile, "Cell Info JSON file", normalizedPath("cells/cellInfo.json"),
                 true, JFileChooser.FILES_ONLY, false);
 
         panel.addTextEntry(8, TextParam.RemoteConfigFile, "Remote config file", normalizedPath("remoteConfig.json"),
                 true, JFileChooser.FILES_ONLY, false);
 
-        addOutSection(panel, 10, "aNetlist_optimized.v", "defaultOutdir");
+        addOutSection(panel, 10, "aNetlist_optimized.v", normalizedPath("drivestrength-output"));
         getDataFromPanel(panel);
     }
 
