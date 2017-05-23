@@ -7,6 +7,8 @@ import java.util.List;
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractParameters.GeneralTextParam;
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractRunner;
 import de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthGuiMain;
+import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.DoubleParam;
+import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.EnumParam;
 import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.IntParam;
 import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.TextParam;
 
@@ -49,6 +51,9 @@ public class DrivestrengthRunner extends AbstractRunner {
         cmd.add("-cellInfoJson");
         cmd.add(params.getTextValue(TextParam.cellInfoJsonFile));
 
+        cmd.add("-outSdc");
+        cmd.add(params.getTextValue(GeneralTextParam.OutDir) + "/" + params.getTextValue(TextParam.OutputConstraintFile));
+
         cmd.add("-out");
         cmd.add(params.getTextValue(GeneralTextParam.OutDir) + "/" + params.getTextValue(GeneralTextParam.OutFile));
 
@@ -62,6 +67,15 @@ public class DrivestrengthRunner extends AbstractRunner {
     private void addAdvancedParamsTo(List<String> cmd) {
         cmd.add("-optimizeEnergyPercentage");
         cmd.add(Integer.toString(params.getIntValue(IntParam.optimizeEnergyPercentage)));
+
+        cmd.add("-outputPinCapacitance");
+        cmd.add(Double.toString(params.getDoubleValue(DoubleParam.outputPinCapacitance)));
+
+        cmd.add("-inputDrivenMaxCIn");
+        cmd.add(Double.toString(params.getDoubleValue(DoubleParam.inputDrivenMaxCIn)));
+
+        cmd.add("-optimizer");
+        cmd.add(params.getEnumValue(EnumParam.optimizer).toString());
     }
 
 }

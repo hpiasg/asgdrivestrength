@@ -15,6 +15,8 @@ import javax.swing.JTabbedPane;
 import de.uni_potsdam.hpi.asg.common.gui.PropertiesPanel;
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractRunPanel;
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractRunner.TerminalMode;
+import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.DoubleParam;
+import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.EnumParam;
 import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.IntParam;
 import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.TextParam;
 
@@ -65,7 +67,12 @@ public class RunDrivestrengthPanel extends AbstractRunPanel {
         gbl_advpanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         panel.setLayout(gbl_advpanel);
 
-        panel.addSliderEntry(1, IntParam.optimizeEnergyPercentage, "Energy weight in SA-Optimizer", 0, 100, 0);
+        panel.addComboBoxEntry(1, EnumParam.optimizer, "Optimizer", DrivestrengthParameters.OPTIMIZERS);
+
+        panel.addSliderEntry(2, IntParam.optimizeEnergyPercentage, "Energy weight in SA-Optimizer", 0, 100, 0);
+
+        panel.addSpinnerEntry(3, DoubleParam.outputPinCapacitance, "Output pin load capacitance (picofarad)", 0.01, 0.012);
+        panel.addSpinnerEntry(4, DoubleParam.inputDrivenMaxCIn, "Capacitance limit for input-driven cells (picofarad)", 0.01, 0.005);
 
         getDataFromPanel(panel);
     }
@@ -89,10 +96,14 @@ public class RunDrivestrengthPanel extends AbstractRunPanel {
         panel.addTextEntry(3, TextParam.cellInfoJsonFile, "Cell Info JSON file", normalizedPath("cells/cellInfo.json"),
                 true, JFileChooser.FILES_ONLY, false);
 
-        panel.addTextEntry(8, TextParam.RemoteConfigFile, "Remote config file", normalizedPath("remoteConfig.json"),
+        panel.addTextEntry(4, TextParam.RemoteConfigFile, "Remote config file", normalizedPath("remoteConfig.json"),
                 true, JFileChooser.FILES_ONLY, false);
 
-        addOutSection(panel, 10, "aNetlist_optimized.v", normalizedPath("drivestrength-output"));
+
+        addOutSection(panel, 6, "aNetlist_optimized.v", normalizedPath("drivestrength-output"));
+
+        panel.addTextEntry(8, TextParam.OutputConstraintFile, "Output constraints file (SDC)", "constraints.sdc");
+
         getDataFromPanel(panel);
     }
 
