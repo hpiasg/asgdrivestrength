@@ -54,7 +54,17 @@ public class NetlistFlattener {
         boolean foundOnce = false;
         for (Module eachModule : this.netlist.getModules()) {
             for (ModuleInstance eachModuleInstance : eachModule.getModuleInstances()) {
-                if (eachModuleInstance.getDefinition().getName() == testedModule.getName()) {
+                if (eachModuleInstance.getDefinition().getName().equals(testedModule.getName())) {
+                    if (foundOnce) {
+                        return false;
+                    }
+                    foundOnce = true;
+                }
+            }
+        }
+        for (Module eachModule : this.flattenedModules) {
+            for (ModuleInstance eachModuleInstance : eachModule.getModuleInstances()) {
+                if (eachModuleInstance.getDefinition().getName().equals(testedModule.getName())) {
                     if (foundOnce) {
                         return false;
                     }
