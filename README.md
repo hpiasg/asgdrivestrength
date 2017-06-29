@@ -23,6 +23,34 @@ To see a list of supported command line arguments execute
 
     bin/ASGdrivestrength
 
+#### Default operation ####
+
+	bin/ASGdrivestrength -lib tech/techname_liberty.lib -cellInfoJson tech/techname_addInfo.json infile.v
+
+The `-lib` option expects the technology file in the Liberty format. The `-cellInfoJson` option expects a file in ??? format. You can create and install technologies with [ASGtechMngr](https://github.com/hpiasg/asgtechmngr).
+
+The command will print the sized netlist on the console. By setting the `-out outfile.v` option, ASGdrivestrength will export the verilog code to `outfile.v`.
+
+#### Optimizers ####
+
+`-optimizer <optimizer>`
+
+* SA  (default) `-optimizeEnergyPercentage`
+* NOP
+* TOP
+* BOT
+* SFL
+* ESE
+* NSE
+* EDM (only for all-single-stage cells)
+* FO
+
+#### Constraints ####
+
+`-outSdc`
+`-inputDrivenMaxCIn`
+`-outputPinCapacitance`
+
 ### Build instructions ###
 
 To build ASGdrivestrength, Apache Maven v3 (or later) and the Java Development Kit (JDK) v1.8 (or later) are required.
