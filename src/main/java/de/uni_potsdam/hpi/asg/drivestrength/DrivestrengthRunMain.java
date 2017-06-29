@@ -10,10 +10,10 @@ import de.uni_potsdam.hpi.asg.common.gui.WatchForCloseWindowAdapter;
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper;
 import de.uni_potsdam.hpi.asg.common.iohelper.LoggerHelper.Mode;
 import de.uni_potsdam.hpi.asg.common.misc.CommonConstants;
-import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters;
-import de.uni_potsdam.hpi.asg.drivestrength.gui.RunDrivestrengthPanel;
+import de.uni_potsdam.hpi.asg.drivestrength.runner.DrivestrengthParameters;
+import de.uni_potsdam.hpi.asg.drivestrength.runner.RunDrivestrengthPanel;
 
-public class DrivestrengthGuiMain {
+public class DrivestrengthRunMain {
 
     public static final File DRIVESTRENGTH_BIN = new File(CommonConstants.DEF_BIN_DIR_FILE,
                                                   "ASGdrivestrength" + CommonConstants.SCRIPT_FILE_EXTENSION);

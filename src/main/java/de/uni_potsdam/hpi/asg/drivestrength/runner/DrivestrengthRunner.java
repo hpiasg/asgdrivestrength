@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.gui;
+package de.uni_potsdam.hpi.asg.drivestrength.runner;
 
 import java.awt.Window;
 import java.util.ArrayList;
@@ -6,11 +6,11 @@ import java.util.List;
 
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractParameters.GeneralTextParam;
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractRunner;
-import de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthGuiMain;
-import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.DoubleParam;
-import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.EnumParam;
-import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.IntParam;
-import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.TextParam;
+import de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthRunMain;
+import de.uni_potsdam.hpi.asg.drivestrength.runner.DrivestrengthParameters.DoubleParam;
+import de.uni_potsdam.hpi.asg.drivestrength.runner.DrivestrengthParameters.EnumParam;
+import de.uni_potsdam.hpi.asg.drivestrength.runner.DrivestrengthParameters.IntParam;
+import de.uni_potsdam.hpi.asg.drivestrength.runner.DrivestrengthParameters.TextParam;
 
 public class DrivestrengthRunner extends AbstractRunner {
     private DrivestrengthParameters params;
@@ -31,7 +31,7 @@ public class DrivestrengthRunner extends AbstractRunner {
 
     private List<String> buildCmd() {
         List<String> cmd = new ArrayList<>();
-        cmd.add(DrivestrengthGuiMain.DRIVESTRENGTH_BIN.getAbsolutePath());
+        cmd.add(DrivestrengthRunMain.DRIVESTRENGTH_BIN.getAbsolutePath());
 
         this.addGeneralParamsTo(cmd);
         this.addAdvancedParamsTo(cmd);

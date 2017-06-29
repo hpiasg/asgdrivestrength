@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.uni_potsdam.hpi.asg</groupId>
 	<artifactId>asgdrivestrength</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<organization>
 		<name>Hasso-Plattner-Institut fuer Softwaresystemtechnik GmbH</name>
 		<url>http://www.hpi.uni-potsdam.de</url>
@@ -23,9 +23,12 @@
 			<url>http://www.gnu.org/licenses/gpl.txt</url>
 		</license>
 	</licenses>
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<common.version>2.1.0-SNAPSHOT</common.version>
+		<common.version>3.0.0-SNAPSHOT</common.version>
 	</properties>
 	<build>
 		<resources>
@@ -65,7 +68,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>3.6.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -74,7 +77,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.18</version>
+				<version>2.20</version>
 				<configuration>
 					<workingDirectory>${project.build.directory}/test-runs</workingDirectory>
 					<argLine>-Xmx1500m</argLine>
@@ -95,7 +98,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>appassembler-maven-plugin</artifactId>
-						<version>1.8.1</version>
+						<version>2.0.0</version>
 						<executions>
 							<execution>
 								<phase>prepare-package</phase>
@@ -119,8 +122,8 @@
 									</jvmSettings>
 								</program>
 								<program>
-									<mainClass>de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthGuiMain</mainClass>
-									<id>ASGdrivestrength_gui</id>
+									<mainClass>de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthRunMain</mainClass>
+									<id>ASGdrivestrength_run</id>
 									<jvmSettings>
 										<extraArguments>
 											<extraArgument>-Dlog4j.configurationFile=@BASEDIR@/config/log4j2_noconfig.xml</extraArgument>
@@ -136,7 +139,7 @@
 					</plugin>
 					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.5.3</version>
+						<version>3.0.0</version>
 						<configuration>
 							<descriptors>
 								<descriptor>src/assembly/unix_assembly.xml</descriptor>
@@ -167,7 +170,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>appassembler-maven-plugin</artifactId>
-						<version>1.8.1</version>
+						<version>2.0.0</version>
 						<executions>
 							<execution>
 								<phase>package</phase>
@@ -191,8 +194,8 @@
 									</jvmSettings>
 								</program>
 								<program>
-									<mainClass>de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthGuiMain</mainClass>
-									<id>ASGdrivestrength_gui</id>
+									<mainClass>de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthRunMain</mainClass>
+									<id>ASGdrivestrength_run</id>
 									<jvmSettings>
 										<extraArguments>
 											<extraArgument>-Dlog4j.configurationFile=file://@BASEDIR@/config/log4j2_noconfig.xml</extraArgument>
@@ -208,7 +211,7 @@
 					</plugin>
 					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.5.3</version>
+						<version>3.0.0</version>
 						<configuration>
 							<descriptors>
 								<descriptor>src/assembly/windows_assembly.xml</descriptor>
@@ -237,7 +240,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -253,12 +256,12 @@
 		<dependency>
 		    <groupId>org.apache.commons</groupId>
     		<artifactId>commons-math3</artifactId>
-    		<version>3.2</version>
+    		<version>3.6.1</version>
 		</dependency>
 		<dependency>
 			<groupId>args4j</groupId>
 			<artifactId>args4j</artifactId>
-			<version>2.0.29</version>
+			<version>2.33</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
