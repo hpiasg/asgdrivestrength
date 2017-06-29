@@ -12,8 +12,8 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
         return super.parseCmdLine(args, "Usage: ASGdrivestrength");
     }
 
-    @Option(name = "-o", metaVar = "<level>", usage = "Outputlevel: 0:nothing\n1:errors\n[2:+warnings]\n3:+info")
-    private int outputlevel             = 2;
+    @Option(name = "-o", metaVar = "<level>", usage = "Outputlevel: 0:nothing\n1:errors\n2:+warnings\n[3:+info]")
+    private int outputlevel             = 3;
 
     @Option(name = "-log", metaVar = "<logfile>", usage = "Define output Logfile, default is drivestrength.log")
     private File logfile = new File("drivestrength.log");
