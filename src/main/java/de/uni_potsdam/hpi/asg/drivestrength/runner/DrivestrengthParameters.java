@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.gui;
+package de.uni_potsdam.hpi.asg.drivestrength.runner;
 
 import de.uni_potsdam.hpi.asg.common.gui.PropertiesPanel.AbstractDoubleParam;
 import de.uni_potsdam.hpi.asg.common.gui.PropertiesPanel.AbstractEnumParam;

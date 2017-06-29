@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.gui;
+package de.uni_potsdam.hpi.asg.drivestrength.runner;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
@@ -15,10 +15,10 @@ import javax.swing.JTabbedPane;
 import de.uni_potsdam.hpi.asg.common.gui.PropertiesPanel;
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractRunPanel;
 import de.uni_potsdam.hpi.asg.common.gui.runner.AbstractRunner.TerminalMode;
-import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.DoubleParam;
-import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.EnumParam;
-import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.IntParam;
-import de.uni_potsdam.hpi.asg.drivestrength.gui.DrivestrengthParameters.TextParam;
+import de.uni_potsdam.hpi.asg.drivestrength.runner.DrivestrengthParameters.DoubleParam;
+import de.uni_potsdam.hpi.asg.drivestrength.runner.DrivestrengthParameters.EnumParam;
+import de.uni_potsdam.hpi.asg.drivestrength.runner.DrivestrengthParameters.IntParam;
+import de.uni_potsdam.hpi.asg.drivestrength.runner.DrivestrengthParameters.TextParam;
 
 public class RunDrivestrengthPanel extends AbstractRunPanel {
     private static final long serialVersionUID = 6679558413574675095L;

@@ -1,4 +1,4 @@
-package de.uni_potsdam.hpi.asg.drivestrength.gui;
+package de.uni_potsdam.hpi.asg.drivestrength.runner;
 
 import java.awt.GridBagLayout;
 

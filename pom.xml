@@ -119,8 +119,8 @@
 									</jvmSettings>
 								</program>
 								<program>
-									<mainClass>de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthGuiMain</mainClass>
-									<id>ASGdrivestrength_gui</id>
+									<mainClass>de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthRunMain</mainClass>
+									<id>ASGdrivestrength_run</id>
 									<jvmSettings>
 										<extraArguments>
 											<extraArgument>-Dlog4j.configurationFile=@BASEDIR@/config/log4j2_noconfig.xml</extraArgument>
@@ -191,8 +191,8 @@
 									</jvmSettings>
 								</program>
 								<program>
-									<mainClass>de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthGuiMain</mainClass>
-									<id>ASGdrivestrength_gui</id>
+									<mainClass>de.uni_potsdam.hpi.asg.drivestrength.DrivestrengthRunMain</mainClass>
+									<id>ASGdrivestrength_run</id>
 									<jvmSettings>
 										<extraArguments>
 											<extraArgument>-Dlog4j.configurationFile=file://@BASEDIR@/config/log4j2_noconfig.xml</extraArgument>
