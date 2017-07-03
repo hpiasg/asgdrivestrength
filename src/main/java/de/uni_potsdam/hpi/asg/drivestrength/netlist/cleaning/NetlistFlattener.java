@@ -50,37 +50,9 @@ public class NetlistFlattener {
         }
     }
 
-    private boolean isUniqueInNetlist(Module testedModule) {
-        boolean foundOnce = false;
-        for (Module eachModule : this.netlist.getModules()) {
-            for (ModuleInstance eachModuleInstance : eachModule.getModuleInstances()) {
-                if (eachModuleInstance.getDefinition().getName().equals(testedModule.getName())) {
-                    if (foundOnce) {
-                        return false;
-                    }
-                    foundOnce = true;
-                }
-            }
-        }
-        for (Module eachModule : this.flattenedModules) {
-            for (ModuleInstance eachModuleInstance : eachModule.getModuleInstances()) {
-                if (eachModuleInstance.getDefinition().getName().equals(testedModule.getName())) {
-                    if (foundOnce) {
-                        return false;
-                    }
-                    foundOnce = true;
-                }
-            }
-        }
-        return true;
-    }
-
     private Module createFlattenedCopy(Module originalModule, String instanceName, String parentName) {
-        if (this.isUniqueInNetlist(originalModule)) {
-            return originalModule;
-        }
         Module module = new Module(originalModule);
-        module.setName(parentName + "__" + module.getName() + "___" + instanceName);
+        module.setName(parentName + "___" + module.getName() + "__" + instanceName);
         return module;
     }
 
