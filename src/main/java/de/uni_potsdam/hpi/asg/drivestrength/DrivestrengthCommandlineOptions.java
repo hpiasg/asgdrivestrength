@@ -21,6 +21,9 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     @Option(name = "-debug")
     private boolean debug = false;
 
+    @Option(name = "-skipFlattener")
+    private boolean skipFlattener = false;
+    
     @Option(name = "-runBenchmarks")
     private boolean runBenchmarks = false;
 
@@ -122,5 +125,9 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
 
     public File getOutputConstraintFile() {
         return outputConstraintFile;
+    }
+    
+    public boolean isSkipFlattener() {
+        return skipFlattener;
     }
 }

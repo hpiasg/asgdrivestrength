@@ -99,7 +99,9 @@ public class DrivestrengthMain {
         boolean replaceBySingleStageCells = false; //Will lead to non-functional netlist, exists just to analyze our algorithm behavior
         Netlist netlist = new VerilogParser(options.getNetlistFile(), cellLibrary, replaceBySingleStageCells).createNetlist();
 
-        new NetlistFlattener(netlist).run();
+        if(!options.isSkipFlattener()) {
+            new NetlistFlattener(netlist).run();
+        }
         Netlist inlinedNetlist = new NetlistInliner(netlist).run();
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
