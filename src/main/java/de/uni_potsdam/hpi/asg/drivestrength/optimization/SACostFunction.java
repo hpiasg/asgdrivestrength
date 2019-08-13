@@ -11,6 +11,12 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.PowerEstimator;
 public class SACostFunction {
     protected static final Logger logger = LogManager.getLogger();
 
+    private enum SAAlgorithm {
+        delay, power, energy, none
+    }
+    
+    private SAAlgorithm algo;    
+    
     private DelayEstimator delayEstimator;
     private EnergyEstimator energyEstimator;
     private PowerEstimator powerEstimator;
@@ -23,24 +29,65 @@ public class SACostFunction {
     private double avgDeltaEnergy;
     private double avgDeltaPower;
     
-    public SACostFunction(Netlist netlist, int factorDelay, int factorEnergy, int factorPower) {
+    public SACostFunction(Netlist netlist, int factorDelay, int factorEnergy, int factorPower, String saAlgorithm) {
 //        logger.info("SA: using energy weight " + percentageEnergy + " %");
         this.delayEstimator = new DelayEstimator(netlist, false, false);
         this.energyEstimator = new EnergyEstimator(netlist, false);
         this.powerEstimator = new PowerEstimator(netlist, false);
         
-        int factorSum = factorDelay + factorPower + factorEnergy; 
-        this.weightDelay = (float) factorDelay / factorSum;
-        this.weightEnergy = (float) factorEnergy / factorSum;
-        this.weightPower = (float) factorPower / factorSum;
-        
-        logger.info("SA: using delay weight:" + weightDelay + ", energy weight:" + weightEnergy + ", power weight:" + weightPower);
+        //TODO: fix this hack
+        this.algo = detectAlgorithm(saAlgorithm);
+        if(this.algo != SAAlgorithm.none) {
+            logger.info("SA: using algorithm " + this.algo);
+            switch(this.algo) {
+                case delay:
+                    this.weightDelay = 1.0f;
+                    this.weightEnergy = 0.0f;
+                    this.weightPower = 0.0f;
+                    break;
+                case energy:
+                    this.weightDelay = 0.0f;
+                    this.weightEnergy = 1.0f;
+                    this.weightPower = 0.0f;
+                    break;
+                case power:
+                    this.weightDelay = 0.0f;
+                    this.weightEnergy = 0.0f;
+                    this.weightPower = 1.0f;
+                    break;
+                case none:
+                    break;
+            }
+        } else {
+            int factorSum = factorDelay + factorPower + factorEnergy; 
+            this.weightDelay = (float) factorDelay / factorSum;
+            this.weightEnergy = (float) factorEnergy / factorSum;
+            this.weightPower = (float) factorPower / factorSum;
+            
+            logger.info("SA: using delay weight:" + weightDelay + ", energy weight:" + weightEnergy + ", power weight:" + weightPower);
+        }
         
         this.weightDelay /= delayEstimator.run();
         this.weightEnergy /= energyEstimator.run();
         this.weightPower /= powerEstimator.run();
         
 //        logger.info("SA: using delay weight:" + weightDelay + ", energy weight:" + weightEnergy + ", power weight:" + weightPower);
+    }
+
+    private SAAlgorithm detectAlgorithm(String saAlgorithm) {
+        if(saAlgorithm == null) {
+            return SAAlgorithm.none;
+        }
+        switch(saAlgorithm) {
+            case "SAD":
+                return SAAlgorithm.delay;
+            case "SAP":
+                return SAAlgorithm.power;
+            case "SAE":
+                return SAAlgorithm.energy;
+            default:
+                return SAAlgorithm.none;
+        }
     }
     
 
@@ -57,7 +104,18 @@ public class SACostFunction {
 //        if (weightDelay < 0.00000001) {
 //            return energyEstimator.run() * weightEnergy;
 //        }
-        return delayEstimator.run() * weightDelay + energyEstimator.run() * weightEnergy + powerEstimator.run() * weightPower;
+        switch(algo) {
+            case delay:
+                return delayEstimator.run() * weightDelay;
+            case energy:
+                return energyEstimator.run() * weightEnergy;
+            case power:
+                return powerEstimator.run() * weightPower;
+            default:
+            case none:
+                return delayEstimator.run() * weightDelay + energyEstimator.run() * weightEnergy + powerEstimator.run() * weightPower;
+            
+        }
     }
 
     public double estimateEnergy() {

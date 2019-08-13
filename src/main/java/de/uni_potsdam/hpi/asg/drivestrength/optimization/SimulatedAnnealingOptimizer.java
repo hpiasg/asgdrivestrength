@@ -18,11 +18,11 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
     private Cell previousSizeForUndo;
     private SACostFunction costFunction;
 
-    public SimulatedAnnealingOptimizer(Netlist netlist, boolean jumpNotStep, int roundsPerCell, int factorDelay, int factorEnergy, int factorPower) {
+    public SimulatedAnnealingOptimizer(Netlist netlist, boolean jumpNotStep, int roundsPerCell, int factorDelay, int factorEnergy, int factorPower, String saAlgorithm) {
         super(netlist);
         this.jumpInMutation = jumpNotStep;
         this.randomGenerator = new Random();
-        this.costFunction = new SACostFunction(netlist, factorDelay, factorEnergy, factorPower);
+        this.costFunction = new SACostFunction(netlist, factorDelay, factorEnergy, factorPower, saAlgorithm);
         this.calibrate();
         this.selectParameters(roundsPerCell);
     }
