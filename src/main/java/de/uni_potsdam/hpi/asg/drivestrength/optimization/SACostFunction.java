@@ -59,7 +59,7 @@ public class SACostFunction {
                     break;
             }
         } else {
-            int factorSum = factorDelay + factorPower + factorEnergy; 
+            float factorSum = factorDelay + factorPower + factorEnergy;
             this.weightDelay = (float) factorDelay / factorSum;
             this.weightEnergy = (float) factorEnergy / factorSum;
             this.weightPower = (float) factorPower / factorSum;
@@ -67,10 +67,19 @@ public class SACostFunction {
             logger.info("SA: using delay weight:" + weightDelay + ", energy weight:" + weightEnergy + ", power weight:" + weightPower);
         }
         
-        this.weightDelay /= delayEstimator.run();
-        this.weightEnergy /= energyEstimator.run();
-        this.weightPower /= powerEstimator.run();
+        // normalize
+        double delayEst = delayEstimator.run();
+        double energyEst = energyEstimator.run();
+        double powerEst = powerEstimator.run();
+        this.weightDelay = this.weightDelay * energyEst * powerEst;
+        this.weightEnergy = this.weightEnergy * delayEst * powerEst;
+        this.weightPower = this.weightPower * delayEst * energyEst;
         
+        
+//        this.weightDelay /= delayEstimator.run();
+//        this.weightEnergy /= energyEstimator.run();
+//        this.weightPower /= powerEstimator.run();
+//        
 //        logger.info("SA: using delay weight:" + weightDelay + ", energy weight:" + weightEnergy + ", power weight:" + weightPower);
     }
 
