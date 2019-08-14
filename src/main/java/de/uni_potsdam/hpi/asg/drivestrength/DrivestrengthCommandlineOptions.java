@@ -54,9 +54,6 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     @Option(name = "-optimizePowerFactor", metaVar = "<optimizePowerFactor>", usage ="Factor for Power in SA Optimizer (integer)", required = false)
     private int optimizePowerFactor = 0;
     
-    @Option(name = "-optimizeSAAlgorithm", metaVar = "<algorithm>", usage ="SAD=delay, SAP=power, SAE=energy", required = false)
-    private String optimizeSAAlgorithm = null;
-    
     @Option(name = "-out", metaVar="<outputNetlistFile>", usage="Output file name for the optimized verilog netlist", required = false)
     private File outputNetlistFile;
 
@@ -150,9 +147,5 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     
     public int getOptimizePowerFactor() {
         return optimizePowerFactor;
-    }
-    
-    public String getOptimizeSAAlgorithm() {
-        return optimizeSAAlgorithm;
     }
 }

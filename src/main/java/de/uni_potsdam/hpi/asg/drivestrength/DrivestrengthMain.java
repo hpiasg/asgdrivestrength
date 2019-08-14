@@ -176,7 +176,7 @@ public class DrivestrengthMain {
             new FanoutOptimizer(inlinedNetlist).run();
             break;
         case "SA":
-            new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, options.getOptimizeDelayFactor(), options.getOptimizeEnergyFactor(), options.getOptimizePowerFactor(), options.getOptimizeSAAlgorithm()).run();
+            new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, options.getOptimizeDelayFactor(), options.getOptimizeEnergyFactor(), options.getOptimizePowerFactor()).run();
             break;
         default:
             throw new Error("Specified optimizer " + options.getOptimizer() + " does not exist");
