@@ -8,3 +8,5 @@ workingdir
 ${sys:logFilename}
 drivestrength.log
 src/test/java/de/uni_potsdam/hpi/asg/drivestrength/Drivestrength*MainTest.java
+.factorypath
+.vscode
