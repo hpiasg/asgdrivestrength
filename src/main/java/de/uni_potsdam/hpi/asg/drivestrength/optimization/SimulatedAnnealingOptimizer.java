@@ -18,11 +18,11 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
     private Cell previousSizeForUndo;
     private SACostFunction costFunction;
 
-    public SimulatedAnnealingOptimizer(Netlist netlist, boolean jumpNotStep, int roundsPerCell, int percentageEnergy) {
+    public SimulatedAnnealingOptimizer(Netlist netlist, boolean jumpNotStep, int roundsPerCell, int factorDelay, int factorEnergy, int factorPower) {
         super(netlist);
         this.jumpInMutation = jumpNotStep;
         this.randomGenerator = new Random();
-        this.costFunction = new SACostFunction(netlist, percentageEnergy);
+        this.costFunction = new SACostFunction(netlist, factorDelay, factorEnergy, factorPower);
         this.calibrate();
         this.selectParameters(roundsPerCell);
     }
@@ -41,18 +41,22 @@ public class SimulatedAnnealingOptimizer extends AbstractDriveOptimizer {
     }
 
     private void calibrate() {
-        double beforeEnergy = this.costFunction.estimateEnergy();
         double beforeDelay = this.costFunction.estimateDelay();
-        double sumDeltaEnergy = 0;
+        double beforeEnergy = this.costFunction.estimateEnergy();
+        double beforePower = this.costFunction.estimatePower();
+        
         double sumDeltaDelay = 0;
+        double sumDeltaEnergy = 0;
+        double sumDeltaPower = 0;
         int calibrationIterations = 1000;
         for (int i = 0; i < calibrationIterations; i++) {
             performRandomStep();
-            sumDeltaEnergy += Math.abs(this.costFunction.estimateEnergy() - beforeEnergy);
             sumDeltaDelay += Math.abs(this.costFunction.estimateDelay() - beforeDelay);
+            sumDeltaEnergy += Math.abs(this.costFunction.estimateEnergy() - beforeEnergy);
+            sumDeltaPower += Math.abs(this.costFunction.estimatePower() - beforePower);
             undoRandomStep();
         }
-        this.costFunction.setCalibrationDeltas(sumDeltaEnergy / calibrationIterations, sumDeltaDelay / calibrationIterations);
+        this.costFunction.setCalibrationDeltas(sumDeltaDelay / calibrationIterations, sumDeltaEnergy / calibrationIterations, sumDeltaPower / calibrationIterations);
     }
 
     @Override

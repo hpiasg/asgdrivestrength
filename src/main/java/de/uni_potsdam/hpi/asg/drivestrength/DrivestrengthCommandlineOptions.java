@@ -45,9 +45,15 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     @Option(name = "-optimizer", metaVar = "<optimizer>", usage ="Selected Optimizer. Values are SA (default), NOP, TOP, BOT, SFL, ESE, NSE, EDM (only for all-single-stage cells), and FO", required = false)
     private String optimizer = "SA";
 
-    @Option(name = "-optimizeEnergyPercentage", metaVar = "<optimizeEnergyPercentage>", usage ="Percentage for Energy in SA Optimizer (0: Minimize only Delay, 100: Minimize only Energy)", required = false)
-    private int optimizeEnergyPercentage = 0;
-
+//    @Option(name = "-optimizeEnergyPercentage", metaVar = "<optimizeEnergyPercentage>", usage ="Percentage for Energy in SA Optimizer (0: Minimize only Delay, 100: Minimize only Energy)", required = false)
+//    private int optimizeEnergyPercentage = 0;
+    @Option(name = "-optimizeDelayFactor", metaVar = "<optimizeDelayFactor>", usage ="Factor for Delay in SA Optimizer (integer)", required = false)
+    private int optimizeDelayFactor = 0;
+    @Option(name = "-optimizeEnergyFactor", metaVar = "<optimizeEnergyFactor>", usage ="Factor for Energy in SA Optimizer (integer)", required = false)
+    private int optimizeEnergyFactor = 0;
+    @Option(name = "-optimizePowerFactor", metaVar = "<optimizePowerFactor>", usage ="Factor for Power in SA Optimizer (integer)", required = false)
+    private int optimizePowerFactor = 0;
+    
     @Option(name = "-out", metaVar="<outputNetlistFile>", usage="Output file name for the optimized verilog netlist", required = false)
     private File outputNetlistFile;
 
@@ -91,9 +97,9 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     public File getRemoteConfigFile() {
         return remoteConfigFile;
     }
-    public int getOptimizeEnergyPercentage() {
-        return optimizeEnergyPercentage;
-    }
+//    public int getOptimizeEnergyPercentage() {
+//        return optimizeEnergyPercentage;
+//    }
 
     public File getOutputNetlistFile() {
         return outputNetlistFile;
@@ -129,5 +135,17 @@ public class DrivestrengthCommandlineOptions extends CommandlineOptions {
     
     public boolean isSkipFlattener() {
         return skipFlattener;
+    }
+    
+    public int getOptimizeDelayFactor() {
+        return optimizeDelayFactor;
+    }
+    
+    public int getOptimizeEnergyFactor() {
+        return optimizeEnergyFactor;
+    }
+    
+    public int getOptimizePowerFactor() {
+        return optimizePowerFactor;
     }
 }
