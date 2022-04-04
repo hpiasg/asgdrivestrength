@@ -19,6 +19,7 @@ import de.uni_potsdam.hpi.asg.drivestrength.netlist.DelayEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.EnergyEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.LoadGraphExporter;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.Netlist;
+import de.uni_potsdam.hpi.asg.drivestrength.netlist.PowerEstimator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.InputDrivenAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.LoadGraphAnnotator;
 import de.uni_potsdam.hpi.asg.drivestrength.netlist.annotating.PredecessorAnnotator;
@@ -99,7 +100,9 @@ public class DrivestrengthMain {
         boolean replaceBySingleStageCells = false; //Will lead to non-functional netlist, exists just to analyze our algorithm behavior
         Netlist netlist = new VerilogParser(options.getNetlistFile(), cellLibrary, replaceBySingleStageCells).createNetlist();
 
-        new NetlistFlattener(netlist).run();
+        if(!options.isSkipFlattener()) {
+            new NetlistFlattener(netlist).run();
+        }
         Netlist inlinedNetlist = new NetlistInliner(netlist).run();
         new NetlistBundleSplitter(inlinedNetlist).run();
         new NetlistAssignCleaner(inlinedNetlist).run();
@@ -109,6 +112,7 @@ public class DrivestrengthMain {
 
         new DelayEstimator(inlinedNetlist, false, false).print();
         new EnergyEstimator(inlinedNetlist, false).print();
+        new PowerEstimator(inlinedNetlist, false).print();
 
 //        new BruteForceRunner(inlinedNetlist).run();
 
@@ -118,7 +122,8 @@ public class DrivestrengthMain {
         boolean estimateWithTheoreticalLoad = false;
         new DelayEstimator(inlinedNetlist, estimateWithTheoreticalLoad, false).print();
         new EnergyEstimator(inlinedNetlist, false).print();
-
+        new PowerEstimator(inlinedNetlist, false).print();
+        
         writeLoadGraph(inlinedNetlist);
         writeOptimizedNetlistToFile(netlist);
         writeConstraintFile(netlist);
@@ -171,7 +176,7 @@ public class DrivestrengthMain {
             new FanoutOptimizer(inlinedNetlist).run();
             break;
         case "SA":
-            new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, options.getOptimizeEnergyPercentage()).run();
+            new SimulatedAnnealingOptimizer(inlinedNetlist, false, 1000, options.getOptimizeDelayFactor(), options.getOptimizeEnergyFactor(), options.getOptimizePowerFactor()).run();
             break;
         default:
             throw new Error("Specified optimizer " + options.getOptimizer() + " does not exist");

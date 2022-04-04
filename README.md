@@ -51,7 +51,10 @@ The command will print the sized netlist on the console. By setting the `-out ou
 
 `-optimizer <optimizer>`
 
-* SA  (default) `-optimizeEnergyPercentage` : Simulated Annealing optimizer, minimizing a locally-estimated cost function comprising speed and energy consumption (use values from 0 to 100 in the parameter to control how much to optimize energy)
+* SA  (default) : Simulated Annealing optimizer, minimizing a locally-estimated cost function comprising speed, power and energy consumption
+	* `-optimizeDelayFactor <val>`: Factor for optimisation towards delay
+	* `-optimizeEnergyFactor <val>`: Factor for optimisation towards energy consumption
+	* `-optimizePowerFactor <val>`: Factor for optimisation towards power consumption
 * NOP : No optimizer, use default drive strengths (fanout factor 1)
 * TOP : Use largest-available size for each cell
 * BOT : Use smallest-available size for each cell
@@ -69,7 +72,7 @@ The command will print the sized netlist on the console. By setting the `-out ou
 
 ### Build instructions ###
 
-To build ASGdrivestrength, Apache Maven v3 (or later) and the Java Development Kit (JDK) v1.8 (or later) are required.
+To build ASGdrivestrength, Apache Maven v3.1.1 (or later) and the Java Development Kit (JDK) v1.8 (or later) are required.
 
-1. Build [ASGcommon](https://github.com/hpiasg/asgcommon)
+1. Build [ASGcommon v3](https://github.com/hpiasg/asgcommon/tree/main-v3)
 2. Execute `mvn clean install -DskipTests`

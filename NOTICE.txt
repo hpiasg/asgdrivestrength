@@ -1,5 +1,5 @@
-ASGdrivestrength v1.0
-Copyright (C) 2016-2021 Florian Meinel
+ASGdrivestrength v1.1.0
+Copyright (C) 2016-2022 Florian Meinel, Hasso-Plattner-Institut für Digital Engineering gGmbH
 
 This software is licensed under the GNU GENERAL PUBLIC LICENSE Version 3 (http://www.fsf.org/licensing/licenses/gpl-3.0.html) ("GPL") to all third parties and that license, as required by the GPL, is included in the LICENSE.txt file.
 
@@ -10,9 +10,9 @@ http://commons.apache.org/proper/commons-math/
 Copyright 2001-2017 The Apache Software Foundation
 Licensed under the Apache License, Version 2.0
 
-Apache log4j(TM) v2.15
+Apache log4j(TM) v2.17
 http://logging.apache.org/log4j/2.x/
-Copyright (C) 1999-2021 Apache Software Foundation
+Copyright (C) 1999-2022 Apache Software Foundation
 Licensed under Apache License, Version 2.0
 
 args4j v2.33
@@ -22,12 +22,12 @@ Licensed under the MIT license
 
 ASGcommon v3.0
 https://github.com/hpiasg/asgcommon
-Copyright 2004-2017 Universitaet Augsburg, Hasso-Plattner-Institut fuer Softwaresystemtechnik GmbH
+Copyright 2004-2022 Universitaet Augsburg, Hasso-Plattner-Institut fuer Softwaresystemtechnik GmbH
 Licensed under the GNU General Public License Version 3
 
-Gson v2.8.0
+Gson v2.9.0
 https://github.com/google/gson
-Copyright 2008-2017 Google Inc.
+Copyright 2008-2022 Google Inc.
 Licensed under the Apache License 2.0
 
 JUnit v4.12

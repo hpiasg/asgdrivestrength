@@ -122,9 +122,9 @@ public class BenchmarkRunner {
         netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
         optimizers.put("BOT", new AllSmallestOptimizer(netlistCopy));
         netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
-        optimizers.put("SA-D", new SimulatedAnnealingOptimizer(netlistCopy, false, 1000, 0));
+        optimizers.put("SA-D", new SimulatedAnnealingOptimizer(netlistCopy, false, 1000, 1, 0, 0));
         netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
-        optimizers.put("SA-E", new SimulatedAnnealingOptimizer(netlistCopy, false, 1000, 100));
+        optimizers.put("SA-E", new SimulatedAnnealingOptimizer(netlistCopy, false, 1000, 0, 1, 0));
         netlistCopy = copyAndReAnnotateNetlist(netlist, outputC, inputDrivenMaxCIn);
         optimizers.put("FO", new FanoutOptimizer(netlistCopy));
         if (netlist.isAllSingleStage()) {
