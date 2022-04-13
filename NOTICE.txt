@@ -1,4 +1,4 @@
-ASGdrivestrength v1.1.0
+ASGdrivestrength v1.1.1
 Copyright (C) 2016-2022 Florian Meinel, Hasso-Plattner-Institut für Digital Engineering gGmbH
 
 This software is licensed under the GNU GENERAL PUBLIC LICENSE Version 3 (http://www.fsf.org/licensing/licenses/gpl-3.0.html) ("GPL") to all third parties and that license, as required by the GPL, is included in the LICENSE.txt file.
@@ -20,7 +20,7 @@ http://args4j.kohsuke.org/
 Copyright (C) 2003-2016 Kohsuke Kawaguchi
 Licensed under the MIT license
 
-ASGcommon v3.0
+ASGcommon v3.0.2
 https://github.com/hpiasg/asgcommon
 Copyright 2004-2022 Universitaet Augsburg, Hasso-Plattner-Institut fuer Softwaresystemtechnik GmbH
 Licensed under the GNU General Public License Version 3
@@ -30,7 +30,7 @@ https://github.com/google/gson
 Copyright 2008-2022 Google Inc.
 Licensed under the Apache License 2.0
 
-JUnit v4.12
+JUnit v4.13.1
 http://junit.org/
-Copyright (C) 2002-2017 JUnit
+Copyright (C) 2002-2020 JUnit
 Licensed under Common Public License Version 1.0
