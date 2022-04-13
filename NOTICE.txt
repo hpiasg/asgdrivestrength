@@ -30,7 +30,7 @@ https://github.com/google/gson
 Copyright 2008-2022 Google Inc.
 Licensed under the Apache License 2.0
 
-JUnit v4.12
+JUnit v4.13.1
 http://junit.org/
-Copyright (C) 2002-2017 JUnit
+Copyright (C) 2002-2020 JUnit
 Licensed under Common Public License Version 1.0
