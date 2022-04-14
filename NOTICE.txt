@@ -10,16 +10,6 @@ http://commons.apache.org/proper/commons-math/
 Copyright 2001-2017 The Apache Software Foundation
 Licensed under the Apache License, Version 2.0
 
-Apache log4j(TM) v2.17
-http://logging.apache.org/log4j/2.x/
-Copyright (C) 1999-2022 Apache Software Foundation
-Licensed under Apache License, Version 2.0
-
-args4j v2.33
-http://args4j.kohsuke.org/
-Copyright (C) 2003-2016 Kohsuke Kawaguchi
-Licensed under the MIT license
-
 ASGcommon v3.0.2
 https://github.com/hpiasg/asgcommon
 Copyright 2004-2022 Universitaet Augsburg, Hasso-Plattner-Institut fuer Softwaresystemtechnik GmbH
